@@ -27,3 +27,10 @@
 *.exe
 *.out
 *.app
+
+#User Custom
+*VC.VC.opendb
+*.VC.db
+*.vcxproj
+*.vcxproj.filters
+WSSockServer/ipch/
