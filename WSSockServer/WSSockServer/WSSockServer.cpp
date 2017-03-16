@@ -6,6 +6,8 @@
 
 int main()
 {
+	CIOCP* _iocp = new CIOCP;
+	_iocp->InitServer();
     return 0;
 }
 

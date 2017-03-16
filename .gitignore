@@ -34,3 +34,4 @@
 *.vcxproj
 *.vcxproj.filters
 WSSockServer/ipch/
+WSSockServer/WSSockServer/Debug
