@@ -4,6 +4,7 @@
 
 CIOCP::CIOCP()
 {
+	m_sqlmanager = new CSqlManager;
 }
 
 
@@ -19,11 +20,15 @@ bool CIOCP::InitServer()
 		std::cout << "WSAStartup Error" << std::endl;
 		return false;
 	}
+
+	m_sqlmanager->InitConnection();
+	
+	return true;
 }
 
 void CIOCP::Update()
 {
-	while (1);
+	while (1) { Sleep(1000); }
 }
 
 void CIOCP::CloseServer()
