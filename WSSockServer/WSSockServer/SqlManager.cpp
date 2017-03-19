@@ -12,7 +12,7 @@ CSqlManager::~CSqlManager()
 {
 }
 
-bool CSqlManager::InitConnection()
+bool CSqlManager::InitSQLManager()
 {
 	m_connection = mysql_real_connect(
 		&m_conn, 

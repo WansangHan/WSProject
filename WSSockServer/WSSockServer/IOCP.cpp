@@ -4,7 +4,6 @@
 
 CIOCP::CIOCP()
 {
-	m_sqlmanager = new CSqlManager;
 }
 
 
@@ -21,7 +20,7 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
-	m_sqlmanager->InitConnection();
+	CLogManager::getInstance().InitLogManager();
 	
 	return true;
 }

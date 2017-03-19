@@ -11,6 +11,6 @@ class CSqlManager
 public:
 	CSqlManager();
 	~CSqlManager();
-	bool InitConnection();
+	bool InitSQLManager();
 };
 
