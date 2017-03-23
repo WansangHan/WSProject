@@ -21,3 +21,9 @@ bool CLogManager::InitLogManager()
 
 	return true;
 }
+
+bool CLogManager::WriteLogMessage(char * _message, char * _level)
+{
+	m_sqlmanager->SendLogMessage(_message, _level);
+	return false;
+}

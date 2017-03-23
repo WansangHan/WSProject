@@ -19,5 +19,6 @@ public:
 	}
 	~CLogManager();
 	bool InitLogManager();
+	bool WriteLogMessage(char* _message, char* _level);
 };
 

@@ -3,6 +3,7 @@
 #include <my_global.h>
 #include <mysql.h>
 #include <iostream>
+#include <stdio.h>
 
 class CSqlManager
 {
@@ -12,5 +13,6 @@ public:
 	CSqlManager();
 	~CSqlManager();
 	bool InitSQLManager();
+	bool SendLogMessage(char* _message, char* _level);
 };
 

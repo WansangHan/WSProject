@@ -14,13 +14,14 @@ CIOCP::~CIOCP()
 
 bool CIOCP::InitServer()
 {
+	CLogManager::getInstance().InitLogManager();
+
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsaData) != 0)
 	{
-		std::cout << "WSAStartup Error" << std::endl;
+		CLogManager::getInstance().WriteLogMessage("WSAStartup Error", "ERROR");
 		return false;
 	}
 
-	CLogManager::getInstance().InitLogManager();
 	
 	return true;
 }
