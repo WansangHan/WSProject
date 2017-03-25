@@ -34,6 +34,8 @@ bool CFileManager::WriteFileLog(char * _message, char * _level)
 
 	fclose(file);
 
+	std::cout << logg << std::endl;
+
 	delete[] logg;
 	delete[] curDate;
 	return false;
