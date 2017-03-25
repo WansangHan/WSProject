@@ -18,7 +18,7 @@ bool CIOCP::InitServer()
 
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsaData) != 0)
 	{
-		CLogManager::getInstance().WriteLogMessage("WSAStartup Error", "ERROR");
+		CLogManager::getInstance().WriteLogMessage("WSAStartup Error", "ERROR", false);
 		return false;
 	}
 

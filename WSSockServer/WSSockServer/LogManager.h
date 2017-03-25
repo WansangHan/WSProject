@@ -1,5 +1,6 @@
 #pragma once
 #include "SqlManager.h"
+#include "FileManager.h"
 #include <memory>
 #include <thread>
 #include <mutex>
@@ -9,6 +10,7 @@ class CLogManager
 	static std::once_flag m_once;
 
 	CSqlManager* m_sqlmanager;
+	CFileManager* m_filemanager;
 
 	CLogManager();
 public:
@@ -19,6 +21,6 @@ public:
 	}
 	~CLogManager();
 	bool InitLogManager();
-	bool WriteLogMessage(char* _message, char* _level);
+	bool WriteLogMessage(char* _message, char* _level, bool _sendsql);
 };
 
