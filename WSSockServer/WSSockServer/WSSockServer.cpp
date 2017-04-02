@@ -2,13 +2,20 @@
 //
 
 #include "stdafx.h"
+#ifdef IOCP_SERVER
 #include "IOCP.h"
+#else
+#endif
 
 int main()
 {
-	CIOCP* _iocp = new CIOCP;
-	if (_iocp->InitServer())
-		_iocp->Update();
+#ifdef IOCP_SERVER
+	CIOCP* _iomodel = new CIOCP;
+	if (_iomodel->InitServer())
+		_iomodel->Update();
+#else
+	printf("Epoll_Server!!\n");
+#endif
     return 0;
 }
 
