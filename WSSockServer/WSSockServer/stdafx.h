@@ -17,6 +17,7 @@
 #else
 #endif
 
+#include <memory.h>
 #include <stdio.h>
 #include <time.h>
 
