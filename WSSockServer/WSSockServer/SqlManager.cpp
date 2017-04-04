@@ -35,11 +35,11 @@ bool CSqlManager::SendLogMessage(char * _message, char * _level)
 #ifdef IOCP_SERVER
 	sprintf_s(query, 53 + strlen(_message) + strlen(_level),
 		"SELECT INSERT_LOG_MESSAGE('%s', '%s', '%s') FROM DUAL;",
-		SERVER_CATE, _message, _level);
+		SERVER_CATE, _level, _message);
 #else
 	sprintf(query,
 		"SELECT INSERT_LOG_MESSAGE('%s', '%s', '%s') FROM DUAL;",
-		SERVER_CATE, _message, _level);
+		SERVER_CATE, _level, _message);
 #endif
 
 	MYSQL_RES *sql_result;
