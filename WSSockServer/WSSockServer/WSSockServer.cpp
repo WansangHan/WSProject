@@ -11,12 +11,13 @@
 int main()
 {
 #ifdef IOCP_SERVER
-	CIOCP* _iomodel = new CIOCP;
+	if (CIOCP::getInstance().InitServer())
+		CIOCP::getInstance().Update();
 #else
-	CEPOLL* _iomodel = new CEPOLL;
+	if (CEPOLL::getInstance().InitServer())
+		CEPOLL::getInstance().Update();
 #endif
-	if (_iomodel->InitServer())
-		_iomodel->Update();
+	
     return 0;
 }
 

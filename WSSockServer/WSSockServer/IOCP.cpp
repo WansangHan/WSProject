@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "IOCP.h"
 
+std::unique_ptr<CIOCP> CIOCP::m_inst;
+std::once_flag CIOCP::m_once;
 
 CIOCP::CIOCP()
 {

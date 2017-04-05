@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "EPOLL.h"
 
+std::unique_ptr<CEPOLL> CEPOLL::m_inst;
+std::once_flag CEPOLL::m_once;
 
 CEPOLL::CEPOLL()
 {
