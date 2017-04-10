@@ -29,7 +29,7 @@ bool CSqlManager::InitSQLManager()
 	return true;
 }
 
-bool CSqlManager::SendLogMessage(char * _message, char * _level)
+bool CSqlManager::SendLogMessage(const char * _message, char * _level)
 {
 	char* query = new char[53 + strlen(_message) + strlen(_level)];
 #ifdef IOCP_SERVER

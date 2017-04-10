@@ -12,25 +12,29 @@ CFileManager::~CFileManager()
 }
 
 
-bool CFileManager::WriteFileLog(char * _message, char * _level)
+bool CFileManager::WriteFileLog(const char * _message, char * _level)
 {
 	char* curDate = new char[20];
 	currentDateTime(curDate);
-	
-	char fileName[20] = "logs/";
-	char filetail[5] = ".txt";
-	memcpy(fileName + 5, curDate, 10);
+	char* fileDir = new char[20];
+	char* fileName = new char[11];
+	memcpy(fileName, curDate, 10);
+	fileName[10] = '\0';
 #ifdef IOCP_SERVER
-	strcat_s(fileName, filetail);
+	sprintf_s(fileDir, 20,
+		"logs/%s.txt",
+		fileName);
 #else
-	strcat(fileName, filetail);
+	sprintf(fileDir,
+		"logs/%s.txt",
+		fileName);
 #endif
 	
 	FILE* file;
 #ifdef IOCP_SERVER
-	fopen_s(&file, fileName, "a");
+	fopen_s(&file, fileDir, "a");
 #else
-	file = fopen(fileName, "a");
+	file = fopen(fileDir, "a");
 #endif
 	
 	char* logg = new char[6 + strlen(_message) + strlen(_level) + strlen(curDate)];
@@ -49,6 +53,8 @@ bool CFileManager::WriteFileLog(char * _message, char * _level)
 	std::cout << logg << std::endl;
 
 	delete[] logg;
+	delete[] fileDir;
+	delete[] fileName;
 	delete[] curDate;
 	return false;
 }

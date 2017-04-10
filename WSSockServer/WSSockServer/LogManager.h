@@ -21,6 +21,7 @@ public:
 	}
 	~CLogManager();
 	bool InitLogManager();
-	bool WriteLogMessage(char* _message, char* _level, bool _sendsql);
+	bool WriteLogMessage(char* _level, bool _sendsql, const char* _message, ...);
+	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
 };
 

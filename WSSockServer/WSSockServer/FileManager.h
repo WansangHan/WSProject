@@ -5,6 +5,6 @@ public:
 	CFileManager();
 	~CFileManager();
 
-	bool WriteFileLog(char* _message, char* _level);
+	bool WriteFileLog(const char* _message, char* _level);
 };
 

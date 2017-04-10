@@ -12,6 +12,6 @@ public:
 	CSqlManager();
 	~CSqlManager();
 	bool InitSQLManager();
-	bool SendLogMessage(char* _message, char* _level);
+	bool SendLogMessage(const char* _message, char* _level);
 };
 
