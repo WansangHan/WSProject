@@ -21,5 +21,4 @@ void currentDateTime(char* curTime)
 	strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
 	memcpy(curTime, buf, 20);
 	curTime[19] = '\0';
-	std::cout << curTime << std::endl;
 }

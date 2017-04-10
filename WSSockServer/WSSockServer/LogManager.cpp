@@ -34,16 +34,13 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 	len = vsnprintf(NULL, 0, _message, lpStart) + 1;
 	va_end(lpStart);
 #endif
-	std::cout << "len : " << len << std::endl;
 	char* resMessage = new char[len * sizeof(char)];
 #ifdef IOCP_SERVER
 	vsprintf_s(resMessage, len, _message, lpStart);
 #else
 	va_start(lpStart, _message);
-	std::cout << "vsprintf : " << vsprintf(resMessage, _message, lpStart) << std::endl;
+	vsprintf(resMessage, _message, lpStart);
 #endif
-
-	std::cout << "resMessage : " << resMessage << std::endl;
 
 	va_end(lpStart);
 
