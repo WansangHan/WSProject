@@ -16,7 +16,7 @@ CEPOLL::~CEPOLL()
 bool CEPOLL::InitServer()
 {
 	CLogManager::getInstance().InitLogManager();
-	CLogManager::getInstance().WriteLogMessage("ERROR", true, "WSAStartup Error%d", 10);
+
 	return true;
 }
 
