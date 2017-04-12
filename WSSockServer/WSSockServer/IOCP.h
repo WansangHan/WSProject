@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "LogManager.h"
+#include "TCPSocket.h"
 
 class CIOCP
 {
@@ -11,6 +12,10 @@ class CIOCP
 	static std::once_flag m_once;
 
 	WSADATA m_wsaData;
+	HANDLE m_CompPort;
+
+	CTCPSocket* m_listenTcpSocket;
+	sockaddr_in m_listenSocketAddr;
 
 	CIOCP();
 public:

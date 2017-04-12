@@ -5,7 +5,7 @@
 
 #pragma once
 
-//#define IOCP_SERVER
+#define IOCP_SERVER
 
 #ifdef IOCP_SERVER
 #pragma comment(lib, "Ws2_32.lib")

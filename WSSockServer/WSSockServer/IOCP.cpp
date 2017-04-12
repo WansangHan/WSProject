@@ -24,6 +24,40 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
+	m_CompPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+	if (m_CompPort == NULL)
+	{
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CreateIoCompletionPort() Error : %d", GetLastError());
+		return false;
+	}
+
+	m_listenTcpSocket = new CTCPSocket();
+
+	CreateIoCompletionPort((HANDLE)m_listenTcpSocket->GetSOCKET(), m_CompPort, 0, 0);
+
+	memset(&m_listenSocketAddr, 0, sizeof(m_listenSocketAddr));
+	m_listenSocketAddr.sin_family = AF_INET;
+	m_listenSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	m_listenSocketAddr.sin_port = htons(9999);
+
+	if (::bind(m_listenTcpSocket->GetSOCKET(), (SOCKADDR*)&m_listenSocketAddr, sizeof(m_listenSocketAddr)) == SOCKET_ERROR)
+	{
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "TCP Bind() Error : %d", WSAGetLastError());
+		return false;
+	}
+
+	int enable = 0;
+	if (setsockopt(m_listenTcpSocket->GetSOCKET(), SOL_SOCKET, SO_CONDITIONAL_ACCEPT, (const char*)&enable, sizeof(int)) == SOCKET_ERROR)
+	{
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "setsockopt SO_CONDITIONAL_ACCEPT Error : %d", WSAGetLastError());
+		return false;
+	}
+
+	if (listen(m_listenTcpSocket->GetSOCKET(), 1000) == SOCKET_ERROR)
+	{
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "Listen() Error : %d", WSAGetLastError());
+		return false;
+	}
 	
 	return true;
 }
@@ -35,5 +69,6 @@ void CIOCP::Update()
 
 void CIOCP::CloseServer()
 {
+	delete m_listenTcpSocket;
 	WSACleanup();
 }
