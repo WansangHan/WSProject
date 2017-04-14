@@ -1,12 +1,8 @@
 #pragma once
-#include <WinSock2.h>
-#include <windows.h>
-#include "LogManager.h"
-class CTCPSocket
+#include "BaseSocket.h"
+class CTCPSocket : public CBaseSocket
 {
-	SOCKET m_socket;
 public:
-
 	CTCPSocket()
 	{
 		m_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -35,7 +31,4 @@ public:
 	{
 		closesocket(m_socket);
 	}
-
-	void SetSOCKET(SOCKET sock) { m_socket = sock; }
-	SOCKET GetSOCKET() { return m_socket; }
 };
