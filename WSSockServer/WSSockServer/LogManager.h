@@ -13,6 +13,8 @@ class CLogManager
 	CFileManager* m_filemanager;
 
 	CLogManager();
+
+	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
 public:
 	static CLogManager& getInstance()
 	{
@@ -22,6 +24,5 @@ public:
 	~CLogManager();
 	bool InitLogManager();
 	bool WriteLogMessage(char* _level, bool _sendsql, const char* _message, ...);
-	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
 };
 
