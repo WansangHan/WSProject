@@ -27,6 +27,8 @@
 #else
 #define SERVER_CATE "EPOL"
 #endif
+#define MAX_SOCKET_BUFFER_SIZE 3472
+#define WORKERTHREAD_NUM 8
 
 void currentDateTime(char* curTime);
 
