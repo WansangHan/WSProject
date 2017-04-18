@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "BattleCity.h"
+#include "GameManager.h"
 
 #define MAX_LOADSTRING 100
 
@@ -122,8 +123,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static CGameManager* gameManager = new CGameManager;
+
     switch (message)
     {
+	case WM_CREATE:
+		gameManager->InitGameManager();
+		break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -150,6 +156,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+		delete gameManager;
         PostQuitMessage(0);
         break;
     default:
