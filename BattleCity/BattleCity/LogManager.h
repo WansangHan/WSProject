@@ -1,5 +1,4 @@
 #pragma once
-#include "SqlManager.h"
 #include "FileManager.h"
 #include <memory>
 #include <thread>
@@ -9,7 +8,6 @@ class CLogManager
 	static std::unique_ptr<CLogManager> m_inst;
 	static std::once_flag m_once;
 
-	CSqlManager* m_sqlmanager;
 	CFileManager* m_filemanager;
 
 	CLogManager();
