@@ -48,3 +48,17 @@ WSSockServer/WSSockServer/linuxBuild/
 BattleCity/ipch/
 BattleCity/BattleCity/Debug
 BattleCity/BattleCity/logs
+BattleCity/.vs/
+
+www/system/
+www/application/language/
+www/application/views/errors/
+www/application/third_party/
+www/application/logs/
+www/application/libraries/
+www/application/hooks/
+www/application/helpers/
+www/application/core/
+www/application/cache/
+www/application/config/
+www/application/.htaccess
