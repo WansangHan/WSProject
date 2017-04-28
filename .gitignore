@@ -46,6 +46,8 @@ WSSockServer/WSSockServer/logs/
 WSSockServer/WSSockServer/linuxBuild/
 
 BattleCity/ipch/
+BattleCity/curl-7.54.0/
+BattleCity/jsoncpp-src-0.5.0/
 BattleCity/BattleCity/Debug
 BattleCity/BattleCity/logs
 BattleCity/.vs/

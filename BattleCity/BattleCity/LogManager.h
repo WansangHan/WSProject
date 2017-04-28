@@ -1,5 +1,6 @@
 #pragma once
 #include "FileManager.h"
+#include "CurlManager.h"
 #include <memory>
 #include <thread>
 #include <mutex>
@@ -9,6 +10,7 @@ class CLogManager
 	static std::once_flag m_once;
 
 	CFileManager* m_filemanager;
+	CCurlManager* m_curlmanager;
 
 	CLogManager();
 
