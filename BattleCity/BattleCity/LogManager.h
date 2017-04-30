@@ -4,6 +4,10 @@
 #include <memory>
 #include <thread>
 #include <mutex>
+
+class CCurlManager;
+class CFileManager;
+
 class CLogManager
 {
 	static std::unique_ptr<CLogManager> m_inst;

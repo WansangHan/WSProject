@@ -3,6 +3,7 @@
 #include <my_global.h>
 #include <mysql.h>
 #include <iostream>
+#include "LogManager.h"
 
 class CSqlManager
 {

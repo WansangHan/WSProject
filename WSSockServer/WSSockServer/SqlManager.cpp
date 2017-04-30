@@ -22,10 +22,9 @@ bool CSqlManager::InitSQLManager()
 
 	if (m_connection == NULL)
 	{
-		std::cout << "Connect Error" << std::endl;
+		CLogManager::getInstance().WriteLogMessage("ERROR", false, "Database Connect Error");
 		return false;
 	}
-	std::cout << "Connect Success" << std::endl;
 	return true;
 }
 
@@ -47,7 +46,7 @@ bool CSqlManager::SendLogMessage(const char * _message, char * _level)
 
 	query_result = mysql_query(m_connection, query);
 	if (query_result != 0)
-		std::cout << "Mysql query error" << std::endl;
+		CLogManager::getInstance().WriteLogMessage("ERROR", false, "Database Query Error");
 
 	sql_result = mysql_store_result(m_connection);
 
