@@ -25,6 +25,8 @@ bool CSqlManager::InitSQLManager()
 		CLogManager::getInstance().WriteLogMessage("ERROR", false, "Database Connect Error");
 		return false;
 	}
+
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "Database Connect Success");
 	return true;
 }
 
