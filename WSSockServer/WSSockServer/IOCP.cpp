@@ -286,11 +286,48 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
+	GUID guidAcceptEx = WSAID_ACCEPTEX;
+	DWORD acceptRecvDwBytes;
+	if (WSAIoctl(
+		m_listenTcpSocket->GetSOCKET(),
+		SIO_GET_EXTENSION_FUNCTION_POINTER,
+		&guidAcceptEx,
+		sizeof(guidAcceptEx),
+		&lpfnAcceptEx,
+		sizeof(lpfnAcceptEx),
+		&acceptRecvDwBytes,
+		NULL,
+		NULL
+	) == SOCKET_ERROR)
+	{
+		std::cout << "WSAIoctl(get AcceptEx) Error: " << WSAGetLastError() << std::endl;
+		return false;
+	}
+
+	GUID GuidGetAcceptExSockaddrs = WSAID_GETACCEPTEXSOCKADDRS;
+	DWORD getAcceptexSockaddrsRecvDwBytes;
+	if (WSAIoctl(
+		m_listenTcpSocket->GetSOCKET(),
+		SIO_GET_EXTENSION_FUNCTION_POINTER,
+		&GuidGetAcceptExSockaddrs,
+		sizeof(GuidGetAcceptExSockaddrs),
+		&lpfnGetAcceptExSockaddrs,
+		sizeof(lpfnGetAcceptExSockaddrs),
+		&getAcceptexSockaddrsRecvDwBytes,
+		NULL,
+		NULL))
+	{
+		std::cout << "WSAIoctl(get GetAcceptExSockaddr) Error: " << WSAGetLastError() << std::endl;
+		return false;
+	}
+
 	GetSocketCallbackThread = new std::thread*[WORKERTHREAD_NUM];
 	for (int i = 0; i < WORKERTHREAD_NUM; i++)
 	{
 		GetSocketCallbackThread[i] = new std::thread([this] {this->WorkerThread(); });
 	}
+
+	PostAccept();
 	
 	return true;
 }

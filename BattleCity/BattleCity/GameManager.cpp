@@ -14,5 +14,6 @@ CGameManager::~CGameManager()
 bool CGameManager::InitGameManager()
 {
 	CLogManager::getInstance().InitLogManager();
+	CNetworkManager::getInstance().InitNetworkManager();
 	return false;
 }
