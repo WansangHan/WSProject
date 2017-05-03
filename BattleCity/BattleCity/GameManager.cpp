@@ -14,7 +14,5 @@ CGameManager::~CGameManager()
 bool CGameManager::InitGameManager()
 {
 	CLogManager::getInstance().InitLogManager();
-
-	CLogManager::getInstance().WriteLogMessage("INFO", true, "Init GameManager");
 	return false;
 }

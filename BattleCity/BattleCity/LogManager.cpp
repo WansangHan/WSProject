@@ -20,6 +20,8 @@ CLogManager::~CLogManager()
 bool CLogManager::InitLogManager()
 {
 	m_curlmanager->InitCurlManager();
+
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "Init LogManager");
 	return true;
 }
 
