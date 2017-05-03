@@ -36,8 +36,6 @@ bool CFileManager::WriteFileLog(const char * _message, char * _level)
 
 	fclose(file);
 
-	std::cout << logg << std::endl;
-
 	delete[] logg;
 	delete[] fileDir;
 	delete[] fileName;
