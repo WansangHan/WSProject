@@ -50,7 +50,7 @@ bool CFileManager::WriteFileLog(const char * _message, char * _level)
 
 	fclose(file);
 
-	std::cout << logg << std::endl;
+	std::cout << logg;
 
 	delete[] logg;
 	delete[] fileDir;

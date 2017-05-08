@@ -6,6 +6,7 @@
 #pragma comment(lib, "wldap32.lib")
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "libcurld.lib")
+#include "LogManager.h"
 class CCurlManager
 {
 	CURL *m_curl;

@@ -45,7 +45,7 @@ bool CCurlManager::SendLogMessage(const char * _message, char * _level)
 
 		if (res != CURLE_OK)
 		{
-			// http error
+			CLogManager::getInstance().WriteLogMessage("ERROR", false, "curl_easy_perform Error : %d", res);
 		}
 
 	}
