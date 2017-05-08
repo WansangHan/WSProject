@@ -10,7 +10,7 @@ class LogWriter_model extends CI_Model {
 
     public function ErrorWriter()
     {
-        $input = $input = json_decode(file_get_contents('php://input'), true);
+        $input = json_decode(file_get_contents('php://input'), true);
 
         $q1 = "
 			SELECT INSERT_LOG_MESSAGE('".$input['cate']."', '".$input['level']."', '".$input['message']."') FROM DUAL
