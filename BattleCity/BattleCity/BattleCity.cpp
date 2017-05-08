@@ -123,12 +123,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static CGameManager* gameManager = new CGameManager;
 
     switch (message)
     {
 	case WM_CREATE:
-		gameManager->InitGameManager();
+		CGameManager::getInstance().InitGameManager();
 		break;
     case WM_COMMAND:
         {
@@ -156,7 +155,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
-		delete gameManager;
         PostQuitMessage(0);
         break;
     default:
