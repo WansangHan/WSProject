@@ -48,7 +48,7 @@ bool CSqlManager::SendLogMessage(const char * _message, char * _level)
 
 	query_result = mysql_query(m_connection, query);
 	if (query_result != 0)
-		CLogManager::getInstance().WriteLogMessage("ERROR", false, "Database Query Error");
+		CLogManager::getInstance().WriteLogMessage("ERROR", false, "Database Query Error : %d %s", query_result, mysql_error(m_connection));
 
 	sql_result = mysql_store_result(m_connection);
 
