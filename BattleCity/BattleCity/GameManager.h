@@ -1,6 +1,12 @@
 #pragma once
+#pragma comment(lib, "libprotobufd")
 #include "LogManager.h"
 #include "NetworkManager.h"
+#include "PacketManager.h"
+#include "SumTest.pb.h"
+
+class CNetWorkManager;
+
 class CGameManager
 {
 	static std::unique_ptr<CGameManager> m_inst;
@@ -15,5 +21,7 @@ public:
 	~CGameManager();
 
 	bool InitGameManager();
+
+	void SumData(char* message);
 };
 

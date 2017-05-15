@@ -225,15 +225,16 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 			RecvBuffer = tempBuf;
 			totalBufSize += socketRemainBuffer;
 			delete[] TempRecvBuffer;
-			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link");
+			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 		}
+		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(ovrlap->m_sock, RecvBuffer, totalBufSize);
 	}
 	else
 	{
 		sockaddr_in adr = ovrlap->m_addr;
 	}
-	delete ovrlap;
 	PostRead(ovrlap->m_sock, isTCP);
+	delete ovrlap;
 }
 
 void CIOCP::ProcessWrite(WriteOverlapped* ovrlap)
@@ -326,6 +327,7 @@ bool CIOCP::InitServer()
 	{
 		GetSocketCallbackThread[i] = new std::thread([this] {this->WorkerThread(); });
 	}
+	CPacketManager::getInstance().InitPacketManager();
 
 	PostAccept();
 	

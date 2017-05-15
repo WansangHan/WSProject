@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "BattleCity.h"
 #include "GameManager.h"
+#include "PacketManager.h"
 
 #define MAX_LOADSTRING 100
 
@@ -155,6 +156,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+		CNetworkManager::getInstance().ExitNetworkManager();
+		CPacketManager::getInstance().ExitPacketManager();
         PostQuitMessage(0);
         break;
     default:

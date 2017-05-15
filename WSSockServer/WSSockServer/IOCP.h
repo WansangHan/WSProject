@@ -1,4 +1,5 @@
 #pragma once
+#pragma comment(lib, "libprotobufd")
 #include <WinSock2.h>
 #include <windows.h>
 #include <iostream>
@@ -7,6 +8,8 @@
 #include "LogManager.h"
 #include "TCPSocket.h"
 #include "UDPSocket.h"
+#include "Lobby.h"
+#include "SumTest.pb.h"
 
 class CIOCP
 {

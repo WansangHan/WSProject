@@ -3,7 +3,15 @@
 #include <WinSock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
+#include <thread>
 #include "LogManager.h"
+#include "GameManager.h"
+#include "PacketManager.h"
+
+class CGameManager;
+class CPacketManager;
+enum SendPacketType;
+
 class CNetworkManager
 {
 	static std::unique_ptr<CNetworkManager> m_inst;
@@ -14,6 +22,9 @@ class CNetworkManager
 	SOCKET m_TCPSocket;
 	sockaddr_in m_TCPSockAddr;
 
+	std::thread* m_RecvThread;
+
+	bool isContinue;
 	CNetworkManager();
 public:
 	static CNetworkManager& getInstance()
@@ -24,5 +35,8 @@ public:
 	~CNetworkManager();
 
 	bool InitNetworkManager();
+	void ExitNetworkManager();
+	void RecvThreadFunction();
+	bool SendToServer(const char* data, int dataSize);
 };
 
