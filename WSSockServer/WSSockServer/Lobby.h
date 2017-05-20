@@ -1,6 +1,10 @@
 #pragma once
 #include "LogManager.h"
+#ifdef IOCP_SERVER
 #include "IOCP.h"
+#else
+#include "EPOLL.h"
+#endif
 #include "PacketManager.h"
 #include "SumTest.pb.h"
 

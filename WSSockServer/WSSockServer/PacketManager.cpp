@@ -15,7 +15,11 @@ void CPacketManager::APPLY_PACKET_TCP()
 		if (!packet_queue_tcp.empty())
 		{
 			PacketInfo* info;
+#ifdef IOCP_SERVER
 			packet_queue_tcp.try_pop(info);
+#else
+			info = packet_queue_tcp.dequeue();
+#endif
 			DEVIDE_PACKET_TYPE_TCP(info);
 			delete info->data;
 			delete info;
@@ -65,7 +69,11 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(CBaseSocket* sock, char * packet, 
 		memcpy(data, packet + curToken, Typesize);
 		PacketInfo* info = new PacketInfo;
 		info->SetVal(sock, data, Typesize);
+#ifdef IOCP_SERVER
 		packet_queue_tcp.push(info);
+#else
+		packet_queue_tcp.enqueue(info);
+#endif
 		curToken += Typesize;
 	}
 }
@@ -78,6 +86,10 @@ void CPacketManager::SendPacketToServer(CBaseSocket* sock, SendPacketType type, 
 	char* packet = new char[ps.dataSize];
 	memcpy(packet, &ps, sizeof(PacketStructure));
 	memcpy(packet + sizeof(PacketStructure), str.c_str(), str.length());
+#ifdef IOCP_SERVER
 	CIOCP::getInstance().PostSend(packet, ps.dataSize, sock, NULL, true);
+#else
+	CEPOLL::getInstance().SendToClient(packet, ps.dataSize, sock, NULL, true);
+#endif
 	delete[] packet;
 }

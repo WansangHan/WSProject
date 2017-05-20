@@ -5,7 +5,11 @@
 #include <map>
 #include <vector>
 #include <functional>
+#ifdef IOCP_SERVER
 #include <concurrent_queue.h>
+#else
+#include "SafeQueue.h"
+#endif
 #include "LogManager.h"
 #include "Lobby.h"
 
@@ -30,7 +34,11 @@ struct PacketInfo
 		data = _data;
 		dataSize = _dataSize;
 	}
+#ifdef IOCP_SERVER
 	PacketInfo() { ZeroMemory(this, sizeof(PacketInfo)); }
+#else
+	PacketInfo() { memset(this, 0, sizeof(PacketInfo)); }
+#endif
 };
 
 #pragma pack(1)
@@ -38,7 +46,11 @@ struct PacketStructure
 {
 	SendPacketType packetType;
 	int dataSize;
+#ifdef IOCP_SERVER
 	PacketStructure() { ZeroMemory(this, sizeof(PacketStructure)); }
+#else
+	PacketStructure() { memset(this, 0, sizeof(PacketStructure)); }
+#endif
 };
 
 class CPacketManager
@@ -53,7 +65,11 @@ class CPacketManager
 	typedef std::function<void(CBaseSocket*, char*)> Function;
 	std::map < RecvPacketType, Function > tcp_function;
 
+#ifdef IOCP_SERVER
 	concurrency::concurrent_queue<PacketInfo*> packet_queue_tcp;
+#else
+	CSafeQueue<PacketInfo*> packet_queue_tcp;
+#endif
 
 	CPacketManager();
 
