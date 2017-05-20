@@ -6,6 +6,14 @@ AND INST_DATE >=
 AND SRVR_CATE = 'IOCP'
 AND LOGG_CONT = 'Database Connect Success');
 
+-- 마지막으로 실행한 EPOLL 서버에서 나온 로그
+SELECT * FROM ERWN_LOGG WHERE 1=1
+AND SRVR_CATE = 'EPOL'
+AND INST_DATE >=
+(SELECT MAX(INST_DATE) FROM ERWN_LOGG WHERE 1=1
+AND SRVR_CATE = 'EPOL'
+AND LOGG_CONT = 'Database Connect Success');
+
 -- 마지막으로 실행한 클라이언트에서 나온 로그
 SELECT * FROM ERWN_LOGG WHERE 1=1
 AND SRVR_CATE = 'CLNT'
