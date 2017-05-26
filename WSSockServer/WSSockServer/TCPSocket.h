@@ -39,6 +39,5 @@ public:
 
 	~CTCPSocket()
 	{
-		closesocket(m_socket);
 	}
 };

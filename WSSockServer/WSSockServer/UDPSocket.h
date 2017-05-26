@@ -41,7 +41,6 @@ public:
 
 	~CUDPSocket()
 	{
-		closesocket(m_socket);
 	}
 };
 

@@ -195,7 +195,7 @@ void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 
 void CIOCP::ProcessDisconnect(DisconnectOverlapped* ovrlap)
 {
-	delete ovrlap->m_sock;
+	ovrlap->m_sock->CloseSocket();
 	delete ovrlap;
 }
 

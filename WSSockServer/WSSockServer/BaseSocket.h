@@ -26,6 +26,11 @@ public:
 	{
 	}
 
+	void CloseSocket()
+	{
+		closesocket(m_socket);
+	}
+
 #ifdef IOCP_SERVER
 	void SetSOCKET(SOCKET sock) { m_socket = sock; }
 	SOCKET GetSOCKET() { return m_socket; }
