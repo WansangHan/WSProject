@@ -301,7 +301,7 @@ bool CIOCP::InitServer()
 		NULL
 	) == SOCKET_ERROR)
 	{
-		std::cout << "WSAIoctl(get AcceptEx) Error: " << WSAGetLastError() << std::endl;
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "WSAIoctl(get AcceptEx) Error: %d", WSAGetLastError());
 		return false;
 	}
 
@@ -318,7 +318,7 @@ bool CIOCP::InitServer()
 		NULL,
 		NULL))
 	{
-		std::cout << "WSAIoctl(get GetAcceptExSockaddr) Error: " << WSAGetLastError() << std::endl;
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "WSAIoctl(get GetAcceptExSockaddr) Error: %d", WSAGetLastError());
 		return false;
 	}
 
