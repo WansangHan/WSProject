@@ -14,31 +14,27 @@ CFileManager::~CFileManager()
 
 bool CFileManager::WriteFileLog(const char * _message, char * _level)
 {
-	char* curDate = new char[20];
-	currentDateTime(curDate);
-	char* fileDir = new char[20];
-	char* fileName = new char[11];
-	memcpy(fileName, curDate, 10);
-	fileName[10] = '\0';
-	sprintf_s(fileDir, 20,
+	std::shared_ptr<char> curDate = std::shared_ptr<char>(new char[20], std::default_delete<char[]>());
+	currentDateTime(curDate.get());
+	std::shared_ptr<char> fileDir = std::shared_ptr<char>(new char[20], std::default_delete<char[]>());
+	std::shared_ptr<char> fileName = std::shared_ptr<char>(new char[11], std::default_delete<char[]>());
+	memcpy(fileName.get(), curDate.get(), 10);
+	fileName.get()[10] = '\0';
+	sprintf_s(fileDir.get(), 20,
 		"logs/%s.txt",
-		fileName);
+		fileName.get());
 	
 	FILE* file;
-	fopen_s(&file, fileDir, "a");
+	fopen_s(&file, fileDir.get(), "a");
 	
-	char* logg = new char[6 + strlen(_message) + strlen(_level) + strlen(curDate)];
-	sprintf_s(logg , 6 + strlen(_message) + strlen(_level) + strlen(curDate),
+	std::shared_ptr<char> logg = std::shared_ptr<char>(new char[6 + strlen(_message) + strlen(_level) + strlen(curDate.get())], std::default_delete<char[]>());
+	sprintf_s(logg.get() , 6 + strlen(_message) + strlen(_level) + strlen(curDate.get()),
 		"%s : %s %s\n",
-		_level, _message, curDate);
+		_level, _message, curDate.get());
 
-	fwrite(logg, 1, 5 + strlen(_message) + strlen(_level) + strlen(curDate), file);
+	fwrite(logg.get(), 1, 5 + strlen(_message) + strlen(_level) + strlen(curDate.get()), file);
 
 	fclose(file);
 
-	delete[] logg;
-	delete[] fileDir;
-	delete[] fileName;
-	delete[] curDate;
 	return false;
 }

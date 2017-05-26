@@ -22,6 +22,6 @@ public:
 	}
 	~CLobby();
 
-	void SumData(CBaseSocket* sock, char* message);
+	void SumData(std::shared_ptr<CBaseSocket> sock, char * message);
 };
 

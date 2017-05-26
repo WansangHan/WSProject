@@ -18,7 +18,7 @@ bool CEPOLL::InitServer()
 {
 	CLogManager::getInstance().InitLogManager();
 
-	m_listenTcpSocket = new CTCPSocket();
+	m_listenTcpSocket = std::make_shared<CTCPSocket>();
 
 	memset(&m_listenSocketAddr, 0, sizeof(m_listenSocketAddr));
 	m_listenSocketAddr.sin_family = AF_INET;
@@ -70,8 +70,8 @@ void CEPOLL::Update()
 			}
 			else
 			{
-				char* buf = new char[MAX_SOCKET_BUFFER_SIZE];
-				int str_len = read(ep_events[i].data.fd, buf, MAX_SOCKET_BUFFER_SIZE);
+				std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+				int str_len = read(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
 				if (str_len == 0)    // close request!
 				{
 					epoll_ctl(
@@ -83,26 +83,23 @@ void CEPOLL::Update()
 				{
 					int socketRemainBuffer = str_len;
 					int totalBufSize = str_len;
-					char* RecvBuffer = buf;
-
 					while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 					{
-						char* tempBuf = new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE];
-						memcpy(tempBuf, RecvBuffer, totalBufSize);
-						char * TempRecvBuffer = new char[MAX_SOCKET_BUFFER_SIZE];
-						socketRemainBuffer = read(ep_events[i].data.fd, TempRecvBuffer, MAX_SOCKET_BUFFER_SIZE);
+						std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+						memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
+						std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+						socketRemainBuffer = read(ep_events[i].data.fd, TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
 						if (socketRemainBuffer == -1)
 						{
 							CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv : -1");
 							break;
 						}
-						memcpy(tempBuf + totalBufSize, TempRecvBuffer, socketRemainBuffer);
+						memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
 						RecvBuffer = tempBuf;
 						totalBufSize += socketRemainBuffer;
-						delete[] TempRecvBuffer;
 						CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 					}
-					CBaseSocket* sock = new CTCPSocket;
+					std::shared_ptr<CBaseSocket> sock = std::make_shared<CTCPSocket>();
 					sock->SetSOCKET(ep_events[i].data.fd);
 
 					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(sock, RecvBuffer, totalBufSize);
@@ -120,9 +117,9 @@ void CEPOLL::CloseServer()
 	close(m_epfd);
 }
 
-bool CEPOLL::SendToClient(void * buf, int len, CBaseSocket* sock, sockaddr_in * soaddr, bool isTCP)
+bool CEPOLL::SendToClient(std::shared_ptr<char> buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in * soaddr, bool isTCP)
 {
-	write(sock->GetSOCKET(), buf, len);
+	write(sock->GetSOCKET(), buf.get(), len);
 
 	return true;
 }

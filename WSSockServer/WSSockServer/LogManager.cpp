@@ -34,19 +34,17 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 	len = vsnprintf(NULL, 0, _message, lpStart) + 1;
 	va_end(lpStart);
 #endif
-	char* resMessage = new char[len * sizeof(char)];
+	std::shared_ptr<char> resMessage = std::shared_ptr<char>(new char[len * sizeof(char)], std::default_delete<char[]>());
 #ifdef IOCP_SERVER
-	vsprintf_s(resMessage, len, _message, lpStart);
+	vsprintf_s(resMessage.get(), len, _message, lpStart);
 #else
 	va_start(lpStart, _message);
-	vsprintf(resMessage, _message, lpStart);
+	vsprintf(resMessage.get(), _message, lpStart);
 #endif
 
 	va_end(lpStart);
 
-	ApplyLogMessage(_level, _sendsql, resMessage);
-
-	delete[] resMessage;
+	ApplyLogMessage(_level, _sendsql, resMessage.get());
 
 	return true;
 }

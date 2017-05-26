@@ -25,10 +25,10 @@ enum RecvPacketType
 
 struct PacketInfo
 {
-	CBaseSocket* sock;
-	char* data;
+	std::shared_ptr<CBaseSocket> sock;
+	std::shared_ptr<char> data;
 	int dataSize;
-	void SetVal(CBaseSocket* _sock, char* _data, int _dataSize)
+	void SetVal(std::shared_ptr<CBaseSocket> _sock, std::shared_ptr<char> _data, int _dataSize)
 	{
 		sock = _sock;
 		data = _data;
@@ -58,17 +58,15 @@ class CPacketManager
 	static std::unique_ptr<CPacketManager> m_inst;
 	static std::once_flag m_once;
 
+	std::unique_ptr<std::thread> th_tcp;
 
-	std::thread* th_tcp;
-
-
-	typedef std::function<void(CBaseSocket*, char*)> Function;
+	typedef std::function<void(std::shared_ptr<CBaseSocket>, char*)> Function;
 	std::map < RecvPacketType, Function > tcp_function;
 
 #ifdef IOCP_SERVER
-	concurrency::concurrent_queue<PacketInfo*> packet_queue_tcp;
+	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
 #else
-	CSafeQueue<PacketInfo*> packet_queue_tcp;
+	CSafeQueue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
 #endif
 
 	CPacketManager();
@@ -87,7 +85,7 @@ public:
 	~CPacketManager();
 
 	void InitPacketManager();
-	void DEVIDE_PACKET_BUNDLE_TCP(CBaseSocket* sock, char* packet, int packetSize);
-	void SendPacketToServer(CBaseSocket* sock, SendPacketType type, std::string str);
+	void DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize);
+	void SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str);
 };
 

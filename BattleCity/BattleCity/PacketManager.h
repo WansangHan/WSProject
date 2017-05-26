@@ -22,9 +22,9 @@ enum SendPacketType
 
 struct PacketInfo
 {
-	char* data;
+	std::shared_ptr<char> data;
 	int dataSize;
-	void SetVal(char* _data, int _dataSize)
+	void SetVal(std::shared_ptr<char> _data, int _dataSize)
 	{
 		data = _data;
 		dataSize = _dataSize;
@@ -46,13 +46,13 @@ class CPacketManager
 	static std::once_flag m_once;
 
 
-	std::thread* th_tcp;
+	std::unique_ptr<std::thread> th_tcp;
 
 
 	typedef std::function<void(char*)> Function;
 	std::map < RecvPacketType, Function > tcp_function;
 
-	concurrency::concurrent_queue<PacketInfo*> packet_queue_tcp;
+	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
 
 	bool isContinue;
 
@@ -60,7 +60,7 @@ class CPacketManager
 
 	void APPLY_PACKET_TCP();
 
-	void DEVIDE_PACKET_TYPE_TCP(PacketInfo* info);
+	void DEVIDE_PACKET_TYPE_TCP(std::shared_ptr<PacketInfo> info);
 
 	void InitFunctionmap();
 public:

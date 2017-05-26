@@ -47,8 +47,8 @@ void CIOCP::WorkerThread()
 
 void CIOCP::PostAccept()
 {
-	CBaseSocket* sock = new CTCPSocket;
 	AcceptOverlapped *acceptOverlapped = new AcceptOverlapped;
+	std::shared_ptr<CBaseSocket> sock = std::make_shared<CTCPSocket>();
 	acceptOverlapped->m_sock = sock;
 
 	if (lpfnAcceptEx(m_listenTcpSocket->GetSOCKET(),
@@ -68,7 +68,7 @@ void CIOCP::PostAccept()
 	}
 }
 
-void CIOCP::PostDisconnect(CBaseSocket* sock)
+void CIOCP::PostDisconnect(std::shared_ptr<CBaseSocket> sock)
 {
 	DisconnectOverlapped* disconnectOverlapped = new DisconnectOverlapped;
 	disconnectOverlapped->m_sock = sock;
@@ -86,7 +86,7 @@ void CIOCP::PostDisconnect(CBaseSocket* sock)
 	}
 }
 
-void CIOCP::PostRead(CBaseSocket* sock, bool isTCP)
+void CIOCP::PostRead(std::shared_ptr<CBaseSocket> sock, bool isTCP)
 {
 	ReadOverlapped* readOverlapped = new ReadOverlapped;
 	readOverlapped->m_isTCP = isTCP;
@@ -121,7 +121,7 @@ void CIOCP::PostRead(CBaseSocket* sock, bool isTCP)
 	}
 }
 
-int CIOCP::PostSend(void* buf, int len, CBaseSocket* sock, sockaddr_in* soaddr, bool isTCP)
+int CIOCP::PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in* soaddr, bool isTCP)
 {
 	WriteOverlapped* writeOverlapped = new WriteOverlapped;
 
@@ -208,23 +208,23 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 	{
 		int socketRemainBuffer = datalen;
 		int totalBufSize = datalen;
-		char* RecvBuffer = ovrlap->m_buffer;
+		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[datalen], std::default_delete<char[]>());
+		memcpy(RecvBuffer.get(), ovrlap->m_buffer, datalen);
 
 		while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 		{
-			char* tempBuf = new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE];
-			memcpy(tempBuf, RecvBuffer, totalBufSize);
-			char * TempRecvBuffer = new char[MAX_SOCKET_BUFFER_SIZE];
-			socketRemainBuffer = recv(ovrlap->m_sock->GetSOCKET(), TempRecvBuffer, MAX_SOCKET_BUFFER_SIZE, NULL);
+			std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+			memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
+			std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+			socketRemainBuffer = recv(ovrlap->m_sock->GetSOCKET(), TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
 			if (socketRemainBuffer == SOCKET_ERROR)
 			{
 				CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv SOCKET_ERROR");
 				break;
 			}
-			memcpy(tempBuf + totalBufSize, TempRecvBuffer, socketRemainBuffer);
+			memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
 			RecvBuffer = tempBuf;
 			totalBufSize += socketRemainBuffer;
-			delete[] TempRecvBuffer;
 			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 		}
 		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(ovrlap->m_sock, RecvBuffer, totalBufSize);
@@ -259,7 +259,8 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
-	m_listenTcpSocket = new CTCPSocket();
+	m_listenTcpSocket = std::make_shared<CTCPSocket>();
+	m_UDPSocket = std::make_shared<CUDPSocket>();
 
 	CreateIoCompletionPort((HANDLE)m_listenTcpSocket->GetSOCKET(), m_CompPort, 0, 0);
 
@@ -347,6 +348,5 @@ void CIOCP::CloseServer()
 	}
 
 	delete[] GetSocketCallbackThread;
-	delete m_listenTcpSocket;
 	WSACleanup();
 }

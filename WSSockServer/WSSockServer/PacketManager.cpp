@@ -14,15 +14,13 @@ void CPacketManager::APPLY_PACKET_TCP()
 	{
 		if (!packet_queue_tcp.empty())
 		{
-			PacketInfo* info;
+			std::shared_ptr<PacketInfo> info;
 #ifdef IOCP_SERVER
 			packet_queue_tcp.try_pop(info);
 #else
 			info = packet_queue_tcp.dequeue();
 #endif
-			DEVIDE_PACKET_TYPE_TCP(info);
-			delete info->data;
-			delete info;
+			DEVIDE_PACKET_TYPE_TCP(info.get());
 		}
 	}
 }
@@ -30,15 +28,14 @@ void CPacketManager::APPLY_PACKET_TCP()
 void CPacketManager::DEVIDE_PACKET_TYPE_TCP(PacketInfo * info)
 {
 	RecvPacketType packetType = RECV_SUM_INT;
-	memcpy(&packetType, info->data, sizeof(RecvPacketType));
+	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
 	auto it = tcp_function.find(packetType);
 	if (it == tcp_function.end()) { CLogManager::getInstance().WriteLogMessage("ERROR", true, "tcp_function.end() : %d", packetType); return; }
 
-	char* protoBuf = new char[MAX_SOCKET_BUFFER_SIZE];
-	memcpy(protoBuf, info->data + sizeof(int) + sizeof(RecvPacketType), info->dataSize - sizeof(int) - sizeof(RecvPacketType));
+	std::shared_ptr<char> protoBuf = std::shared_ptr<char>(new char[info->dataSize - sizeof(int) - sizeof(RecvPacketType)], std::default_delete<char[]>());
+	memcpy(protoBuf.get(), info->data.get() + sizeof(int) + sizeof(RecvPacketType), info->dataSize - sizeof(int) - sizeof(RecvPacketType));
 
-	it->second(info->sock, protoBuf);
-	delete protoBuf;
+	it->second(info->sock, protoBuf.get());
 }
 
 void CPacketManager::InitFunctionmap()
@@ -48,26 +45,25 @@ void CPacketManager::InitFunctionmap()
 
 CPacketManager::~CPacketManager()
 {
-	delete th_tcp;
 }
 
 void CPacketManager::InitPacketManager()
 {
 	InitFunctionmap();
-	th_tcp = new std::thread(&CPacketManager::APPLY_PACKET_TCP, this);
+	th_tcp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_TCP, this));
 }
 
-void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(CBaseSocket* sock, char * packet, int packetSize)
+void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize)
 {
 	int curToken = 0;
 	int Typesize = 0;
 	while (packetSize > curToken)
 	{
 		Typesize = 0;
-		memcpy(&Typesize, packet + curToken + 4, sizeof(int));
-		char* data = new char[MAX_SOCKET_BUFFER_SIZE];
-		memcpy(data, packet + curToken, Typesize);
-		PacketInfo* info = new PacketInfo;
+		memcpy(&Typesize, packet.get() + curToken + 4, sizeof(int));
+		std::shared_ptr<char> data = std::shared_ptr<char>(new char[Typesize], std::default_delete<char[]>());
+		memcpy(data.get(), packet.get() + curToken, Typesize);
+		std::shared_ptr<PacketInfo> info = std::make_shared<PacketInfo>();
 		info->SetVal(sock, data, Typesize);
 #ifdef IOCP_SERVER
 		packet_queue_tcp.push(info);
@@ -78,18 +74,17 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(CBaseSocket* sock, char * packet, 
 	}
 }
 
-void CPacketManager::SendPacketToServer(CBaseSocket* sock, SendPacketType type, std::string str)
+void CPacketManager::SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str)
 {
 	PacketStructure ps;
 	ps.packetType = type;
 	ps.dataSize = str.length() + sizeof(PacketStructure);
-	char* packet = new char[ps.dataSize];
-	memcpy(packet, &ps, sizeof(PacketStructure));
-	memcpy(packet + sizeof(PacketStructure), str.c_str(), str.length());
+	std::shared_ptr<char> packet = std::shared_ptr<char>(new char[ps.dataSize], std::default_delete<char[]>());
+	memcpy(packet.get(), &ps, sizeof(PacketStructure));
+	memcpy(packet.get() + sizeof(PacketStructure), str.c_str(), str.length());
 #ifdef IOCP_SERVER
-	CIOCP::getInstance().PostSend(packet, ps.dataSize, sock, NULL, true);
+	CIOCP::getInstance().PostSend(packet.get(), ps.dataSize, sock, NULL, true);
 #else
 	CEPOLL::getInstance().SendToClient(packet, ps.dataSize, sock, NULL, true);
 #endif
-	delete[] packet;
 }

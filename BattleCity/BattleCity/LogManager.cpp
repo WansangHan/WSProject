@@ -31,14 +31,13 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 	va_list lpStart;
 	va_start(lpStart, _message);
 	len = _vscprintf(_message, lpStart) + 1;
-	char* resMessage = new char[len * sizeof(char)];
-	vsprintf_s(resMessage, len, _message, lpStart);
+	std::shared_ptr<char> resMessage = std::shared_ptr<char>(new char[len * sizeof(char)], std::default_delete<char[]>());
+	vsprintf_s(resMessage.get(), len, _message, lpStart);
 
 	va_end(lpStart);
 
-	ApplyLogMessage(_level, _sendsql, resMessage);
+	ApplyLogMessage(_level, _sendsql, resMessage.get());
 
-	delete[] resMessage;
 
 	return true;
 }

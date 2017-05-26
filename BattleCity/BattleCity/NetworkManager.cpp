@@ -24,6 +24,8 @@ bool CNetworkManager::InitNetworkManager()
 
 	memset(&m_TCPSockAddr, 0, sizeof(m_TCPSockAddr));
 	m_TCPSockAddr.sin_family = AF_INET;
+	//m_TCPSockAddr.sin_addr.s_addr = inet_addr("192.168.127.128");
+	//m_TCPSockAddr.sin_port = htons(22222);
 	m_TCPSockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	m_TCPSockAddr.sin_port = htons(9999);
 
@@ -48,8 +50,8 @@ void CNetworkManager::RecvThreadFunction()
 {
 	while (isContinue)
 	{
-		char* message = new char[MAX_SOCKET_BUFFER_SIZE];
-		int strLen = recv(m_TCPSocket, message, MAX_SOCKET_BUFFER_SIZE, 0);
+		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+		int strLen = recv(m_TCPSocket, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0);
 		if (strLen == 0)
 		{
 			CLogManager::getInstance().WriteLogMessage("ERROR", true, "Server Disconnect!");
@@ -63,34 +65,25 @@ void CNetworkManager::RecvThreadFunction()
 
 		int socketRemainBuffer = strLen;
 		int totalBufSize = strLen;
-		char* RecvBuffer = message;
 
 		while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 		{
-			char* tempBuf = new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE];
-			memcpy(tempBuf, RecvBuffer, totalBufSize);
-			char * TempRecvBuffer = new char[MAX_SOCKET_BUFFER_SIZE];
-			socketRemainBuffer = recv(m_TCPSocket, TempRecvBuffer, MAX_SOCKET_BUFFER_SIZE, NULL);
+			std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+			memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
+			std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+			socketRemainBuffer = recv(m_TCPSocket, TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
 			if (socketRemainBuffer == SOCKET_ERROR)
 			{
 				CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv SOCKET_ERROR");
 				break;
 			}
-			memcpy(tempBuf + totalBufSize, TempRecvBuffer, socketRemainBuffer);
+			memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
 			RecvBuffer = tempBuf;
 			totalBufSize += socketRemainBuffer;
-			delete[] TempRecvBuffer;
 			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 		}
 
-		char* recvData = new char[totalBufSize + 1];
-		memcpy(recvData, RecvBuffer, totalBufSize);
-		recvData[totalBufSize] = '\0';
-
-		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(recvData, totalBufSize);
-
-		delete[] recvData;
-		delete[] message;
+		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(RecvBuffer.get(), totalBufSize);
 	}
 }
 

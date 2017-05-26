@@ -1,4 +1,6 @@
 #pragma once
+#include "LogManager.h"
+
 class CFileManager
 {
 public:

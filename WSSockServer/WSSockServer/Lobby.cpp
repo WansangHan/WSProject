@@ -13,7 +13,7 @@ CLobby::~CLobby()
 {
 }
 
-void CLobby::SumData(CBaseSocket* sock, char * message)
+void CLobby::SumData(std::shared_ptr<CBaseSocket> sock, char * message)
 {
 
 	Test::SumNumber result;

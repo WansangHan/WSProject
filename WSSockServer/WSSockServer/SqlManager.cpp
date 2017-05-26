@@ -32,13 +32,14 @@ bool CSqlManager::InitSQLManager()
 
 bool CSqlManager::SendLogMessage(const char * _message, char * _level)
 {
-	char* query = new char[53 + strlen(_message) + strlen(_level)];
+	std::shared_ptr<char> query = std::shared_ptr<char>(new char[53 + strlen(_message) + strlen(_level)], std::default_delete<char[]>());
+
 #ifdef IOCP_SERVER
-	sprintf_s(query, 53 + strlen(_message) + strlen(_level),
+	sprintf_s(query.get(), 53 + strlen(_message) + strlen(_level),
 		"SELECT INSERT_LOG_MESSAGE('%s', '%s', '%s') FROM DUAL;",
 		SERVER_CATE, _level, _message);
 #else
-	sprintf(query,
+	sprintf(query.get(),
 		"SELECT INSERT_LOG_MESSAGE('%s', '%s', '%s') FROM DUAL;",
 		SERVER_CATE, _level, _message);
 #endif
@@ -46,12 +47,11 @@ bool CSqlManager::SendLogMessage(const char * _message, char * _level)
 	MYSQL_RES *sql_result;
 	int query_result;
 
-	query_result = mysql_query(m_connection, query);
+	query_result = mysql_query(m_connection, query.get());
 	if (query_result != 0)
 		CLogManager::getInstance().WriteLogMessage("ERROR", false, "Database Query Error : %d %s", query_result, mysql_error(m_connection));
 
 	sql_result = mysql_store_result(m_connection);
 
-	delete[] query;
 	return false;
 }

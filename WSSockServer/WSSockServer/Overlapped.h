@@ -12,7 +12,7 @@ enum SocketState
 
 struct Overlapped : public WSAOVERLAPPED
 {
-	CBaseSocket* m_sock;
+	std::shared_ptr<CBaseSocket> m_sock;
 	sockaddr_in m_addr;
 	SocketState m_state;
 	Overlapped() {}

@@ -18,7 +18,7 @@ class CEPOLL
 	epoll_event *ep_events;
 	int m_epfd;
 
-	CBaseSocket* m_listenTcpSocket;
+	std::shared_ptr<CTCPSocket> m_listenTcpSocket;
 	sockaddr_in m_listenSocketAddr;
 
 	CEPOLL();
@@ -34,6 +34,6 @@ public:
 	void Update();
 	void CloseServer();
 
-	bool SendToClient(void* buf, int len, CBaseSocket* sock, sockaddr_in* soaddr, bool isTCP);
+	bool SendToClient(std::shared_ptr<char> buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in* soaddr, bool isTCP);
 };
 

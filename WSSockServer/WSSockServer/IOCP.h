@@ -27,8 +27,8 @@ class CIOCP
 	DWORD ReadRecvFlag;
 	DWORD WritedwFlags;
 
-	CTCPSocket* m_listenTcpSocket;
-	CUDPSocket* m_UDPSocket;
+	std::shared_ptr<CTCPSocket> m_listenTcpSocket;
+	std::shared_ptr<CUDPSocket> m_UDPSocket;
 
 	sockaddr_in m_listenSocketAddr;
 
@@ -47,9 +47,9 @@ public:
 	void WorkerThread();
 
 	void PostAccept();
-	void PostDisconnect(CBaseSocket* sock);
-	void PostRead(CBaseSocket* sock, bool isTCP);
-	int PostSend(void* buf, int len, CBaseSocket* sock, sockaddr_in* soaddr, bool isTCP);
+	void PostDisconnect(std::shared_ptr<CBaseSocket> sock);
+	void PostRead(std::shared_ptr<CBaseSocket> sock, bool isTCP);
+	int PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in* soaddr, bool isTCP);
 
 	void ProcessAccept(AcceptOverlapped* ovrlap);
 	void ProcessDisconnect(DisconnectOverlapped* ovrlap);
