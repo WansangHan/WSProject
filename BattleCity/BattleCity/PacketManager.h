@@ -47,20 +47,22 @@ class CPacketManager
 
 
 	std::unique_ptr<std::thread> th_tcp;
-
+	std::unique_ptr<std::thread> th_udp;
 
 	typedef std::function<void(char*)> Function;
-	std::map < RecvPacketType, Function > tcp_function;
+	std::map < RecvPacketType, Function > map_function;
 
 	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
+	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_udp;
 
 	bool isContinue;
 
 	CPacketManager();
 
 	void APPLY_PACKET_TCP();
+	void APPLY_PACKET_UDP();
 
-	void DEVIDE_PACKET_TYPE_TCP(std::shared_ptr<PacketInfo> info);
+	void DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info);
 
 	void InitFunctionmap();
 public:
@@ -73,8 +75,8 @@ public:
 
 	void InitPacketManager();
 	void ExitPacketManager();
-	void DEVIDE_PACKET_BUNDLE_TCP(char* packet, int packetSize);
+	void DEVIDE_PACKET_BUNDLE(char* packet, int packetSize);
 
-	void SendPacketToServer(SendPacketType type, std::string str);
+	void SendPacketToServer(SendPacketType type, std::string str, bool isTCP);
 };
 

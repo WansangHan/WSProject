@@ -20,9 +20,13 @@ class CNetworkManager
 	WSADATA m_wsaData;
 
 	SOCKET m_TCPSocket;
+	SOCKET m_UDPSocket;
 	sockaddr_in m_TCPSockAddr;
+	sockaddr_in m_UDPSockAddr;
+	sockaddr_in m_ClnSockAddr;
 
-	std::thread* m_RecvThread;
+	std::thread* m_RecvTCPThread;
+	std::thread* m_RecvUDPThread;
 
 	bool isContinue;
 	CNetworkManager();
@@ -36,7 +40,8 @@ public:
 
 	bool InitNetworkManager();
 	void ExitNetworkManager();
-	void RecvThreadFunction();
-	bool SendToServer(const char* data, int dataSize);
+	void RecvTCPThreadFunction();
+	void RecvUDPThreadFunction();
+	bool SendToServer(const char* data, int dataSize, bool isTCP);
 };
 

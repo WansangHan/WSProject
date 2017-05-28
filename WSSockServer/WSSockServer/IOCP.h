@@ -27,11 +27,15 @@ class CIOCP
 	DWORD ReadRecvFlag;
 	DWORD WritedwFlags;
 
-	std::shared_ptr<CTCPSocket> m_listenTcpSocket;
-	std::shared_ptr<CUDPSocket> m_UDPSocket;
+	std::shared_ptr<CTCPSocket> m_listenTCPSocket;
+	std::shared_ptr<CUDPSocket> m_listenUDPSocket;
 
-	sockaddr_in m_listenSocketAddr;
+	sockaddr_in m_listenTCPSocketAddr;
+	sockaddr_in m_listenUDPSocketAddr;
 
+	// 임시 클라이언트 UDP sockaddr
+	sockaddr_in m_clientUDPSockAddr;
+	//
 
 	std::thread** GetSocketCallbackThread;
 

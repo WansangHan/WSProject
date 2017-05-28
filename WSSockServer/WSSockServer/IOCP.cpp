@@ -51,7 +51,7 @@ void CIOCP::PostAccept()
 	std::shared_ptr<CBaseSocket> sock = std::make_shared<CTCPSocket>();
 	acceptOverlapped->m_sock = sock;
 
-	if (lpfnAcceptEx(m_listenTcpSocket->GetSOCKET(),
+	if (lpfnAcceptEx(m_listenTCPSocket->GetSOCKET(),
 		acceptOverlapped->m_sock->GetSOCKET(),
 		&acceptOverlapped->m_Bufs,
 		0,
@@ -108,7 +108,7 @@ void CIOCP::PostRead(std::shared_ptr<CBaseSocket> sock, bool isTCP)
 	}
 	else
 	{
-		readOverlapped->m_sock = m_UDPSocket;
+		readOverlapped->m_sock = m_listenUDPSocket;
 		int udpAddrSize = sizeof(sockaddr_in);
 		if (WSARecvFrom(readOverlapped->m_sock->GetSOCKET(), &readOverlapped->m_wsabuf, 1, &readOverlapped->m_packetSize, &ReadRecvFlag, (sockaddr*)&readOverlapped->m_addr, &udpAddrSize, readOverlapped, NULL) != 0)
 		{
@@ -146,7 +146,7 @@ int CIOCP::PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, socka
 	}
 	else
 	{
-		if (WSASendTo(m_UDPSocket->GetSOCKET(), &writeOverlapped->m_wsabuf, 1, &writeOverlapped->m_packetSize, WritedwFlags, (SOCKADDR*)soaddr, sizeof(*soaddr), writeOverlapped, NULL) == SOCKET_ERROR)
+		if (WSASendTo(m_listenUDPSocket->GetSOCKET(), &writeOverlapped->m_wsabuf, 1, &writeOverlapped->m_packetSize, WritedwFlags, (SOCKADDR*)&m_clientUDPSockAddr, sizeof(*soaddr), writeOverlapped, NULL) == SOCKET_ERROR)
 		{
 			DWORD Err;
 			if ((Err = WSAGetLastError()) != WSA_IO_PENDING)
@@ -161,7 +161,7 @@ int CIOCP::PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, socka
 
 void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 {
-	SOCKET so = m_listenTcpSocket->GetSOCKET();
+	SOCKET so = m_listenTCPSocket->GetSOCKET();
 	if (setsockopt(ovrlap->m_sock->GetSOCKET(), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
 		(const char *)&so, sizeof(so)) == SOCKET_ERROR)
 	{
@@ -204,35 +204,32 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 	if (datalen == 0) { PostDisconnect(ovrlap->m_sock); return; }
 
 	bool isTCP = ovrlap->m_isTCP;
-	if (isTCP)
-	{
-		int socketRemainBuffer = datalen;
-		int totalBufSize = datalen;
-		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[datalen], std::default_delete<char[]>());
-		memcpy(RecvBuffer.get(), ovrlap->m_buffer, datalen);
+	// 임시 코드
+	if (!isTCP)
+		m_clientUDPSockAddr = ovrlap->m_addr;
+	int addrSize = sizeof(m_listenUDPSocketAddr);
+	int socketRemainBuffer = datalen;
+	int totalBufSize = datalen;
+	std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[datalen], std::default_delete<char[]>());
+	memcpy(RecvBuffer.get(), ovrlap->m_buffer, datalen);
 
-		while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
-		{
-			std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
-			memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
-			std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
-			socketRemainBuffer = recv(ovrlap->m_sock->GetSOCKET(), TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
-			if (socketRemainBuffer == SOCKET_ERROR)
-			{
-				CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv SOCKET_ERROR");
-				break;
-			}
-			memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
-			RecvBuffer = tempBuf;
-			totalBufSize += socketRemainBuffer;
-			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
-		}
-		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(ovrlap->m_sock, RecvBuffer, totalBufSize);
-	}
-	else
+	while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 	{
-		sockaddr_in adr = ovrlap->m_addr;
+		std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+		memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
+		std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+		socketRemainBuffer = recv(ovrlap->m_sock->GetSOCKET(), TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
+		if (socketRemainBuffer == SOCKET_ERROR)
+		{
+			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv SOCKET_ERROR");
+			break;
+		}
+		memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
+		RecvBuffer = tempBuf;
+		totalBufSize += socketRemainBuffer;
+		CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 	}
+	CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(ovrlap->m_sock, RecvBuffer, totalBufSize, isTCP);
 	PostRead(ovrlap->m_sock, isTCP);
 	delete ovrlap;
 }
@@ -259,30 +256,30 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
-	m_listenTcpSocket = std::make_shared<CTCPSocket>();
-	m_UDPSocket = std::make_shared<CUDPSocket>();
+	m_listenTCPSocket = std::make_shared<CTCPSocket>();
+	m_listenUDPSocket = std::make_shared<CUDPSocket>();
 
-	CreateIoCompletionPort((HANDLE)m_listenTcpSocket->GetSOCKET(), m_CompPort, 0, 0);
+	CreateIoCompletionPort((HANDLE)m_listenTCPSocket->GetSOCKET(), m_CompPort, 0, 0);
 
-	memset(&m_listenSocketAddr, 0, sizeof(m_listenSocketAddr));
-	m_listenSocketAddr.sin_family = AF_INET;
-	m_listenSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	m_listenSocketAddr.sin_port = htons(9999);
+	memset(&m_listenTCPSocketAddr, 0, sizeof(m_listenTCPSocketAddr));
+	m_listenTCPSocketAddr.sin_family = AF_INET;
+	m_listenTCPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	m_listenTCPSocketAddr.sin_port = htons(9999);
 
-	if (::bind(m_listenTcpSocket->GetSOCKET(), (SOCKADDR*)&m_listenSocketAddr, sizeof(m_listenSocketAddr)) == SOCKET_ERROR)
+	if (::bind(m_listenTCPSocket->GetSOCKET(), (SOCKADDR*)&m_listenTCPSocketAddr, sizeof(m_listenTCPSocketAddr)) == SOCKET_ERROR)
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "TCP Bind() Error : %d", WSAGetLastError());
 		return false;
 	}
 
 	int enable = 0;
-	if (setsockopt(m_listenTcpSocket->GetSOCKET(), SOL_SOCKET, SO_CONDITIONAL_ACCEPT, (const char*)&enable, sizeof(int)) == SOCKET_ERROR)
+	if (setsockopt(m_listenTCPSocket->GetSOCKET(), SOL_SOCKET, SO_CONDITIONAL_ACCEPT, (const char*)&enable, sizeof(int)) == SOCKET_ERROR)
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "setsockopt SO_CONDITIONAL_ACCEPT Error : %d", WSAGetLastError());
 		return false;
 	}
 
-	if (listen(m_listenTcpSocket->GetSOCKET(), 1000) == SOCKET_ERROR)
+	if (listen(m_listenTCPSocket->GetSOCKET(), 1000) == SOCKET_ERROR)
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "Listen() Error : %d", WSAGetLastError());
 		return false;
@@ -291,7 +288,7 @@ bool CIOCP::InitServer()
 	GUID guidAcceptEx = WSAID_ACCEPTEX;
 	DWORD acceptRecvDwBytes;
 	if (WSAIoctl(
-		m_listenTcpSocket->GetSOCKET(),
+		m_listenTCPSocket->GetSOCKET(),
 		SIO_GET_EXTENSION_FUNCTION_POINTER,
 		&guidAcceptEx,
 		sizeof(guidAcceptEx),
@@ -309,7 +306,7 @@ bool CIOCP::InitServer()
 	GUID GuidGetAcceptExSockaddrs = WSAID_GETACCEPTEXSOCKADDRS;
 	DWORD getAcceptexSockaddrsRecvDwBytes;
 	if (WSAIoctl(
-		m_listenTcpSocket->GetSOCKET(),
+		m_listenTCPSocket->GetSOCKET(),
 		SIO_GET_EXTENSION_FUNCTION_POINTER,
 		&GuidGetAcceptExSockaddrs,
 		sizeof(GuidGetAcceptExSockaddrs),
@@ -323,6 +320,19 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
+	memset(&m_listenUDPSocketAddr, 0, sizeof(SOCKADDR_IN));
+	m_listenUDPSocketAddr.sin_family = PF_INET;
+	m_listenUDPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	m_listenUDPSocketAddr.sin_port = htons(8888);
+
+	if (::bind(m_listenUDPSocket->GetSOCKET(), (SOCKADDR*)&m_listenUDPSocketAddr, sizeof(m_listenUDPSocketAddr)) == SOCKET_ERROR)
+	{
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "UDP Bind() Error : %d", WSAGetLastError());
+		return false;
+	}
+
+	CreateIoCompletionPort((HANDLE)m_listenUDPSocket->GetSOCKET(), m_CompPort, 0, 0);
+
 	GetSocketCallbackThread = new std::thread*[WORKERTHREAD_NUM];
 	for (int i = 0; i < WORKERTHREAD_NUM; i++)
 	{
@@ -331,6 +341,7 @@ bool CIOCP::InitServer()
 	CPacketManager::getInstance().InitPacketManager();
 
 	PostAccept();
+	PostRead(nullptr, false);
 	
 	return true;
 }

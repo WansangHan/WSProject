@@ -24,7 +24,7 @@ bool CGameManager::InitGameManager()
 		Test::SumNumber numb;
 		numb.set_num(i);
 
-		CPacketManager::getInstance().SendPacketToServer(SendPacketType::SEND_SUM_INT, numb.SerializeAsString());
+		CPacketManager::getInstance().SendPacketToServer(SendPacketType::SEND_SUM_INT, numb.SerializeAsString(), false);
 	}
 
 	return false;

@@ -59,21 +59,25 @@ class CPacketManager
 	static std::once_flag m_once;
 
 	std::unique_ptr<std::thread> th_tcp;
+	std::unique_ptr<std::thread> th_udp;
 
 	typedef std::function<void(std::shared_ptr<CBaseSocket>, char*)> Function;
-	std::map < RecvPacketType, Function > tcp_function;
+	std::map < RecvPacketType, Function > map_function;
 
 #ifdef IOCP_SERVER
 	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
+	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_udp;
 #else
 	CSafeQueue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
+	CSafeQueue<std::shared_ptr<PacketInfo>> packet_queue_udp;
 #endif
 
 	CPacketManager();
 
 	void APPLY_PACKET_TCP();
+	void APPLY_PACKET_UDP();
 
-	void DEVIDE_PACKET_TYPE_TCP(PacketInfo* info);
+	void DEVIDE_PACKET_TYPE(PacketInfo* info);
 
 	void InitFunctionmap();
 public:
@@ -85,7 +89,7 @@ public:
 	~CPacketManager();
 
 	void InitPacketManager();
-	void DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize);
-	void SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str);
+	void DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize, bool isTCP);
+	void SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str, sockaddr_in* sockaddr, bool isTCP);
 };
 

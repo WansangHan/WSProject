@@ -18,17 +18,27 @@ bool CEPOLL::InitServer()
 {
 	CLogManager::getInstance().InitLogManager();
 
-	m_listenTcpSocket = std::make_shared<CTCPSocket>();
+	m_listenTCPSocket = std::make_shared<CTCPSocket>();
 
-	memset(&m_listenSocketAddr, 0, sizeof(m_listenSocketAddr));
-	m_listenSocketAddr.sin_family = AF_INET;
-	m_listenSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	m_listenSocketAddr.sin_port = htons(22222);
+	memset(&m_listenTCPSocketAddr, 0, sizeof(m_listenTCPSocketAddr));
+	m_listenTCPSocketAddr.sin_family = AF_INET;
+	m_listenTCPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	m_listenTCPSocketAddr.sin_port = htons(22222);
 
-	if (bind(m_listenTcpSocket->GetSOCKET(), (sockaddr*)&m_listenSocketAddr, sizeof(m_listenSocketAddr)) == -1)
+	if (bind(m_listenTCPSocket->GetSOCKET(), (sockaddr*)&m_listenTCPSocketAddr, sizeof(m_listenTCPSocketAddr)) == -1)
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "bind() error");
-	if (listen(m_listenTcpSocket->GetSOCKET(), 5) == -1)
+	if (listen(m_listenTCPSocket->GetSOCKET(), 5) == -1)
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "listen() error");
+
+	m_listenUDPSocket = std::make_shared<CUDPSocket>();
+
+	memset(&m_listenUDPSocketAddr, 0, sizeof(m_listenUDPSocketAddr));
+	m_listenUDPSocketAddr.sin_family = AF_INET;
+	m_listenUDPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	m_listenUDPSocketAddr.sin_port = htons(33333);
+
+	if (bind(m_listenUDPSocket->GetSOCKET(), (sockaddr*)&m_listenUDPSocketAddr, sizeof(m_listenUDPSocketAddr)) == -1)
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "bind() error");
 
 	m_epfd = epoll_create(50);
 	ep_events = new epoll_event[50];
@@ -36,8 +46,11 @@ bool CEPOLL::InitServer()
 	epoll_event event;
 
 	event.events = EPOLLIN;
-	event.data.fd = m_listenTcpSocket->GetSOCKET();
-	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenTcpSocket->GetSOCKET(), &event);
+	event.data.fd = m_listenTCPSocket->GetSOCKET();
+	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenTCPSocket->GetSOCKET(), &event);
+
+	event.data.fd = m_listenUDPSocket->GetSOCKET();
+	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenUDPSocket->GetSOCKET(), &event);
 
 	CPacketManager::getInstance().InitPacketManager();
 
@@ -57,11 +70,11 @@ void CEPOLL::Update()
 
 		for (int i = 0; i<event_cnt; i++)
 		{
-			if (ep_events[i].data.fd == m_listenTcpSocket->GetSOCKET())
+			if (ep_events[i].data.fd == m_listenTCPSocket->GetSOCKET())
 			{
-				socklen_t adr_sz = sizeof(m_listenSocketAddr);
+				socklen_t adr_sz = sizeof(m_listenTCPSocketAddr);
 				sockaddr_in clnt_adr;
-				int clnt_sock = accept(m_listenTcpSocket->GetSOCKET(), (struct sockaddr*)&clnt_adr, &adr_sz);
+				int clnt_sock = accept(m_listenTCPSocket->GetSOCKET(), (struct sockaddr*)&clnt_adr, &adr_sz);
 				epoll_event event;
 				event.events = EPOLLIN;
 				event.data.fd = clnt_sock;
@@ -71,7 +84,12 @@ void CEPOLL::Update()
 			else
 			{
 				std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
-				int str_len = read(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
+				int str_len = 0;
+				socklen_t addrSize = sizeof(m_clientUDPSockAddr);
+				if (ep_events[i].data.fd != m_listenUDPSocket->GetSOCKET())
+					str_len = read(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
+				else
+					str_len = recvfrom(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL, (sockaddr*)&m_clientUDPSockAddr, &addrSize);
 				if (str_len == 0)    // close request!
 				{
 					epoll_ctl(
@@ -99,10 +117,14 @@ void CEPOLL::Update()
 						totalBufSize += socketRemainBuffer;
 						CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 					}
-					std::shared_ptr<CBaseSocket> sock = std::make_shared<CTCPSocket>();
+					std::shared_ptr<CBaseSocket> sock;
+					if (ep_events[i].data.fd != m_listenUDPSocket->GetSOCKET())
+						sock = std::make_shared<CTCPSocket>();
+					else
+						sock = std::make_shared<CUDPSocket>();
 					sock->SetSOCKET(ep_events[i].data.fd);
 
-					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(sock, RecvBuffer, totalBufSize);
+					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(sock, RecvBuffer, totalBufSize, true);
 				}
 
 			}
@@ -113,13 +135,17 @@ void CEPOLL::Update()
 void CEPOLL::CloseServer()
 {
 	delete[] ep_events;
-	close(m_listenTcpSocket->GetSOCKET());
+	close(m_listenTCPSocket->GetSOCKET());
+	close(m_listenUDPSocket->GetSOCKET());
 	close(m_epfd);
 }
 
-bool CEPOLL::SendToClient(std::shared_ptr<char> buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in * soaddr, bool isTCP)
+bool CEPOLL::SendToClient(void* buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in * soaddr, bool isTCP)
 {
-	write(sock->GetSOCKET(), buf.get(), len);
+	if (isTCP)
+		write(sock->GetSOCKET(), buf, len);
+	else
+		sendto(m_listenUDPSocket->GetSOCKET(), (char*)buf, len, NULL, (sockaddr*)&m_clientUDPSockAddr, sizeof(sockaddr));
 
 	return true;
 }

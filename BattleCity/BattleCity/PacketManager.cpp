@@ -16,17 +16,30 @@ void CPacketManager::APPLY_PACKET_TCP()
 		{
 			std::shared_ptr<PacketInfo> info;
 			packet_queue_tcp.try_pop(info);
-			DEVIDE_PACKET_TYPE_TCP(info);
+			DEVIDE_PACKET_TYPE(info);
 		}
 	}
 }
 
-void CPacketManager::DEVIDE_PACKET_TYPE_TCP(std::shared_ptr<PacketInfo> info)
+void CPacketManager::APPLY_PACKET_UDP()
+{
+	while (isContinue)
+	{
+		if (!packet_queue_udp.empty())
+		{
+			std::shared_ptr<PacketInfo> info;
+			packet_queue_udp.try_pop(info);
+			DEVIDE_PACKET_TYPE(info);
+		}
+	}
+}
+
+void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 {
 	RecvPacketType packetType = RECV_SUM_INT;
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
-	auto it = tcp_function.find(packetType);
-	if (it == tcp_function.end()) { CLogManager::getInstance().WriteLogMessage("ERROR", true, "tcp_function.end() : ", packetType); return; }
+	auto it = map_function.find(packetType);
+	if (it == map_function.end()) { CLogManager::getInstance().WriteLogMessage("ERROR", true, "map_function.end() : ", packetType); return; }
 
 	std::shared_ptr<char> protoBuf = std::shared_ptr<char>(new char[info->dataSize - sizeof(int) - sizeof(RecvPacketType)], std::default_delete<char[]>());
 	memcpy(protoBuf.get(), info->data.get() + sizeof(int) + sizeof(RecvPacketType), info->dataSize - sizeof(int) - sizeof(RecvPacketType));
@@ -36,7 +49,7 @@ void CPacketManager::DEVIDE_PACKET_TYPE_TCP(std::shared_ptr<PacketInfo> info)
 
 void CPacketManager::InitFunctionmap()
 {
-	tcp_function.insert(std::make_pair(RECV_SUM_INT, std::bind(&CGameManager::SumData, CGameManager::getInstance(), std::placeholders::_1)));
+	map_function.insert(std::make_pair(RECV_SUM_INT, std::bind(&CGameManager::SumData, CGameManager::getInstance(), std::placeholders::_1)));
 }
 
 CPacketManager::~CPacketManager()
@@ -48,15 +61,17 @@ void CPacketManager::InitPacketManager()
 	InitFunctionmap();
 	isContinue = true;
 	th_tcp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_TCP, this));
+	th_udp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_UDP, this));
 }
 
 void CPacketManager::ExitPacketManager()
 {
 	isContinue = false;
 	th_tcp->join();
+	th_udp->join();
 }
 
-void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(char * packet, int packetSize)
+void CPacketManager::DEVIDE_PACKET_BUNDLE(char * packet, int packetSize)
 {
 	int curToken = 0;
 	int Typesize = 0;
@@ -73,7 +88,7 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(char * packet, int packetSize)
 	}
 }
 
-void CPacketManager::SendPacketToServer(SendPacketType type, std::string str)
+void CPacketManager::SendPacketToServer(SendPacketType type, std::string str, bool isTCP)
 {
 	PacketStructure ps;
 	ps.packetType = type;
@@ -81,5 +96,5 @@ void CPacketManager::SendPacketToServer(SendPacketType type, std::string str)
 	std::shared_ptr<char> packet = std::shared_ptr<char>(new char[ps.dataSize], std::default_delete<char[]>());
 	memcpy(packet.get(), &ps, sizeof(PacketStructure));
 	memcpy(packet.get() + sizeof(PacketStructure), str.c_str(), str.length());
-	CNetworkManager::getInstance().SendToServer(packet.get(), ps.dataSize);
+	CNetworkManager::getInstance().SendToServer(packet.get(), ps.dataSize, isTCP);
 }

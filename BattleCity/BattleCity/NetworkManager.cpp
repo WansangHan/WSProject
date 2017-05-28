@@ -32,21 +32,36 @@ bool CNetworkManager::InitNetworkManager()
 	if (connect(m_TCPSocket, (SOCKADDR*)&m_TCPSockAddr, sizeof(m_TCPSockAddr)) == SOCKET_ERROR)
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "connect() error");
 
+	m_UDPSocket = socket(PF_INET, SOCK_DGRAM, 0);
+
+	memset(&m_UDPSockAddr, 0, sizeof(m_UDPSockAddr));
+	m_UDPSockAddr.sin_family = AF_INET;
+	//m_UDPSockAddr.sin_addr.s_addr = inet_addr("192.168.127.128");
+	//m_UDPSockAddr.sin_port = htons(33333);
+	m_UDPSockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	m_UDPSockAddr.sin_port = htons(8888);
+
+	connect(m_UDPSocket, (SOCKADDR*)&m_UDPSockAddr, sizeof(m_UDPSockAddr));
+
 	isContinue = true;
 
-	m_RecvThread = new std::thread([this] {this->RecvThreadFunction(); });
+	m_RecvTCPThread = new std::thread([this] {this->RecvTCPThreadFunction(); });
+	m_RecvUDPThread = new std::thread([this] {this->RecvUDPThreadFunction(); });
 	return true;
 }
 
 void CNetworkManager::ExitNetworkManager()
 {
 	closesocket(m_TCPSocket);
+	closesocket(m_UDPSocket);
 	isContinue = false;
-	m_RecvThread->join();
-	delete m_RecvThread;
+	m_RecvTCPThread->join();
+	m_RecvUDPThread->join();
+	delete m_RecvTCPThread;
+	delete m_RecvUDPThread;
 }
 
-void CNetworkManager::RecvThreadFunction()
+void CNetworkManager::RecvTCPThreadFunction()
 {
 	while (isContinue)
 	{
@@ -59,7 +74,7 @@ void CNetworkManager::RecvThreadFunction()
 		}
 		else if (strLen == -1)
 		{
-			CLogManager::getInstance().WriteLogMessage("ERROR", true, "read() error");
+			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv() error");
 			return;
 		}
 
@@ -83,12 +98,33 @@ void CNetworkManager::RecvThreadFunction()
 			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 		}
 
-		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(RecvBuffer.get(), totalBufSize);
+		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), totalBufSize);
 	}
 }
 
-bool CNetworkManager::SendToServer(const char* data, int dataSize)
+void CNetworkManager::RecvUDPThreadFunction()
 {
-	send(m_TCPSocket, data, dataSize, NULL);
+	while (isContinue)
+	{
+		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+		int addrSize = sizeof(m_ClnSockAddr);
+		ZeroMemory(&m_ClnSockAddr, addrSize);
+		int strLen = recvfrom(m_UDPSocket, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0, (sockaddr*)&m_ClnSockAddr, &addrSize);
+		if (strLen == SOCKET_ERROR)
+		{
+			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recvfrom() error : %d", GetLastError());
+			return;
+		}
+
+		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), strLen);
+	}
+}
+
+bool CNetworkManager::SendToServer(const char* data, int dataSize, bool isTCP)
+{
+	if (isTCP)
+		send(m_TCPSocket, data, dataSize, NULL);
+	else
+		sendto(m_UDPSocket, data, dataSize, NULL, (sockaddr*)&m_UDPSockAddr, sizeof(m_UDPSockAddr));
 	return true;
 }
