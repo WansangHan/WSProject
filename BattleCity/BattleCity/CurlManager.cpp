@@ -13,7 +13,7 @@ CCurlManager::~CCurlManager()
 	curl_easy_cleanup(m_curl);
 }
 
-void CCurlManager::MakeJsonString(const char * _message, char * _level, std::string& JsonContainer)
+void CCurlManager::MakeErWnJsonString(const char * _message, char * _level, std::string& JsonContainer)
 {
 	Json::Value data;
 	data["cate"] = "CLNT";
@@ -31,7 +31,7 @@ void CCurlManager::InitCurlManager()
 bool CCurlManager::SendLogMessage(const char * _message, char * _level)
 {
 	std::string JsonContainer;
-	MakeJsonString(_message, _level, JsonContainer);
+	MakeErWnJsonString(_message, _level, JsonContainer);
 	const char* postString = JsonContainer.c_str();
 
 	if (m_curl)

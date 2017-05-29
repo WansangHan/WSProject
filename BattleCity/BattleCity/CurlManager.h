@@ -12,7 +12,7 @@ class CCurlManager
 	CURL *m_curl;
 	CURLcode res;
 
-	void MakeJsonString(const char * _message, char * _level, std::string& JsonContainer);
+	void MakeErWnJsonString(const char * _message, char * _level, std::string& JsonContainer);
 public:
 	CCurlManager();
 	~CCurlManager();

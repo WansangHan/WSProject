@@ -221,7 +221,7 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 		socketRemainBuffer = recv(ovrlap->m_sock->GetSOCKET(), TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
 		if (socketRemainBuffer == SOCKET_ERROR)
 		{
-			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv SOCKET_ERROR");
+			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv() error in linking packet");
 			break;
 		}
 		memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);

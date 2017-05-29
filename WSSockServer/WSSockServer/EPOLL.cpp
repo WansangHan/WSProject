@@ -79,7 +79,6 @@ void CEPOLL::Update()
 				event.events = EPOLLIN;
 				event.data.fd = clnt_sock;
 				epoll_ctl(m_epfd, EPOLL_CTL_ADD, clnt_sock, &event);
-				printf("connected client: %d \n", clnt_sock);
 			}
 			else
 			{
@@ -95,7 +94,6 @@ void CEPOLL::Update()
 					epoll_ctl(
 						m_epfd, EPOLL_CTL_DEL, ep_events[i].data.fd, NULL);
 					close(ep_events[i].data.fd);
-					printf("closed client: %d \n", ep_events[i].data.fd);
 				}
 				else
 				{

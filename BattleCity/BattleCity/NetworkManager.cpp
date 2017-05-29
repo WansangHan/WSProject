@@ -20,7 +20,7 @@ bool CNetworkManager::InitNetworkManager()
 
 	m_TCPSocket = socket(PF_INET, SOCK_STREAM, 0);
 	if(m_TCPSocket == INVALID_SOCKET)
-		CLogManager::getInstance().WriteLogMessage("ERROR", true, "socket() error");
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "tcp socket() error");
 
 	memset(&m_TCPSockAddr, 0, sizeof(m_TCPSockAddr));
 	m_TCPSockAddr.sin_family = AF_INET;
@@ -30,9 +30,12 @@ bool CNetworkManager::InitNetworkManager()
 	m_TCPSockAddr.sin_port = htons(9999);
 
 	if (connect(m_TCPSocket, (SOCKADDR*)&m_TCPSockAddr, sizeof(m_TCPSockAddr)) == SOCKET_ERROR)
-		CLogManager::getInstance().WriteLogMessage("ERROR", true, "connect() error");
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "tcp connect() error");
 
 	m_UDPSocket = socket(PF_INET, SOCK_DGRAM, 0);
+
+	if(m_UDPSocket == INVALID_SOCKET)
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "udp socket() error");
 
 	memset(&m_UDPSockAddr, 0, sizeof(m_UDPSockAddr));
 	m_UDPSockAddr.sin_family = AF_INET;
@@ -41,7 +44,8 @@ bool CNetworkManager::InitNetworkManager()
 	m_UDPSockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	m_UDPSockAddr.sin_port = htons(8888);
 
-	connect(m_UDPSocket, (SOCKADDR*)&m_UDPSockAddr, sizeof(m_UDPSockAddr));
+	if(connect(m_UDPSocket, (SOCKADDR*)&m_UDPSockAddr, sizeof(m_UDPSockAddr)) == SOCKET_ERROR)
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "udp connect() error");
 
 	isContinue = true;
 
@@ -89,7 +93,7 @@ void CNetworkManager::RecvTCPThreadFunction()
 			socketRemainBuffer = recv(m_TCPSocket, TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
 			if (socketRemainBuffer == SOCKET_ERROR)
 			{
-				CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv SOCKET_ERROR");
+				CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv() error in linking packet");
 				break;
 			}
 			memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
