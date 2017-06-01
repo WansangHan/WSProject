@@ -9,7 +9,6 @@
 #include "TCPSocket.h"
 #include "UDPSocket.h"
 #include "Lobby.h"
-#include "SumTest.pb.h"
 
 class CIOCP
 {

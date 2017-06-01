@@ -1,7 +1,0 @@
-syntax="proto3";
-package Test;
-
-message SumNumber
-{
-	int32 num = 1;
-}

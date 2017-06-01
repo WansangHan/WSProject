@@ -3,7 +3,6 @@
 #include "LogManager.h"
 #include "NetworkManager.h"
 #include "PacketManager.h"
-#include "SumTest.pb.h"
 
 class CNetWorkManager;
 
@@ -22,6 +21,5 @@ public:
 
 	bool InitGameManager();
 
-	void SumData(char* message);
 };
 

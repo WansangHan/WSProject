@@ -6,7 +6,6 @@
 #include "EPOLL.h"
 #endif
 #include "PacketManager.h"
-#include "SumTest.pb.h"
 
 class CLobby
 {
@@ -21,7 +20,5 @@ public:
 		return *m_inst;
 	}
 	~CLobby();
-
-	void SumData(std::shared_ptr<CBaseSocket> sock, char * message);
 };
 

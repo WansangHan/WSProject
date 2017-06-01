@@ -49,7 +49,6 @@ void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 
 void CPacketManager::InitFunctionmap()
 {
-	map_function.insert(std::make_pair(RECV_SUM_INT, std::bind(&CGameManager::SumData, CGameManager::getInstance(), std::placeholders::_1)));
 }
 
 CPacketManager::~CPacketManager()

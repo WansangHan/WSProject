@@ -57,7 +57,6 @@ void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 
 void CPacketManager::InitFunctionmap()
 {
-	map_function.insert(std::make_pair(RecvPacketType::RECV_SUM_INT, std::bind(&CLobby::SumData, CLobby::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 }
 
 CPacketManager::~CPacketManager()
