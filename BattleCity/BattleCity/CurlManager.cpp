@@ -1,42 +1,17 @@
 #include "stdafx.h"
 #include "CurlManager.h"
 
+std::unique_ptr<CCurlManager> CCurlManager::m_inst;
+std::once_flag CCurlManager::m_once;
 
-
-CCurlManager::CCurlManager()
+CURLcode CCurlManager::SendCurlMessage(const char* _url, std::string _JsonContainer)
 {
-}
-
-
-CCurlManager::~CCurlManager()
-{
-	curl_easy_cleanup(m_curl);
-}
-
-void CCurlManager::MakeErWnJsonString(const char * _message, char * _level, std::string& JsonContainer)
-{
-	Json::Value data;
-	data["cate"] = "CLNT";
-	data["message"] = _message;
-	data["level"] = _level;
-	Json::StyledWriter writer;
-	JsonContainer = writer.write(data);
-}
-
-void CCurlManager::InitCurlManager()
-{
-	m_curl = curl_easy_init();
-}
-
-bool CCurlManager::SendLogMessage(const char * _message, char * _level)
-{
-	std::string JsonContainer;
-	MakeErWnJsonString(_message, _level, JsonContainer);
-	const char* postString = JsonContainer.c_str();
+	CURLcode res;
+	const char* postString = _JsonContainer.c_str();
 
 	if (m_curl)
 	{
-		curl_easy_setopt(m_curl, CURLOPT_URL, "http://192.168.127.128/index.php/LogWriter/LogWriter");
+		curl_easy_setopt(m_curl, CURLOPT_URL, _url);
 
 		curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, postString);
 
@@ -49,6 +24,56 @@ bool CCurlManager::SendLogMessage(const char * _message, char * _level)
 		}
 
 	}
+
+	return res;
+}
+
+CCurlManager::CCurlManager()
+{
+}
+
+
+CCurlManager::~CCurlManager()
+{
+	curl_easy_cleanup(m_curl);
+}
+
+void CCurlManager::InitCurlManager()
+{
+	m_curl = curl_easy_init();
+}
+
+bool CCurlManager::SendErWnJsonString(const char * _message, char * _level)
+{
+	Json::Value data;
+	data["cate"] = "CLNT";
+	data["message"] = _message;
+	data["level"] = _level;
+	Json::StyledWriter writer;
+	SendCurlMessage("http://192.168.127.128/index.php/LogWriter/LogWriter", writer.write(data));
+
+	return true;
+}
+
+bool CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char* _ml)
+{
+	Json::Value data;
+	data["id"] = _id;
+	data["pw"] = _pw;
+	data["ml"] = _ml;
+	Json::StyledWriter writer;
+	CURLcode retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/NewAccount", writer.write(data));
+
+	return true;
+}
+
+bool CCurlManager::SendLoginJsonString(char* _id, char* _pw)
+{
+	Json::Value data;
+	data["id"] = _id;
+	data["pw"] = _pw;
+	Json::StyledWriter writer;
+	CURLcode retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/Login", writer.write(data));
 
 	return true;
 }

@@ -5,8 +5,8 @@
 #include <thread>
 #include <mutex>
 
-class CCurlManager;
 class CFileManager;
+class CCurlManager;
 
 class CLogManager
 {
@@ -14,7 +14,6 @@ class CLogManager
 	static std::once_flag m_once;
 
 	CFileManager* m_filemanager;
-	CCurlManager* m_curlmanager;
 
 	CLogManager();
 

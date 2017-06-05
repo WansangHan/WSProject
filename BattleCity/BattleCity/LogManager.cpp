@@ -7,19 +7,16 @@ std::once_flag CLogManager::m_once;
 CLogManager::CLogManager()
 {
 	m_filemanager = new CFileManager;
-	m_curlmanager = new CCurlManager;
 }
 
 
 CLogManager::~CLogManager()
 {
 	delete m_filemanager;
-	delete m_curlmanager;
 }
 
 bool CLogManager::InitLogManager()
 {
-	m_curlmanager->InitCurlManager();
 
 	CLogManager::getInstance().WriteLogMessage("INFO", true, "Init LogManager");
 	return true;
@@ -45,7 +42,7 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 bool CLogManager::ApplyLogMessage(char * _level, bool _sendsql, const char* _message)
 {
 	if(_sendsql)
-		m_curlmanager->SendLogMessage(_message, _level);
+		CCurlManager::getInstance().SendErWnJsonString(_message, _level);
 
 	m_filemanager->WriteFileLog(_message, _level);
 	return true;

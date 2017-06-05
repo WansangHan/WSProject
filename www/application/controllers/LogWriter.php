@@ -10,12 +10,10 @@ class LogWriter extends CI_Controller {
 
     public function index()
     {
-        echo 'Index_Controller';
     }
 
     public function LogWriter()
     {
-        echo 'LogWriter_model_Controller';
         $this->load->model('LogWriter_model');
         echo $this->LogWriter_model->ErrorWriter();
     }

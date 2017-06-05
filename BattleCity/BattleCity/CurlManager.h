@@ -7,17 +7,29 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "libcurld.lib")
 #include "LogManager.h"
+#include <memory>
+#include <thread>
+#include <mutex>
 class CCurlManager
 {
-	CURL *m_curl;
-	CURLcode res;
+	static std::unique_ptr<CCurlManager> m_inst;
+	static std::once_flag m_once;
 
-	void MakeErWnJsonString(const char * _message, char * _level, std::string& JsonContainer);
-public:
+	CURL *m_curl;
+
+	CURLcode SendCurlMessage(const char* _url, std::string _JsonContainer);
 	CCurlManager();
+public:
+	static CCurlManager& getInstance()
+	{
+		std::call_once(m_once, []() { m_inst.reset(new CCurlManager()); });
+		return *m_inst;
+	}
 	~CCurlManager();
 
 	void InitCurlManager();
-	bool SendLogMessage(const char* _message, char* _level);
+	bool SendErWnJsonString(const char * _message, char * _level);
+	bool SendNewAccountJsonString(char* _id, char* _pw, char* _ml);
+	bool SendLoginJsonString(char* _id, char* _pw);
 };
 
