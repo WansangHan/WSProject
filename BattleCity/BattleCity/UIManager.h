@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <map>
+#include <atlstr.h>
 #include "CommonUIScene.h"
 #include "LoginUIScene.h"
 #include "LogManager.h"

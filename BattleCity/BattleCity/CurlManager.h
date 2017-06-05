@@ -33,7 +33,7 @@ public:
 
 	void InitCurlManager();
 	bool SendErWnJsonString(const char * _message, char * _level);
-	bool SendNewAccountJsonString(char* _id, char* _pw, char* _ml);
-	bool SendLoginJsonString(char* _id, char* _pw);
+	Json::Value SendNewAccountJsonString(char* _id, char* _pw, char* _ml);
+	Json::Value SendLoginJsonString(char* _id, char* _pw);
 };
 

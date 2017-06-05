@@ -62,7 +62,19 @@ void CLoginUIScene::CommandHandling(HWND _hwnd, WPARAM _wParam)
 		WideCharToMultiByte(CP_ACP, 0, tid, 128, cid, MAX_LOGIN_ID_LENGTH, NULL, NULL);
 		WideCharToMultiByte(CP_ACP, 0, tpw, 128, cpw, MAX_LOGIN_PW_LENGTH, NULL, NULL);
 
-		CCurlManager::getInstance().SendLoginJsonString(cid, cpw);
+		Json::Value val = CCurlManager::getInstance().SendLoginJsonString(cid, cpw);
+		Json::Value isSuccessJ = val["isSuccess"];
+		bool isSuccess = isSuccessJ.asBool();
+
+		if (isSuccess)
+		{
+			MessageBox(_hwnd, L"Success.", L"회원가입", MB_OK);
+		}
+		else
+		{
+			MessageBox(_hwnd, L"fail.", L"회원가입", MB_OK);
+		}
+
 	}
 	break;
 	case NEWACCOUNT_NEWACCOUNT_BUTTON:
@@ -80,7 +92,12 @@ void CLoginUIScene::CommandHandling(HWND _hwnd, WPARAM _wParam)
 		WideCharToMultiByte(CP_ACP, 0, tpw, 128, cpw, MAX_NEWACCOUNT_PW_LENGTH, NULL, NULL);
 		WideCharToMultiByte(CP_ACP, 0, tml, 128, cml, MAX_NEWACCOUNT_ML_LENGTH, NULL, NULL);
 
-		CCurlManager::getInstance().SendNewAccountJsonString(cid, cpw, cml);
+		Json::Value val = CCurlManager::getInstance().SendNewAccountJsonString(cid, cpw, cml);
+		Json::Value textJ = val["text"];
+		
+		CString msg;
+		msg.Format(_T("%S"), textJ.asCString());
+		MessageBox(_hwnd, msg, L"회원가입", MB_OK);
 	}
 	break;
 	}

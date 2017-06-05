@@ -7,10 +7,6 @@ std::once_flag CCurlManager::m_once;
 void init_string(struct strres *s) {
 	s->len = 0;
 	s->ptr = (char*)malloc(s->len + 1);
-	if (s->ptr == NULL) {
-		fprintf(stderr, "malloc() failed\n");
-		exit(EXIT_FAILURE);
-	}
 	s->ptr[0] = '\0';
 }
 
@@ -18,10 +14,6 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct strres *s)
 {
 	size_t new_len = s->len + size*nmemb;
 	s->ptr = (char*)realloc(s->ptr, new_len + 1);
-	if (s->ptr == NULL) {
-		fprintf(stderr, "realloc() failed\n");
-		exit(EXIT_FAILURE);
-	}
 	memcpy(s->ptr + s->len, ptr, size*nmemb);
 	s->ptr[new_len] = '\0';
 	s->len = new_len;
@@ -84,7 +76,7 @@ bool CCurlManager::SendErWnJsonString(const char * _message, char * _level)
 	return true;
 }
 
-bool CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char* _ml)
+Json::Value CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char* _ml)
 {
 	Json::Value data;
 	data["id"] = _id;
@@ -92,17 +84,22 @@ bool CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char* _ml)
 	data["ml"] = _ml;
 	Json::StyledWriter writer;
 	char* retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/NewAccount", writer.write(data));
+	Json::Reader reader;
+	Json::Value retjsn;
+	reader.parse(retVal, retjsn);
 
-	return true;
+	return retjsn;
 }
 
-bool CCurlManager::SendLoginJsonString(char* _id, char* _pw)
+Json::Value CCurlManager::SendLoginJsonString(char* _id, char* _pw)
 {
 	Json::Value data;
 	data["id"] = _id;
 	data["pw"] = _pw;
 	Json::StyledWriter writer;
 	char* retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/Login", writer.write(data));
-
-	return true;
+	Json::Reader reader;
+	Json::Value retjsn;
+	reader.parse(retVal, retjsn);
+	return retjsn;
 }

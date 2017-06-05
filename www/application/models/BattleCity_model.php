@@ -42,7 +42,7 @@ class BattleCity_model extends CI_Model {
 
 
         $q1 = "
-			SELECT USER_IDNT, USER_PSWD, USER_MAIL
+			SELECT USER_SEQN, USER_IDNT, USER_PSWD, USER_MAIL
             FROM USER_INFO
             WHERE 1=1
             AND USER_IDNT='".$input['id']."'
@@ -56,19 +56,25 @@ class BattleCity_model extends CI_Model {
         {
             if(password_verify($input['pw'], $result[0]['USER_PSWD']))
             {
-                $isSuccess = 'success';
+                $isSuccess = 'true';
+                $id = $result[0]['USER_SEQN'];
             }
             else
             {
-                $isSuccess = 'fail';
+                $isSuccess = 'false';
             }
         }
         else
         {
-            $isSuccess = 'fail';
+            $isSuccess = 'false';
         }
 
-        return $isSuccess;
+        $output = array(
+            'isSuccess' => $isSuccess,
+            'id' => $id
+        );
+
+        return json_encode($output);
     }
 }
 ?>
