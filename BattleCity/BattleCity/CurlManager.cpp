@@ -4,8 +4,35 @@
 std::unique_ptr<CCurlManager> CCurlManager::m_inst;
 std::once_flag CCurlManager::m_once;
 
-CURLcode CCurlManager::SendCurlMessage(const char* _url, std::string _JsonContainer)
+void init_string(struct strres *s) {
+	s->len = 0;
+	s->ptr = (char*)malloc(s->len + 1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "malloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	s->ptr[0] = '\0';
+}
+
+size_t writefunc(void *ptr, size_t size, size_t nmemb, struct strres *s)
 {
+	size_t new_len = s->len + size*nmemb;
+	s->ptr = (char*)realloc(s->ptr, new_len + 1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "realloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	memcpy(s->ptr + s->len, ptr, size*nmemb);
+	s->ptr[new_len] = '\0';
+	s->len = new_len;
+
+	return size*nmemb;
+}
+
+char* CCurlManager::SendCurlMessage(const char* _url, std::string _JsonContainer)
+{
+	struct strres s;
+	init_string(&s);
 	CURLcode res;
 	const char* postString = _JsonContainer.c_str();
 
@@ -14,6 +41,8 @@ CURLcode CCurlManager::SendCurlMessage(const char* _url, std::string _JsonContai
 		curl_easy_setopt(m_curl, CURLOPT_URL, _url);
 
 		curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, postString);
+		curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, writefunc);
+		curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &s);
 
 
 		res = curl_easy_perform(m_curl);
@@ -25,7 +54,7 @@ CURLcode CCurlManager::SendCurlMessage(const char* _url, std::string _JsonContai
 
 	}
 
-	return res;
+	return s.ptr;
 }
 
 CCurlManager::CCurlManager()
@@ -62,7 +91,7 @@ bool CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char* _ml)
 	data["pw"] = _pw;
 	data["ml"] = _ml;
 	Json::StyledWriter writer;
-	CURLcode retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/NewAccount", writer.write(data));
+	char* retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/NewAccount", writer.write(data));
 
 	return true;
 }
@@ -73,7 +102,7 @@ bool CCurlManager::SendLoginJsonString(char* _id, char* _pw)
 	data["id"] = _id;
 	data["pw"] = _pw;
 	Json::StyledWriter writer;
-	CURLcode retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/Login", writer.write(data));
+	char* retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/Login", writer.write(data));
 
 	return true;
 }

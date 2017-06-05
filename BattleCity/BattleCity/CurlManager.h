@@ -10,6 +10,10 @@
 #include <memory>
 #include <thread>
 #include <mutex>
+struct strres {
+	char *ptr;
+	size_t len;
+};
 class CCurlManager
 {
 	static std::unique_ptr<CCurlManager> m_inst;
@@ -17,7 +21,7 @@ class CCurlManager
 
 	CURL *m_curl;
 
-	CURLcode SendCurlMessage(const char* _url, std::string _JsonContainer);
+	char* SendCurlMessage(const char* _url, std::string _JsonContainer);
 	CCurlManager();
 public:
 	static CCurlManager& getInstance()

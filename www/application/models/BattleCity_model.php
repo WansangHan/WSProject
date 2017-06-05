@@ -52,16 +52,22 @@ class BattleCity_model extends CI_Model {
         log_message('debug', $q1);
         $result = $query->result_array();
 
-
-        if(password_verify($input['pw'], $result[0]['USER_PSWD']))
+        if($query->num_rows())
         {
-            $isSuccess = 'success';
+            if(password_verify($input['pw'], $result[0]['USER_PSWD']))
+            {
+                $isSuccess = 'success';
+            }
+            else
+            {
+                $isSuccess = 'fail';
+            }
         }
         else
         {
             $isSuccess = 'fail';
         }
-        log_message('debug', $isSuccess);
+
         return $isSuccess;
     }
 }
