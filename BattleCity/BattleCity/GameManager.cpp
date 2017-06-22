@@ -12,6 +12,7 @@ CGameManager::CGameManager()
 CGameManager::~CGameManager()
 {
 	delete m_uiManager;
+	delete m_playManager;
 }
 
 bool CGameManager::InitGameManager(HWND _hwnd)
@@ -22,11 +23,13 @@ bool CGameManager::InitGameManager(HWND _hwnd)
 	CPacketManager::getInstance().InitPacketManager();
 
 	m_uiManager = new CUIManager;
+	m_playManager = new CPlayManager;
 
 	m_hwnd = _hwnd;
 	m_gameState = INTRO;
 
 	m_uiManager->InitUIManager();
+	m_playManager->InitPlayerManager();
 
 	return false;
 }

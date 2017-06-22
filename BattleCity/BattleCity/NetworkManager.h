@@ -38,6 +38,8 @@ public:
 	}
 	~CNetworkManager();
 
+	bool GetisContinue() { return isContinue; }
+
 	bool InitNetworkManager();
 	void ExitNetworkManager();
 	void RecvTCPThreadFunction();

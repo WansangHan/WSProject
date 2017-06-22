@@ -4,6 +4,7 @@
 #include "NetworkManager.h"
 #include "PacketManager.h"
 #include "UIManager.h"
+#include "PlayManager.h"
 
 enum GameState
 {
@@ -12,6 +13,7 @@ enum GameState
 };
 
 class CNetWorkManager;
+class CUIManager;
 
 class CGameManager
 {
@@ -19,6 +21,7 @@ class CGameManager
 	static std::once_flag m_once;
 
 	CUIManager* m_uiManager;
+	CPlayManager* m_playManager;
 
 	HWND m_hwnd;
 	HDC m_hdc;
@@ -40,5 +43,8 @@ public:
 	bool PaintAll();
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 	void LButtonDown(LPARAM lParam);
+
+	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
+	CUIManager* GetUIManagerInstance() { return m_uiManager; }
 };
 

@@ -11,6 +11,13 @@ CUIManager::~CUIManager()
 {
 	delete m_commonUIScene;
 	delete m_loginUIScene;
+	delete m_lobbyUIScene;
+}
+
+void CUIManager::ChangeScene(HWND _hwnd, SceneState _sceneState)
+{
+	m_sceneState = _sceneState;
+	InvalidateRect(_hwnd, NULL, TRUE);
 }
 
 bool CUIManager::InitUIManager()
@@ -19,6 +26,7 @@ bool CUIManager::InitUIManager()
 
 	m_commonUIScene = new CCommonUIScene;
 	m_loginUIScene = new CLoginUIScene;
+	m_lobbyUIScene = new CLobbyUIScene;
 
 	InitFunction();
 
@@ -28,6 +36,7 @@ bool CUIManager::InitUIManager()
 void CUIManager::InitFunction()
 {
 	Paint_functionmap.insert(std::make_pair(SceneState::LOGIN, std::bind(&CLoginUIScene::PrintUIScene, m_loginUIScene, std::placeholders::_1, std::placeholders::_2)));
+	Paint_functionmap.insert(std::make_pair(SceneState::LOBBY, std::bind(&CLobbyUIScene::PrintUIScene, m_lobbyUIScene, std::placeholders::_1, std::placeholders::_2)));
 	
 	CommandHandling_functionmap.insert(std::make_pair(HMENUNUMBER::COMMON_EXIT_BUTTON, std::bind(&CCommonUIScene::CommandHandling, m_commonUIScene, std::placeholders::_1, std::placeholders::_2)));
 	CommandHandling_functionmap.insert(std::make_pair(HMENUNUMBER::LOGIN_LOGIN_BUTTON, std::bind(&CLoginUIScene::CommandHandling, m_loginUIScene, std::placeholders::_1, std::placeholders::_2)));

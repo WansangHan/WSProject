@@ -32,7 +32,6 @@ class BattleCity_model extends CI_Model {
             'isSuccess' => $isSuccess,
             'text' => $text
         );
-        log_message('debug', $isSuccess);
         return json_encode($output);
     }
 
@@ -71,8 +70,10 @@ class BattleCity_model extends CI_Model {
 
         $output = array(
             'isSuccess' => $isSuccess,
-            'id' => $id
+            'id' => intval($id)
         );
+
+        log_message('debug', json_encode($output));
 
         return json_encode($output);
     }
