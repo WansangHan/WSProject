@@ -74,16 +74,15 @@ void CLoginUIScene::CommandHandling(HWND _hwnd, WPARAM _wParam)
 
 		if (isSuccess)
 		{
-			/*DestroyWindow(m_NewAccountIDBox);
+			DestroyWindow(m_NewAccountIDBox);
 			DestroyWindow(m_NewAccountPWBox);
 			DestroyWindow(m_NewAccountMlBox);
 			DestroyWindow(m_NewAccountButton);
 			DestroyWindow(m_loginIDBox);
 			DestroyWindow(m_loginPWBox);
-			DestroyWindow(m_loginButton);*/
+			DestroyWindow(m_loginButton);
 			Json::Value idJ = val["id"];
 			CGameManager::getInstance().GetPlayerManagerInstance()->GetOwnPlayer()->SetID(idJ.asInt());
-			CGameManager::getInstance().GetUIManagerInstance()->ChangeScene(_hwnd, LOBBY);
 			MessageBox(_hwnd, L"Success.", L"Login", MB_OK);
 		}
 		else

@@ -11,7 +11,8 @@
 #include "SafeQueue.h"
 #endif
 #include "LogManager.h"
-#include "Lobby.h"
+#include "BaseSocket.h"
+#include "IOCP.h"
 
 enum SendPacketType
 {

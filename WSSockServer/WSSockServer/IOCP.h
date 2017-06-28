@@ -6,9 +6,9 @@
 #include <mswsock.h>
 #include "Overlapped.h"
 #include "LogManager.h"
+#include "PacketManager.h"
 #include "TCPSocket.h"
 #include "UDPSocket.h"
-#include "Lobby.h"
 
 class CIOCP
 {

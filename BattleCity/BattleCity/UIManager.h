@@ -4,18 +4,15 @@
 #include <atlstr.h>
 #include "CommonUIScene.h"
 #include "LoginUIScene.h"
-#include "LobbyUIScene.h"
 #include "GameManager.h"
 #include "LogManager.h"
 
 class CCommonUIScene;
 class CLoginUIScene;
-class CLobbyUIScene;
 
 enum SceneState
 {
 	LOGIN,
-	LOBBY,
 };
 
 enum HMENUNUMBER
@@ -30,8 +27,6 @@ enum HMENUNUMBER
 	LOGIN_ID_BOX,
 	LOGIN_PW_BOX,
 	LOGIN_LOGIN_BUTTON,
-
-	LOBBY_ROOM_LISTBOX,
 };
 
 class CUIManager
@@ -40,7 +35,6 @@ class CUIManager
 
 	CCommonUIScene* m_commonUIScene;
 	CLoginUIScene* m_loginUIScene;
-	CLobbyUIScene* m_lobbyUIScene;
 
 	typedef std::function<void(HWND, HDC)> Paint_Function;
 	std::map < SceneState, Paint_Function > Paint_functionmap;
