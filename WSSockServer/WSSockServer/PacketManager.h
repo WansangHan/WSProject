@@ -12,7 +12,11 @@
 #endif
 #include "LogManager.h"
 #include "BaseSocket.h"
+#ifdef IOCP_SERVER
 #include "IOCP.h"
+#else
+#include "EPOLL.h"
+#endif
 
 enum SendPacketType
 {

@@ -87,7 +87,7 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE(char * packet, int packetSize)
 	}
 }
 
-void CPacketManager::SendPacketToServer(SendPacketType type, std::string str, bool isTCP)
+void CPacketManager::SendPacketToServer(SendPacketType type, std::string str, bool isTCP, bool isIOCP)
 {
 	PacketStructure ps;
 	ps.packetType = type;
@@ -95,5 +95,5 @@ void CPacketManager::SendPacketToServer(SendPacketType type, std::string str, bo
 	std::shared_ptr<char> packet = std::shared_ptr<char>(new char[ps.dataSize], std::default_delete<char[]>());
 	memcpy(packet.get(), &ps, sizeof(PacketStructure));
 	memcpy(packet.get() + sizeof(PacketStructure), str.c_str(), str.length());
-	CNetworkManager::getInstance().SendToServer(packet.get(), ps.dataSize, isTCP);
+	CNetworkManager::getInstance().SendToServer(packet.get(), ps.dataSize, isTCP, isIOCP);
 }

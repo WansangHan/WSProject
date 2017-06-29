@@ -77,6 +77,6 @@ public:
 	void ExitPacketManager();
 	void DEVIDE_PACKET_BUNDLE(char* packet, int packetSize);
 
-	void SendPacketToServer(SendPacketType type, std::string str, bool isTCP);
+	void SendPacketToServer(SendPacketType type, std::string str, bool isTCP, bool isIOCP);
 };
 

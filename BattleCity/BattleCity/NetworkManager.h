@@ -19,14 +19,22 @@ class CNetworkManager
 
 	WSADATA m_wsaData;
 
-	SOCKET m_TCPSocket;
-	SOCKET m_UDPSocket;
-	sockaddr_in m_TCPSockAddr;
-	sockaddr_in m_UDPSockAddr;
-	sockaddr_in m_ClnSockAddr;
+	SOCKET* m_IOCP_TCPSocket;
+	SOCKET* m_IOCP_UDPSocket;
+	SOCKET* m_EPOL_TCPSocket;
+	SOCKET* m_EPOL_UDPSocket;
 
-	std::thread* m_RecvTCPThread;
-	std::thread* m_RecvUDPThread;
+	sockaddr_in* m_IOCP_TCPSockAddr;
+	sockaddr_in* m_IOCP_UDPSockAddr;
+	sockaddr_in* m_IOCP_ClnSockAddr;
+	sockaddr_in* m_EPOL_TCPSockAddr;
+	sockaddr_in* m_EPOL_UDPSockAddr;
+	sockaddr_in* m_EPOL_ClnSockAddr;
+
+	std::thread* m_Recv_IOCP_TCPThread;
+	std::thread* m_Recv_IOCP_UDPThread;
+	std::thread* m_Recv_EPOL_TCPThread;
+	std::thread* m_Recv_EPOL_UDPThread;
 
 	bool isContinue;
 	CNetworkManager();
@@ -42,8 +50,11 @@ public:
 
 	bool InitNetworkManager();
 	void ExitNetworkManager();
-	void RecvTCPThreadFunction();
-	void RecvUDPThreadFunction();
-	bool SendToServer(const char* data, int dataSize, bool isTCP);
+
+	void ConnectToServer(SOCKET* _sock, sockaddr_in* _sockAddr, const char* _ip, int _port, bool _isTCP);
+
+	void RecvTCPThreadFunction(SOCKET* _sock);
+	void RecvUDPThreadFunction(SOCKET* _sock, sockaddr_in* _sockAddr);
+	bool SendToServer(const char* data, int dataSize, bool isTCP, bool isIOCP);
 };
 

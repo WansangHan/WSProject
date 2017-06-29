@@ -48,6 +48,9 @@ bool CGameManager::PaintAll()
 	case INTRO:
 		m_uiManager->PaintUI(m_hwnd, m_hdc);
 		break;
+	case PLAY:
+		m_playManager->PaintPlay(m_hwnd, m_hdc);
+		break;
 	}
 	EndPaint(m_hwnd, &ps);
 	return true;

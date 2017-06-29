@@ -8,6 +8,7 @@ public:
 	~CPlayManager();
 
 	void InitPlayerManager();
+	void PaintPlay(HWND _hwnd, HDC _hdc);
 
 	CPlayer* GetOwnPlayer() { return m_ownPlayer; }
 };

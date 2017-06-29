@@ -16,3 +16,7 @@ void CPlayManager::InitPlayerManager()
 {
 	m_ownPlayer = new CPlayer;
 }
+
+void CPlayManager::PaintPlay(HWND _hwnd, HDC _hdc)
+{
+}
