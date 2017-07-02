@@ -108,12 +108,7 @@ void CNetworkManager::RecvTCPThreadFunction(SOCKET* _sock)
 	{
 		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
 		int strLen = recv(*_sock, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0);
-		if (strLen == 0)
-		{
-			CLogManager::getInstance().WriteLogMessage("ERROR", true, "Server Disconnect!");
-			return;
-		}
-		else if (strLen == -1)
+		if (strLen == -1)
 		{
 			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv() error");
 			return;
