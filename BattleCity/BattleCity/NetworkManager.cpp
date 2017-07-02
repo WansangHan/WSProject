@@ -18,58 +18,43 @@ bool CNetworkManager::InitNetworkManager()
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsaData) != 0)
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "WSAStartup() error");
 
-	m_IOCP_TCPSocket = new SOCKET;
-	m_IOCP_UDPSocket = new SOCKET;
-	m_EPOL_TCPSocket = new SOCKET;
-	m_EPOL_UDPSocket = new SOCKET;
+	m_IOCP_TCPSocket = std::make_shared<SOCKET>();
+	m_IOCP_UDPSocket = std::make_shared<SOCKET>();
+	m_EPOL_TCPSocket = std::make_shared<SOCKET>();
+	m_EPOL_UDPSocket = std::make_shared<SOCKET>();
 
-	m_IOCP_TCPSockAddr = new sockaddr_in;
-	m_IOCP_UDPSockAddr = new sockaddr_in;
-	m_IOCP_ClnSockAddr = new sockaddr_in;
-	m_EPOL_TCPSockAddr = new sockaddr_in;
-	m_EPOL_UDPSockAddr = new sockaddr_in;
-	m_EPOL_ClnSockAddr = new sockaddr_in;
+	m_IOCP_TCPSockAddr = std::make_shared<sockaddr_in>();
+	m_IOCP_UDPSockAddr = std::make_shared<sockaddr_in>();
+	m_IOCP_ClnSockAddr = std::make_shared<sockaddr_in>();
+	m_EPOL_TCPSockAddr = std::make_shared<sockaddr_in>();
+	m_EPOL_UDPSockAddr = std::make_shared<sockaddr_in>();
+	m_EPOL_ClnSockAddr = std::make_shared<sockaddr_in>();
 
-	ConnectToServer(m_IOCP_TCPSocket, m_IOCP_TCPSockAddr, "127.0.0.1", 9999, true);
-	ConnectToServer(m_IOCP_UDPSocket, m_IOCP_UDPSockAddr, "127.0.0.1", 8888, false);
-	ConnectToServer(m_EPOL_TCPSocket, m_EPOL_TCPSockAddr, "192.168.127.128", 22222, true);
-	ConnectToServer(m_EPOL_UDPSocket, m_EPOL_UDPSockAddr, "192.168.127.128", 33333, false);
+	ConnectToServer(m_IOCP_TCPSocket.get(), m_IOCP_TCPSockAddr.get(), "127.0.0.1", 9999, true);
+	ConnectToServer(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get(), "127.0.0.1", 8888, false);
+	ConnectToServer(m_EPOL_TCPSocket.get(), m_EPOL_TCPSockAddr.get(), "192.168.127.128", 22222, true);
+	ConnectToServer(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get(), "192.168.127.128", 33333, false);
 
 	isContinue = true;
 
-	m_Recv_IOCP_TCPThread = new std::thread([this] {this->RecvTCPThreadFunction(m_IOCP_TCPSocket); });
-	m_Recv_IOCP_UDPThread = new std::thread([this] {this->RecvUDPThreadFunction(m_IOCP_UDPSocket, m_IOCP_ClnSockAddr); });
-	m_Recv_EPOL_TCPThread = new std::thread([this] {this->RecvTCPThreadFunction(m_EPOL_TCPSocket); });
-	m_Recv_EPOL_UDPThread = new std::thread([this] {this->RecvUDPThreadFunction(m_EPOL_UDPSocket, m_EPOL_ClnSockAddr); });
+	m_Recv_IOCP_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_IOCP_TCPSocket.get()); }));
+	m_Recv_IOCP_UDPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvUDPThreadFunction(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get()); }));
+	m_Recv_EPOL_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_EPOL_TCPSocket.get()); }));
+	m_Recv_EPOL_UDPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvUDPThreadFunction(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get()); }));
 	return true;
 }
 
 void CNetworkManager::ExitNetworkManager()
 {
 	isContinue = false;
+	closesocket(*m_IOCP_TCPSocket.get());
+	closesocket(*m_IOCP_UDPSocket.get());
+	closesocket(*m_EPOL_TCPSocket.get());
+	closesocket(*m_EPOL_UDPSocket.get());
 	m_Recv_IOCP_TCPThread->join();
 	m_Recv_IOCP_UDPThread->join();
 	m_Recv_EPOL_TCPThread->join();
 	m_Recv_EPOL_UDPThread->join();
-	delete m_Recv_IOCP_TCPThread;
-	delete m_Recv_IOCP_UDPThread;
-	delete m_Recv_EPOL_TCPThread;
-	delete m_Recv_EPOL_UDPThread;
-	closesocket(*m_IOCP_TCPSocket);
-	closesocket(*m_IOCP_UDPSocket);
-	closesocket(*m_EPOL_TCPSocket); 
-	closesocket(*m_EPOL_UDPSocket);
-	delete m_IOCP_TCPSocket;
-	delete m_IOCP_UDPSocket;
-	delete m_EPOL_TCPSocket;
-	delete m_EPOL_UDPSocket;
-
-	delete m_IOCP_TCPSockAddr;
-	delete 	m_IOCP_UDPSockAddr;
-	delete 	m_IOCP_ClnSockAddr;
-	delete 	m_EPOL_TCPSockAddr;
-	delete 	m_EPOL_UDPSockAddr;
-	delete 	m_EPOL_ClnSockAddr;
 }
 
 void CNetworkManager::ConnectToServer(SOCKET* _sock, sockaddr_in* _sockAddr, const char* _ip, int _port, bool _isTCP)
@@ -161,16 +146,16 @@ bool CNetworkManager::SendToServer(const char* data, int dataSize, bool isTCP, b
 	if (isIOCP)
 	{
 		if (isTCP)
-			send(*m_IOCP_TCPSocket, data, dataSize, NULL);
+			send(*m_IOCP_TCPSocket.get(), data, dataSize, NULL);
 		else
-			sendto(*m_IOCP_UDPSocket, data, dataSize, NULL, (sockaddr*)m_IOCP_UDPSockAddr, sizeof(*m_IOCP_UDPSockAddr));
+			sendto(*m_IOCP_UDPSocket.get(), data, dataSize, NULL, (sockaddr*)m_IOCP_UDPSockAddr.get(), sizeof(*m_IOCP_UDPSockAddr.get()));
 	}
 	else
 	{
 		if (isTCP)
-			send(*m_EPOL_TCPSocket, data, dataSize, NULL);
+			send(*m_EPOL_TCPSocket.get(), data, dataSize, NULL);
 		else
-			sendto(*m_EPOL_UDPSocket, data, dataSize, NULL, (sockaddr*)m_EPOL_UDPSockAddr, sizeof(*m_EPOL_UDPSockAddr));
+			sendto(*m_EPOL_UDPSocket.get(), data, dataSize, NULL, (sockaddr*)m_EPOL_UDPSockAddr.get(), sizeof(*m_EPOL_UDPSockAddr.get()));
 	}
 	return true;
 }

@@ -19,22 +19,22 @@ class CNetworkManager
 
 	WSADATA m_wsaData;
 
-	SOCKET* m_IOCP_TCPSocket;
-	SOCKET* m_IOCP_UDPSocket;
-	SOCKET* m_EPOL_TCPSocket;
-	SOCKET* m_EPOL_UDPSocket;
+	std::shared_ptr<SOCKET> m_IOCP_TCPSocket;
+	std::shared_ptr<SOCKET> m_IOCP_UDPSocket;
+	std::shared_ptr<SOCKET> m_EPOL_TCPSocket;
+	std::shared_ptr<SOCKET> m_EPOL_UDPSocket;
 
-	sockaddr_in* m_IOCP_TCPSockAddr;
-	sockaddr_in* m_IOCP_UDPSockAddr;
-	sockaddr_in* m_IOCP_ClnSockAddr;
-	sockaddr_in* m_EPOL_TCPSockAddr;
-	sockaddr_in* m_EPOL_UDPSockAddr;
-	sockaddr_in* m_EPOL_ClnSockAddr;
+	std::shared_ptr<sockaddr_in> m_IOCP_TCPSockAddr;
+	std::shared_ptr<sockaddr_in> m_IOCP_UDPSockAddr;
+	std::shared_ptr<sockaddr_in> m_IOCP_ClnSockAddr;
+	std::shared_ptr<sockaddr_in> m_EPOL_TCPSockAddr;
+	std::shared_ptr<sockaddr_in> m_EPOL_UDPSockAddr;
+	std::shared_ptr<sockaddr_in> m_EPOL_ClnSockAddr;
 
-	std::thread* m_Recv_IOCP_TCPThread;
-	std::thread* m_Recv_IOCP_UDPThread;
-	std::thread* m_Recv_EPOL_TCPThread;
-	std::thread* m_Recv_EPOL_UDPThread;
+	std::unique_ptr<std::thread> m_Recv_IOCP_TCPThread;
+	std::unique_ptr<std::thread> m_Recv_IOCP_UDPThread;
+	std::unique_ptr<std::thread> m_Recv_EPOL_TCPThread;
+	std::unique_ptr<std::thread> m_Recv_EPOL_UDPThread;
 
 	bool isContinue;
 	CNetworkManager();
