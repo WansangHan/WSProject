@@ -7,6 +7,7 @@ std::once_flag CLogManager::m_once;
 CLogManager::CLogManager()
 {
 	m_filemanager = new CFileManager;
+	InitializeCriticalSection(&cs);
 }
 
 
@@ -41,9 +42,11 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 
 bool CLogManager::ApplyLogMessage(char * _level, bool _sendsql, const char* _message)
 {
+	EnterCriticalSection(&cs);
 	if(_sendsql)
 		CCurlManager::getInstance().SendErWnJsonString(_message, _level);
 
 	m_filemanager->WriteFileLog(_message, _level);
+	LeaveCriticalSection(&cs);
 	return true;
 }

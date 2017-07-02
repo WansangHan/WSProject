@@ -18,6 +18,8 @@ class CLogManager
 	CLogManager();
 
 	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
+
+	CRITICAL_SECTION cs;
 public:
 	static CLogManager& getInstance()
 	{

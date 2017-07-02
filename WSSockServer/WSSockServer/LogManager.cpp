@@ -8,6 +8,10 @@ CLogManager::CLogManager()
 {
 	m_sqlmanager = new CSqlManager;
 	m_filemanager = new CFileManager;
+#ifdef IOCP_SERVER
+	InitializeCriticalSection(&cs);
+#else
+#endif
 }
 
 
@@ -51,9 +55,19 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 
 bool CLogManager::ApplyLogMessage(char * _level, bool _sendsql, const char* _message)
 {
+#ifdef IOCP_SERVER
+	EnterCriticalSection(&cs);
+#else
+	pthread_mutex_lock(&m_mutex);
+#endif
 	if(_sendsql)
 		m_sqlmanager->SendLogMessage(_message, _level);
 
 	m_filemanager->WriteFileLog(_message, _level);
+#ifdef IOCP_SERVER
+	LeaveCriticalSection(&cs);
+#else
+	pthread_mutex_unlock(&m_mutex);
+#endif
 	return true;
 }

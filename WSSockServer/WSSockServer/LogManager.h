@@ -17,6 +17,11 @@ class CLogManager
 	CFileManager* m_filemanager;
 
 	CLogManager();
+#ifdef IOCP_SERVER
+	CRITICAL_SECTION cs;
+#else
+	pthread_mutex_t m_mutex;
+#endif
 
 	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
 public:
