@@ -40,6 +40,7 @@
 
 WSSockServer/ipch/
 WSSockServer/WSSockServer/Debug
+WSSockServer/Debug
 WSSockServer/mysql-5.7.17-win32/
 WSSockServer/mysql-5.7.17-winx64/
 WSSockServer/protobuf-3.3.0/
@@ -52,6 +53,7 @@ BattleCity/curl-7.54.0/
 BattleCity/jsoncpp-src-0.5.0/
 BattleCity/protobuf-3.3.0/
 BattleCity/BattleCity/Debug
+BattleCity/Debug
 BattleCity/BattleCity/logs
 BattleCity/.vs/
 
