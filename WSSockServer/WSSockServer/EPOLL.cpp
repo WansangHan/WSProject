@@ -88,7 +88,7 @@ void CEPOLL::Update()
 				if (ep_events[i].data.fd != m_listenUDPSocket->GetSOCKET())
 					str_len = read(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
 				else
-					str_len = recvfrom(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL, (sockaddr*)&m_clientUDPSockAddr, &addrSize);
+					str_len = recvfrom(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0, (sockaddr*)&m_clientUDPSockAddr, &addrSize);
 				if (str_len == 0)    // close request!
 				{
 					epoll_ctl(
@@ -143,7 +143,7 @@ bool CEPOLL::SendToClient(void* buf, int len, std::shared_ptr<CBaseSocket> sock,
 	if (isTCP)
 		write(sock->GetSOCKET(), buf, len);
 	else
-		sendto(m_listenUDPSocket->GetSOCKET(), (char*)buf, len, NULL, (sockaddr*)&m_clientUDPSockAddr, sizeof(sockaddr));
+		sendto(m_listenUDPSocket->GetSOCKET(), (char*)buf, len, 0, (sockaddr*)&m_clientUDPSockAddr, sizeof(sockaddr));
 
 	return true;
 }
