@@ -36,7 +36,7 @@ void CPacketManager::APPLY_PACKET_UDP()
 
 void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 {
-	RecvPacketType packetType = RECV_SUM_INT;
+	RecvPacketType packetType = RC_ENTER_SERVER;
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
 	auto it = map_function.find(packetType);
 	if (it == map_function.end()) { CLogManager::getInstance().WriteLogMessage("ERROR", true, "map_function.end() : ", packetType); return; }

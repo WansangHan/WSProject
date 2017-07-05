@@ -44,7 +44,7 @@ void CPacketManager::APPLY_PACKET_UDP()
 
 void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 {
-	RecvPacketType packetType = RECV_SUM_INT;
+	RecvPacketType packetType = RC_ENTER_SERVER;
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
 	auto it = map_function.find(packetType);
 	if (it == map_function.end()) { CLogManager::getInstance().WriteLogMessage("ERROR", true, "map_function.end() : %d", packetType); return; }
@@ -57,6 +57,7 @@ void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 
 void CPacketManager::InitFunctionmap()
 {
+	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 }
 
 CPacketManager::~CPacketManager()

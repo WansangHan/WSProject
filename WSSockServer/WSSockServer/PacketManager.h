@@ -12,20 +12,22 @@
 #endif
 #include "LogManager.h"
 #include "BaseSocket.h"
+#include "InGame.h"
 #ifdef IOCP_SERVER
 #include "IOCP.h"
 #else
 #include "EPOLL.h"
 #endif
+#include "WSSockServer.pb.h"
 
 enum SendPacketType
 {
-	SEND_SUM_INT = 1000,
+	SD_ENTER_SERVER = 20000,
 };
 
 enum RecvPacketType
 {
-	RECV_SUM_INT = 10000,
+	RC_ENTER_SERVER = 10000,
 };
 
 struct PacketInfo

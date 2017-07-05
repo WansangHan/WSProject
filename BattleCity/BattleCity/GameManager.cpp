@@ -70,3 +70,9 @@ void CGameManager::LButtonDown(LPARAM lParam)
 		break;
 	}
 }
+
+void CGameManager::EnterGame()
+{
+	m_gameState = PLAY;
+	m_playManager->EnterGame();
+}

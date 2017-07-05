@@ -9,15 +9,16 @@
 #include <concurrent_queue.h>
 #include "LogManager.h"
 #include "GameManager.h"
+#include "BattleCity.pb.h"
 
 enum RecvPacketType
 {
-	RECV_SUM_INT = 1000,
+	RC_ENTER_SERVER = 20000,
 };
 
 enum SendPacketType
 {
-	SEND_SUM_INT = 10000,
+	SD_ENTER_SERVER = 10000,	
 };
 
 struct PacketInfo

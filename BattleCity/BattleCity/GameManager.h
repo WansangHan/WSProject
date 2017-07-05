@@ -14,6 +14,7 @@ enum GameState
 
 class CNetWorkManager;
 class CUIManager;
+class CPlayManager;
 
 class CGameManager
 {
@@ -43,6 +44,8 @@ public:
 	bool PaintAll();
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 	void LButtonDown(LPARAM lParam);
+
+	void EnterGame();
 
 	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
 	CUIManager* GetUIManagerInstance() { return m_uiManager; }

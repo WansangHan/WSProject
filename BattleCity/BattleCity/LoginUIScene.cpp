@@ -83,6 +83,8 @@ void CLoginUIScene::CommandHandling(HWND _hwnd, WPARAM _wParam)
 			DestroyWindow(m_loginButton);
 			Json::Value idJ = val["id"];
 			CGameManager::getInstance().GetPlayerManagerInstance()->GetOwnPlayer()->SetID(idJ.asInt());
+			CGameManager::getInstance().GetPlayerManagerInstance()->GetOwnPlayer()->SetName(cid);
+			CGameManager::getInstance().EnterGame();
 			MessageBox(_hwnd, L"Success.", L"Login", MB_OK);
 		}
 		else

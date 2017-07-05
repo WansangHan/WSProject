@@ -20,3 +20,12 @@ void CPlayManager::InitPlayerManager()
 void CPlayManager::PaintPlay(HWND _hwnd, HDC _hdc)
 {
 }
+
+void CPlayManager::EnterGame()
+{
+	BattleCity::EnterServer sendData;
+
+	sendData.set__id(m_ownPlayer->GetID());
+	sendData.set__name(m_ownPlayer->GetName());
+	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_SERVER, sendData.SerializeAsString(), true, true);
+}

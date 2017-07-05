@@ -1,0 +1,8 @@
+syntax="proto3";
+package BattleCity;
+ 
+message EnterServer
+{
+	int32 _id = 1;
+	string _name = 2;
+} 
