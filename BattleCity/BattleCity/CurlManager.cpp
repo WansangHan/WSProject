@@ -35,7 +35,7 @@ char* CCurlManager::SendCurlMessage(const char* _url, std::string _JsonContainer
 		curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, postString);
 		curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, writefunc);
 		curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &s);
-		curl_easy_setopt(m_curl, CURLOPT_TIMEOUT, 1);
+		curl_easy_setopt(m_curl, CURLOPT_TIMEOUT, 15);
 
 
 		res = curl_easy_perform(m_curl);
