@@ -30,13 +30,17 @@ bool CNetworkManager::InitNetworkManager()
 	m_EPOL_UDPSockAddr = std::make_shared<sockaddr_in>();
 	m_EPOL_ClnSockAddr = std::make_shared<sockaddr_in>();
 
+	// IOCP 서버에 접속
 	ConnectToServer(m_IOCP_TCPSocket.get(), m_IOCP_TCPSockAddr.get(), "127.0.0.1", 9999, true);
 	ConnectToServer(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get(), "127.0.0.1", 8888, false);
+	// EPOLL 서버에 접속
 	ConnectToServer(m_EPOL_TCPSocket.get(), m_EPOL_TCPSockAddr.get(), "192.168.127.128", 22222, true);
 	ConnectToServer(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get(), "192.168.127.128", 33333, false);
 
+	// Receive Thread 지속 여부
 	isContinue = true;
 
+	// 소켓마다 Receive 할 Thread 시작
 	m_Recv_IOCP_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_IOCP_TCPSocket.get()); }));
 	m_Recv_IOCP_UDPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvUDPThreadFunction(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get()); }));
 	m_Recv_EPOL_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_EPOL_TCPSocket.get()); }));
@@ -51,6 +55,7 @@ void CNetworkManager::ExitNetworkManager()
 	closesocket(*m_IOCP_UDPSocket.get());
 	closesocket(*m_EPOL_TCPSocket.get());
 	closesocket(*m_EPOL_UDPSocket.get());
+	// 쓰레드의 안전한 종료를 위해 join
 	m_Recv_IOCP_TCPThread->join();
 	m_Recv_IOCP_UDPThread->join();
 	m_Recv_EPOL_TCPThread->join();
@@ -59,6 +64,7 @@ void CNetworkManager::ExitNetworkManager()
 
 void CNetworkManager::ConnectToServer(SOCKET* _sock, sockaddr_in* _sockAddr, const char* _ip, int _port, bool _isTCP)
 {
+	// IP, Port를 받아 각 서버에 TCP, UDP 소켓에 연결할 수 있도록 함
 	if(_isTCP)
 	{
 		*_sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -91,6 +97,7 @@ void CNetworkManager::RecvTCPThreadFunction(SOCKET* _sock)
 {
 	while (isContinue)
 	{
+		// Recv
 		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
 		int strLen = recv(*_sock, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0);
 		if (strLen == -1)
@@ -102,23 +109,26 @@ void CNetworkManager::RecvTCPThreadFunction(SOCKET* _sock)
 		int socketRemainBuffer = strLen;
 		int totalBufSize = strLen;
 
+		// 읽은 버퍼의 크기가 최대 버퍼 사이즈와 같다면
 		while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 		{
 			std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
 			memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
 			std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+			// 남은 버퍼를 더 받음
 			socketRemainBuffer = recv(*_sock, TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
 			if (socketRemainBuffer == SOCKET_ERROR)
 			{
 				CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv() error in linking packet");
 				break;
 			}
+			// 더 받은 버퍼를 기존 버퍼에 이어 붙임
 			memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
 			RecvBuffer = tempBuf;
 			totalBufSize += socketRemainBuffer;
 			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 		}
-
+		// 패킷 분석 및 적용
 		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), totalBufSize);
 	}
 }
@@ -127,6 +137,7 @@ void CNetworkManager::RecvUDPThreadFunction(SOCKET* _sock, sockaddr_in* _sockAdd
 {
 	while (isContinue)
 	{
+		// RecvFrom
 		std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
 		int addrSize = sizeof(*_sockAddr);
 		ZeroMemory(_sockAddr, addrSize);
@@ -136,13 +147,14 @@ void CNetworkManager::RecvUDPThreadFunction(SOCKET* _sock, sockaddr_in* _sockAdd
 			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recvfrom() error : %d", GetLastError());
 			return;
 		}
-
+		// 패킷 분석 및 적용
 		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), strLen);
 	}
 }
 
 bool CNetworkManager::SendToServer(const char* data, int dataSize, bool isTCP, bool isIOCP)
 {
+	// IOCP / EPOLL , TCP, UDP에 따라 Send
 	if (isIOCP)
 	{
 		if (isTCP)

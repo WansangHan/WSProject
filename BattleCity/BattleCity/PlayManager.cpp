@@ -27,5 +27,7 @@ void CPlayManager::EnterGame()
 
 	sendData.set__id(m_ownPlayer->GetID());
 	sendData.set__name(m_ownPlayer->GetName());
+
+	// 현재 클라이언트의 정보를 받아 서버로 전달
 	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_SERVER, sendData.SerializeAsString(), true, true);
 }

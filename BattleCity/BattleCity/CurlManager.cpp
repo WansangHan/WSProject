@@ -4,12 +4,14 @@
 std::unique_ptr<CCurlManager> CCurlManager::m_inst;
 std::once_flag CCurlManager::m_once;
 
+// 웹 서버 리턴 값을 받을 구조체 초기화
 void init_string(struct strres *s) {
 	s->len = 0;
 	s->ptr = (char*)malloc(s->len + 1);
 	s->ptr[0] = '\0';
 }
 
+// 웹 서버 리턴 콜벡 함수
 size_t writefunc(void *ptr, size_t size, size_t nmemb, struct strres *s)
 {
 	size_t new_len = s->len + size*nmemb;
@@ -65,6 +67,7 @@ void CCurlManager::InitCurlManager()
 	m_curl = curl_easy_init();
 }
 
+// 로그 메시지를 Json로 만들어 웹서버로 보내는 함수
 bool CCurlManager::SendErWnJsonString(const char * _message, char * _level)
 {
 	Json::Value data;
@@ -77,6 +80,7 @@ bool CCurlManager::SendErWnJsonString(const char * _message, char * _level)
 	return true;
 }
 
+// 회원가입 메시지를 Json로 만들어 웹서버로 보내는 함수
 Json::Value CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char* _ml)
 {
 	Json::Value data;
@@ -92,6 +96,7 @@ Json::Value CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char*
 	return retjsn;
 }
 
+// 로그인 메시지를 Json로 만들어 웹서버로 보내는 함수
 Json::Value CCurlManager::SendLoginJsonString(char* _id, char* _pw)
 {
 	Json::Value data;

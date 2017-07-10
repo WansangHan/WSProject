@@ -17,9 +17,10 @@
 #include <memory.h>
 #include <tchar.h>
 #include <time.h>
-
+// 현재 시간을 받아오는 함수
 void currentDateTime(char* curTime);
 
+// 소켓 최대 버퍼 사이즈
 #define MAX_SOCKET_BUFFER_SIZE 3472
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.

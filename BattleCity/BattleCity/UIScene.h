@@ -1,4 +1,5 @@
 #pragma once
+// 모든 UIScene의 부모 클래스
 class CUIScene
 {
 public:

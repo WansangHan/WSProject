@@ -24,11 +24,11 @@ class CGameManager
 	CUIManager* m_uiManager;
 	CPlayManager* m_playManager;
 
-	HWND m_hwnd;
-	HDC m_hdc;
-	PAINTSTRUCT ps;
+	HWND m_hwnd;	// 프로그램 메인 핸들
+	HDC m_hdc;		// 프로그램 메인 HDC
+	PAINTSTRUCT ps;	// 프로그램 메인 PAINTSTRUCT
 
-	GameState m_gameState;
+	GameState m_gameState;		// 게임 상태
 
 	CGameManager();
 public:

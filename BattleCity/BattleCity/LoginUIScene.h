@@ -1,24 +1,24 @@
 #pragma once
 #include "UIScene.h"
 #include "UIManager.h"
-
+// 회원가입 관련 TextBox 문자열 제한 길이
 #define MAX_NEWACCOUNT_ID_LENGTH 20
 #define MAX_NEWACCOUNT_PW_LENGTH 20
 #define MAX_NEWACCOUNT_ML_LENGTH 40
-
+// 로그인 관련 TextBox 문자열 제한 길이
 #define MAX_LOGIN_ID_LENGTH 20
 #define MAX_LOGIN_PW_LENGTH 20
 
 class CLoginUIScene : public CUIScene
 {
-	HWND m_NewAccountIDBox;
-	HWND m_NewAccountPWBox;
-	HWND m_NewAccountMlBox;
-	HWND m_NewAccountButton;
+	HWND m_NewAccountIDBox;		// 회원가입 ID Box
+	HWND m_NewAccountPWBox;		// 회원가입 Password Box
+	HWND m_NewAccountMlBox;		// 회원가입 Mail Box
+	HWND m_NewAccountButton;	// 회원가입 Button
 
-	HWND m_loginIDBox;
-	HWND m_loginPWBox;
-	HWND m_loginButton;
+	HWND m_loginIDBox;		// 로그인 ID Box
+	HWND m_loginPWBox;		// 로그인 Password Box
+	HWND m_loginButton;		// 로그인 Button
 public:
 	CLoginUIScene();
 	~CLoginUIScene();

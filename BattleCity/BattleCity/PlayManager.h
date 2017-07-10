@@ -6,7 +6,7 @@ class CGameManager;
 
 class CPlayManager
 {
-	CPlayer* m_ownPlayer;
+	CPlayer* m_ownPlayer;		// 클라이언트가 플레이하는 CPlayer 클래스 변수
 public:
 	CPlayManager();
 	~CPlayManager();

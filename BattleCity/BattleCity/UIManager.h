@@ -10,11 +10,13 @@
 class CCommonUIScene;
 class CLoginUIScene;
 
+// Scene 상태 enum
 enum SceneState
 {
 	LOGIN,
 };
 
+// WM_COMMAND에서 콜백 호출 시 윈도우 오브젝트들을 구분하는 ENUM
 enum HMENUNUMBER
 {
 	COMMON_EXIT_BUTTON,
@@ -36,6 +38,7 @@ class CUIManager
 	CCommonUIScene* m_commonUIScene;
 	CLoginUIScene* m_loginUIScene;
 
+	// 윈도우 메시지 콜백에 대응하기 위한 상태값 <-> 함수포인터 매칭 map
 	typedef std::function<void(HWND, HDC)> Paint_Function;
 	std::map < SceneState, Paint_Function > Paint_functionmap;
 

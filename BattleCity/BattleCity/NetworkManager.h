@@ -18,19 +18,19 @@ class CNetworkManager
 	static std::once_flag m_once;
 
 	WSADATA m_wsaData;
-
+	// 통신에 쓰일 소켓
 	std::shared_ptr<SOCKET> m_IOCP_TCPSocket;
 	std::shared_ptr<SOCKET> m_IOCP_UDPSocket;
 	std::shared_ptr<SOCKET> m_EPOL_TCPSocket;
 	std::shared_ptr<SOCKET> m_EPOL_UDPSocket;
-
+	// 통신에 쓰일 소켓 어드레스
 	std::shared_ptr<sockaddr_in> m_IOCP_TCPSockAddr;
 	std::shared_ptr<sockaddr_in> m_IOCP_UDPSockAddr;
 	std::shared_ptr<sockaddr_in> m_IOCP_ClnSockAddr;
 	std::shared_ptr<sockaddr_in> m_EPOL_TCPSockAddr;
 	std::shared_ptr<sockaddr_in> m_EPOL_UDPSockAddr;
 	std::shared_ptr<sockaddr_in> m_EPOL_ClnSockAddr;
-
+	// Receive를 위한 Thread
 	std::unique_ptr<std::thread> m_Recv_IOCP_TCPThread;
 	std::unique_ptr<std::thread> m_Recv_IOCP_UDPThread;
 	std::unique_ptr<std::thread> m_Recv_EPOL_TCPThread;
@@ -50,11 +50,12 @@ public:
 
 	bool InitNetworkManager();
 	void ExitNetworkManager();
-
+	// 서버와 connect를 진행하는 함수
 	void ConnectToServer(SOCKET* _sock, sockaddr_in* _sockAddr, const char* _ip, int _port, bool _isTCP);
-
+	// TCP, UDP Receive 함수
 	void RecvTCPThreadFunction(SOCKET* _sock);
 	void RecvUDPThreadFunction(SOCKET* _sock, sockaddr_in* _sockAddr);
+	// IOCP / EPOLL , TCP, UDP에 따라 Send
 	bool SendToServer(const char* data, int dataSize, bool isTCP, bool isIOCP);
 };
 

@@ -4,7 +4,7 @@
 
 class CCommonUIScene : public CUIScene
 {
-	HWND m_xButton;
+	HWND m_xButton;		// 프로그램 종료 버튼 핸들
 public:
 	CCommonUIScene();
 	~CCommonUIScene();

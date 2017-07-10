@@ -16,7 +16,7 @@ class CLogManager
 	CFileManager* m_filemanager;
 
 	CLogManager();
-
+	// SQL Send 여부를 판단하고 SQL과 File에 로그를 저장하는 함수
 	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
 
 	CRITICAL_SECTION cs;
@@ -28,6 +28,7 @@ public:
 	}
 	~CLogManager();
 	bool InitLogManager();
+	// 가변 인자로 넘어온 정수, 문자열 형태의 변수를 로그에 합쳐 ApplyLogMessage 함수를 호출
 	bool WriteLogMessage(char* _level, bool _sendsql, const char* _message, ...);
 };
 
