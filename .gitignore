@@ -47,6 +47,7 @@ WSSockServer/protobuf-3.3.0/
 WSSockServer/WSSockServer/x64/
 WSSockServer/WSSockServer/logs/
 WSSockServer/WSSockServer/linuxBuild/
+WSSockServer/.vs/
 
 BattleCity/ipch/
 BattleCity/curl-7.54.0/
