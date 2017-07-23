@@ -34,8 +34,8 @@ bool CNetworkManager::InitNetworkManager()
 	ConnectToServer(m_IOCP_TCPSocket.get(), m_IOCP_TCPSockAddr.get(), "127.0.0.1", 9999, true);
 	ConnectToServer(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get(), "127.0.0.1", 8888, false);
 	// EPOLL 서버에 접속
-	ConnectToServer(m_EPOL_TCPSocket.get(), m_EPOL_TCPSockAddr.get(), "192.168.127.128", 22222, true);
-	ConnectToServer(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get(), "192.168.127.128", 33333, false);
+	ConnectToServer(m_EPOL_TCPSocket.get(), m_EPOL_TCPSockAddr.get(), "192.168.68.128", 22222, true);
+	ConnectToServer(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get(), "192.168.68.128", 33333, false);
 
 	// Receive Thread 지속 여부
 	isContinue = true;
