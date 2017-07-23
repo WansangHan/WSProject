@@ -18,6 +18,7 @@ bool CEPOLL::InitServer()
 {
 	CLogManager::getInstance().InitLogManager();
 
+	// TCP 소켓 bind listen
 	m_listenTCPSocket = std::make_shared<CTCPSocket>();
 
 	memset(&m_listenTCPSocketAddr, 0, sizeof(m_listenTCPSocketAddr));
@@ -30,6 +31,7 @@ bool CEPOLL::InitServer()
 	if (listen(m_listenTCPSocket->GetSOCKET(), 5) == -1)
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "listen() error");
 
+	// UDP 소켓 bind
 	m_listenUDPSocket = std::make_shared<CUDPSocket>();
 
 	memset(&m_listenUDPSocketAddr, 0, sizeof(m_listenUDPSocketAddr));
@@ -45,10 +47,12 @@ bool CEPOLL::InitServer()
 
 	epoll_event event;
 
+	// TCP Listen 소켓을 EPOLL 오브젝트에 추가
 	event.events = EPOLLIN;
 	event.data.fd = m_listenTCPSocket->GetSOCKET();
 	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenTCPSocket->GetSOCKET(), &event);
 
+	// UDP Listen 소켓을 EPOLL 오브젝트에 추가
 	event.data.fd = m_listenUDPSocket->GetSOCKET();
 	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenUDPSocket->GetSOCKET(), &event);
 
@@ -61,6 +65,7 @@ void CEPOLL::Update()
 {
 	while (1)
 	{
+		// 이벤트가 발생한 소켓이 있을 때 까지 대기
 		int event_cnt = epoll_wait(m_epfd, ep_events, 50, -1);
 		if (event_cnt == -1)
 		{
@@ -68,16 +73,20 @@ void CEPOLL::Update()
 			break;
 		}
 
+		// 이벤트가 발생한 소켓에 대해 for 처리
 		for (int i = 0; i<event_cnt; i++)
 		{
+			// TCP Listen 소켓에 이벤트가 발생 했을 때(Accept)
 			if (ep_events[i].data.fd == m_listenTCPSocket->GetSOCKET())
 			{
 				socklen_t adr_sz = sizeof(m_listenTCPSocketAddr);
 				sockaddr_in clnt_adr;
+				// Accept
 				int clnt_sock = accept(m_listenTCPSocket->GetSOCKET(), (struct sockaddr*)&clnt_adr, &adr_sz);
 				epoll_event event;
 				event.events = EPOLLIN;
 				event.data.fd = clnt_sock;
+				// Accept한 소켓을 EPOLL 오브젝트에 추가
 				epoll_ctl(m_epfd, EPOLL_CTL_ADD, clnt_sock, &event);
 			}
 			else
@@ -86,11 +95,15 @@ void CEPOLL::Update()
 				int str_len = 0;
 				socklen_t addrSize = sizeof(m_clientUDPSockAddr);
 				if (ep_events[i].data.fd != m_listenUDPSocket->GetSOCKET())
+					// TCP 소켓에 Receive 이벤트 발생시
 					str_len = read(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
 				else
+					// UDP 소켓에 Receive 이벤트 발생시
 					str_len = recvfrom(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0, (sockaddr*)&m_clientUDPSockAddr, &addrSize);
-				if (str_len == 0)    // close request!
+				if (str_len == 0)
 				{
+					// 클라이언트 종료
+					// EPOLL 오브젝트에서 소켓 제거
 					epoll_ctl(
 						m_epfd, EPOLL_CTL_DEL, ep_events[i].data.fd, NULL);
 					close(ep_events[i].data.fd);
@@ -99,17 +112,20 @@ void CEPOLL::Update()
 				{
 					int socketRemainBuffer = str_len;
 					int totalBufSize = str_len;
+					// 읽은 버퍼의 크기가 최대 버퍼 사이즈와 같다면
 					while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 					{
 						std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
 						memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
 						std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+						// 남은 버퍼를 더 받음
 						socketRemainBuffer = read(ep_events[i].data.fd, TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
 						if (socketRemainBuffer == -1)
 						{
 							CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv : -1");
 							break;
 						}
+						// 더 받은 버퍼를 기존 버퍼에 이어 붙임
 						memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
 						RecvBuffer = tempBuf;
 						totalBufSize += socketRemainBuffer;
@@ -121,7 +137,8 @@ void CEPOLL::Update()
 					else
 						sock = std::make_shared<CUDPSocket>();
 					sock->SetSOCKET(ep_events[i].data.fd);
-
+					
+					// 패킷 분석 및 적용
 					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(sock, RecvBuffer, totalBufSize, true);
 				}
 
@@ -140,6 +157,7 @@ void CEPOLL::CloseServer()
 
 bool CEPOLL::SendToClient(void* buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in * soaddr, bool isTCP)
 {
+	// TCP, UDP에 따라 Send
 	if (isTCP)
 		write(sock->GetSOCKET(), buf, len);
 	else

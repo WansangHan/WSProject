@@ -13,7 +13,7 @@ CIOCP::~CIOCP()
 {
 	CloseServer();
 }
-
+// IOCP Worker Thread
 void CIOCP::WorkerThread()
 {
 	DWORD dwNoOfBytes = 0;
@@ -24,6 +24,7 @@ void CIOCP::WorkerThread()
 	{
 		GetQueuedCompletionStatus(m_CompPort, &(DWORD)dwNoOfBytes, &(ULONG_PTR)ulKey, (LPOVERLAPPED*)&ovrlap, INFINITE);
 
+		// 소켓 state에 따라 처리
 		switch (ovrlap->m_state)
 		{
 		case ACEP:
@@ -45,6 +46,7 @@ void CIOCP::WorkerThread()
 	}
 }
 
+// Socket을 Accept 대기 상태로
 void CIOCP::PostAccept()
 {
 	AcceptOverlapped *acceptOverlapped = new AcceptOverlapped;
@@ -68,6 +70,7 @@ void CIOCP::PostAccept()
 	}
 }
 
+// Socket의 Disconnect 대기 상태로
 void CIOCP::PostDisconnect(std::shared_ptr<CBaseSocket> sock)
 {
 	DisconnectOverlapped* disconnectOverlapped = new DisconnectOverlapped;
@@ -86,6 +89,7 @@ void CIOCP::PostDisconnect(std::shared_ptr<CBaseSocket> sock)
 	}
 }
 
+// Socket을 Read 대기 상태로
 void CIOCP::PostRead(std::shared_ptr<CBaseSocket> sock, bool isTCP)
 {
 	ReadOverlapped* readOverlapped = new ReadOverlapped;
@@ -93,6 +97,7 @@ void CIOCP::PostRead(std::shared_ptr<CBaseSocket> sock, bool isTCP)
 
 	readOverlapped->m_wsabuf.buf = readOverlapped->m_buffer;
 	readOverlapped->m_wsabuf.len = MAX_SOCKET_BUFFER_SIZE;
+	// TCP 인지
 	if (isTCP)
 	{
 		readOverlapped->m_sock = sock;
@@ -130,7 +135,7 @@ int CIOCP::PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, socka
 	writeOverlapped->m_wsabuf.buf = writeOverlapped->m_buffer;
 	writeOverlapped->m_wsabuf.len = len;
 
-
+	// TCP인지
 	if (isTCP)
 	{
 		writeOverlapped->m_sock = sock;
@@ -159,6 +164,7 @@ int CIOCP::PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, socka
 	return len;
 }
 
+// Client Accept 시 후처리
 void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 {
 	SOCKET so = m_listenTCPSocket->GetSOCKET();
@@ -173,7 +179,7 @@ void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 	sockaddr* lpRemoteSockAddr = NULL;
 	int nLocalSockaddrLen = 0;
 	int nRemoteSockaddrLen = 0;
-
+	// AcceptEx 호출로 리턴된 버퍼에서 로컬, 리모트 어드레스를 얻어옴
 	lpfnGetAcceptExSockaddrs(
 		&((AcceptOverlapped*)ovrlap)->m_Bufs,
 		0,
@@ -184,23 +190,28 @@ void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 		&lpRemoteSockAddr,
 		&nRemoteSockaddrLen);
 
-
+	// Accept한 소켓을 IOCP 오브젝트에 넣어줌
 	CreateIoCompletionPort((HANDLE)ovrlap->m_sock->GetSOCKET(), m_CompPort, 0, 0);
+	// Recv 대기
 	PostRead(ovrlap->m_sock, true);
+	// 다음 클라이언트 받을 준비
 	PostAccept();
 
 	delete ovrlap;
 
 }
 
+// Client Disconnect 시 후처리
 void CIOCP::ProcessDisconnect(DisconnectOverlapped* ovrlap)
 {
+	// 소켓 close
 	ovrlap->m_sock->CloseSocket();
 	delete ovrlap;
 }
 
 void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 {
+	// 클라이언트의 종료 요청시 PostDisconnect 호출
 	if (datalen == 0) { PostDisconnect(ovrlap->m_sock); return; }
 
 	bool isTCP = ovrlap->m_isTCP;
@@ -213,23 +224,28 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 	std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[datalen], std::default_delete<char[]>());
 	memcpy(RecvBuffer.get(), ovrlap->m_buffer, datalen);
 
+	// 읽은 버퍼의 크기가 최대 버퍼 사이즈와 같다면
 	while (socketRemainBuffer == MAX_SOCKET_BUFFER_SIZE)
 	{
 		std::shared_ptr<char> tempBuf = std::shared_ptr<char>(new char[totalBufSize + MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
 		memcpy(tempBuf.get(), RecvBuffer.get(), totalBufSize);
 		std::shared_ptr<char> TempRecvBuffer = std::shared_ptr<char>(new char[MAX_SOCKET_BUFFER_SIZE], std::default_delete<char[]>());
+		// 남은 버퍼를 더 받음
 		socketRemainBuffer = recv(ovrlap->m_sock->GetSOCKET(), TempRecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, NULL);
 		if (socketRemainBuffer == SOCKET_ERROR)
 		{
 			CLogManager::getInstance().WriteLogMessage("ERROR", true, "recv() error in linking packet");
 			break;
 		}
+		// 더 받은 버퍼를 기존 버퍼에 이어 붙임
 		memcpy(tempBuf.get() + totalBufSize, TempRecvBuffer.get(), socketRemainBuffer);
 		RecvBuffer = tempBuf;
 		totalBufSize += socketRemainBuffer;
 		CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 	}
+	// 패킷 분석 및 적용
 	CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(ovrlap->m_sock, RecvBuffer, totalBufSize, isTCP);
+	// Recv 대기
 	PostRead(ovrlap->m_sock, isTCP);
 	delete ovrlap;
 }
@@ -248,7 +264,7 @@ bool CIOCP::InitServer()
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "WSAStartup Error");
 		return false;
 	}
-
+	// IOCP 오브젝트 생성
 	m_CompPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 	if (m_CompPort == NULL)
 	{
@@ -258,7 +274,7 @@ bool CIOCP::InitServer()
 
 	m_listenTCPSocket = std::make_shared<CTCPSocket>();
 	m_listenUDPSocket = std::make_shared<CUDPSocket>();
-
+	// TCP 소켓 IOCP 오브젝트에 등록
 	CreateIoCompletionPort((HANDLE)m_listenTCPSocket->GetSOCKET(), m_CompPort, 0, 0);
 
 	memset(&m_listenTCPSocketAddr, 0, sizeof(m_listenTCPSocketAddr));
@@ -273,6 +289,7 @@ bool CIOCP::InitServer()
 	}
 
 	int enable = 0;
+	// AcceptEx를 사용하기 위한 소켓 옵션
 	if (setsockopt(m_listenTCPSocket->GetSOCKET(), SOL_SOCKET, SO_CONDITIONAL_ACCEPT, (const char*)&enable, sizeof(int)) == SOCKET_ERROR)
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "setsockopt SO_CONDITIONAL_ACCEPT Error : %d", WSAGetLastError());
