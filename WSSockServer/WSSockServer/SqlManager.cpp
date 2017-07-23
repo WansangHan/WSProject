@@ -16,7 +16,7 @@ bool CSqlManager::InitSQLManager()
 {
 	m_connection = mysql_real_connect(
 		&m_conn,
-		"192.168.127.128", 
+		"192.168.68.128", 
 		"WS", "@013meadmin", 
 		"WSDB", 3306, (char*)NULL, 0);
 
