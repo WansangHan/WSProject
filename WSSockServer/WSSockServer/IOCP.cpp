@@ -259,6 +259,9 @@ bool CIOCP::InitServer()
 {
 	CLogManager::getInstance().InitLogManager();
 
+	ReadRecvFlag = 0;
+	WritedwFlags = 0;
+
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsaData) != 0)
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "WSAStartup Error");
