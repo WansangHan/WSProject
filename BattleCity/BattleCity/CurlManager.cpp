@@ -75,7 +75,7 @@ bool CCurlManager::SendErWnJsonString(const char * _message, char * _level)
 	data["message"] = _message;
 	data["level"] = _level;
 	Json::StyledWriter writer;
-	SendCurlMessage("http://192.168.127.128/index.php/LogWriter/LogWriter", writer.write(data));
+	SendCurlMessage("http://192.168.68.128/index.php/LogWriter/LogWriter", writer.write(data));
 
 	return true;
 }
@@ -88,7 +88,7 @@ Json::Value CCurlManager::SendNewAccountJsonString(char * _id, char * _pw, char*
 	data["pw"] = _pw;
 	data["ml"] = _ml;
 	Json::StyledWriter writer;
-	char* retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/NewAccount", writer.write(data));
+	char* retVal = SendCurlMessage("http://192.168.68.128/index.php/BattleCity/NewAccount", writer.write(data));
 	Json::Reader reader;
 	Json::Value retjsn;
 	reader.parse(retVal, retjsn);
@@ -103,7 +103,7 @@ Json::Value CCurlManager::SendLoginJsonString(char* _id, char* _pw)
 	data["id"] = _id;
 	data["pw"] = _pw;
 	Json::StyledWriter writer;
-	char* retVal = SendCurlMessage("http://192.168.127.128/index.php/BattleCity/Login", writer.write(data));
+	char* retVal = SendCurlMessage("http://192.168.68.128/index.php/BattleCity/Login", writer.write(data));
 	Json::Reader reader;
 	Json::Value retjsn;
 	reader.parse(retVal, retjsn);
