@@ -129,7 +129,7 @@ void CNetworkManager::RecvTCPThreadFunction(SOCKET* _sock)
 			CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 		}
 		// 패킷 분석 및 적용
-		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), totalBufSize);
+		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), totalBufSize, true);
 	}
 }
 
@@ -148,7 +148,7 @@ void CNetworkManager::RecvUDPThreadFunction(SOCKET* _sock, sockaddr_in* _sockAdd
 			return;
 		}
 		// 패킷 분석 및 적용
-		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), strLen);
+		CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(RecvBuffer.get(), strLen, false);
 	}
 }
 

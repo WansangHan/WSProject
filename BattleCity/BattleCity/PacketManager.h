@@ -82,7 +82,7 @@ public:
 	void InitPacketManager();
 	void ExitPacketManager();
 	// 뭉쳐서 온 패킷을 분리하는 함수
-	void DEVIDE_PACKET_BUNDLE(char* packet, int packetSize);
+	void DEVIDE_PACKET_BUNDLE(char* packet, int packetSize, bool isTCP);
 
 	// 받은 protobuffer 패킷 형태를, 미리 정의한 패킷 형태로 만들어 서버로 보내는 함수
 	void SendPacketToServer(SendPacketType type, std::string str, bool isTCP, bool isIOCP);

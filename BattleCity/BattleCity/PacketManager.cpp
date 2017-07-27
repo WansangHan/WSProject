@@ -78,7 +78,7 @@ void CPacketManager::ExitPacketManager()
 	th_udp->join();
 }
 
-void CPacketManager::DEVIDE_PACKET_BUNDLE(char * packet, int packetSize)
+void CPacketManager::DEVIDE_PACKET_BUNDLE(char * packet, int packetSize, bool isTCP)
 {
 	// 패킷이 뭉쳐서 왔을 때 분할해주는 함수
 	// 패킷 타입 4Byte / 패킷 사이즈 4Byte / 이후 protobuf 영역
@@ -96,7 +96,8 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE(char * packet, int packetSize)
 		std::shared_ptr<PacketInfo> info = std::make_shared<PacketInfo>();
 		info->SetVal(data, Typesize);
 		// 패킷 정보를 Queue에 push
-		packet_queue_tcp.push(info);
+		if(isTCP) packet_queue_tcp.push(info);
+		else packet_queue_udp.push(info);
 		curToken += Typesize;
 	}
 }
