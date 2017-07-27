@@ -305,6 +305,7 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
+	// AcceptEx를 사용하기 위해 WSAIoctl 사용
 	GUID guidAcceptEx = WSAID_ACCEPTEX;
 	DWORD acceptRecvDwBytes;
 	if (WSAIoctl(
@@ -323,6 +324,7 @@ bool CIOCP::InitServer()
 		return false;
 	}
 
+	// lpfnGetAcceptExSockaddrs를 사용하기 위해 WSAIoctl 사용
 	GUID GuidGetAcceptExSockaddrs = WSAID_GETACCEPTEXSOCKADDRS;
 	DWORD getAcceptexSockaddrsRecvDwBytes;
 	if (WSAIoctl(
@@ -353,14 +355,18 @@ bool CIOCP::InitServer()
 
 	CreateIoCompletionPort((HANDLE)m_listenUDPSocket->GetSOCKET(), m_CompPort, 0, 0);
 
+	// IOCP Worker Thread를 시작시킨다.
 	GetSocketCallbackThread = new std::thread*[WORKERTHREAD_NUM];
 	for (int i = 0; i < WORKERTHREAD_NUM; i++)
 	{
 		GetSocketCallbackThread[i] = new std::thread([this] {this->WorkerThread(); });
 	}
+	// PacketManager 초기화
 	CPacketManager::getInstance().InitPacketManager();
 
+	// 소켓 하나에 대해 AcceptEx 호출
 	PostAccept();
+	// UDP 소켓에 대해 Read
 	PostRead(nullptr, false);
 	
 	return true;
@@ -371,6 +377,7 @@ void CIOCP::Update()
 	while (1) { Sleep(1000); }
 }
 
+// 서버 종료
 void CIOCP::CloseServer()
 {
 	for (int i = 0; i < WORKERTHREAD_NUM; i++)
