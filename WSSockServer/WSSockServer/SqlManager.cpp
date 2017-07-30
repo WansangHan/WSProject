@@ -14,6 +14,7 @@ CSqlManager::~CSqlManager()
 
 bool CSqlManager::InitSQLManager()
 {
+	// Mysql 서버 접속
 	m_connection = mysql_real_connect(
 		&m_conn,
 		"192.168.68.128", 
@@ -30,10 +31,11 @@ bool CSqlManager::InitSQLManager()
 	return true;
 }
 
+// 로그 메시지를 디비에 저장하는 함수
 bool CSqlManager::SendLogMessage(const char * _message, char * _level)
 {
 	std::shared_ptr<char> query = std::shared_ptr<char>(new char[53 + strlen(_message) + strlen(_level)], std::default_delete<char[]>());
-
+	// 쿼리에 넘어온 데이터 합치기
 #ifdef IOCP_SERVER
 	sprintf_s(query.get(), 53 + strlen(_message) + strlen(_level),
 		"SELECT INSERT_LOG_MESSAGE('%s', '%s', '%s') FROM DUAL;",

@@ -48,6 +48,7 @@ struct PacketInfo
 #endif
 };
 
+// 패킷을 보낼 때 패킷 구조 정의를 위한 구조체
 #pragma pack(1)
 struct PacketStructure
 {
@@ -65,12 +66,15 @@ class CPacketManager
 	static std::unique_ptr<CPacketManager> m_inst;
 	static std::once_flag m_once;
 
+	// Queue에 저장된 TCP, UDP 패킷들을 Dequeue하고 적용할 함수의 Thread 변수
 	std::unique_ptr<std::thread> th_tcp;
 	std::unique_ptr<std::thread> th_udp;
 
+	// 패킷 타입과 그에 따른 함수 호출 바인딩을 위한 map
 	typedef std::function<void(std::shared_ptr<CBaseSocket>, char*)> Function;
 	std::map < RecvPacketType, Function > map_function;
 
+	// Packet의 정보가 담긴 구조체 큐(리눅스에는 Thread Safe Queue가 없어서, 구글에서 가져온 코드 사용)
 #ifdef IOCP_SERVER
 	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_tcp;
 	concurrency::concurrent_queue<std::shared_ptr<PacketInfo>> packet_queue_udp;
@@ -81,11 +85,14 @@ class CPacketManager
 
 	CPacketManager();
 
+	// Queue에 저장된 TCP, UDP 패킷들을 Dequeue해 적용하는 Thread 함수
 	void APPLY_PACKET_TCP();
 	void APPLY_PACKET_UDP();
 
+	// 패킷 타입과 바인딩 된 함수를 찾아 호출시키는 함수
 	void DEVIDE_PACKET_TYPE(PacketInfo* info);
 
+	// map에 패킷 타입과 함수를 바인딩하는 함수
 	void InitFunctionmap();
 public:
 	static CPacketManager& getInstance()
@@ -97,6 +104,7 @@ public:
 
 	void InitPacketManager();
 	void DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize, bool isTCP);
+	// Send 함수
 	void SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str, sockaddr_in* sockaddr, bool isTCP);
 };
 

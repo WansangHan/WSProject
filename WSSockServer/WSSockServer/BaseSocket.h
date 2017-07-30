@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #endif
 #include "LogManager.h"
+
+// TCP, UDP 소켓의 부모 클래스
 class CBaseSocket
 {
 protected:

@@ -95,6 +95,7 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock,
 		memcpy(data.get(), packet.get() + curToken, Typesize);
 		std::shared_ptr<PacketInfo> info = std::make_shared<PacketInfo>();
 		info->SetVal(sock, data, Typesize);
+		// 패킷 정보를 Queue에 push
 		if (isTCP)
 		{
 #ifdef IOCP_SERVER
@@ -117,11 +118,14 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock,
 
 void CPacketManager::SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str, sockaddr_in* sockaddr, bool isTCP)
 {
+	// 인자로 넘어온 패킷 타입, 패킷을 토대로 패킷 사이즈를 정의한 후 패킷의 형태로 만들어 Send 함수를 호출함
 	PacketStructure ps;
 	ps.packetType = type;
 	ps.dataSize = str.length() + sizeof(PacketStructure);
 	std::shared_ptr<char> packet = std::shared_ptr<char>(new char[ps.dataSize], std::default_delete<char[]>());
+	// 패킷 헤더인 8바이트 영역에 패킷의 타입과 사이즈를 memcpy
 	memcpy(packet.get(), &ps, sizeof(PacketStructure));
+	// 이후 영역에 protocolbuffer 형태의 데이터를 이어붙임
 	memcpy(packet.get() + sizeof(PacketStructure), str.c_str(), str.length());
 #ifdef IOCP_SERVER
 	CIOCP::getInstance().PostSend(packet.get(), ps.dataSize, sock, sockaddr, isTCP);

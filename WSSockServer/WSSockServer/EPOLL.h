@@ -15,12 +15,15 @@ class CEPOLL
 	static std::unique_ptr<CEPOLL> m_inst;
 	static std::once_flag m_once;
 
+	// EPOLL Object甸
 	epoll_event *ep_events;
 	int m_epfd;
 
+	// listen 家南
 	std::shared_ptr<CTCPSocket> m_listenTCPSocket;
 	std::shared_ptr<CUDPSocket> m_listenUDPSocket;
 
+	// listen 家南 address
 	sockaddr_in m_listenTCPSocketAddr;
 	sockaddr_in m_listenUDPSocketAddr;
 

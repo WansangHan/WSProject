@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "BaseSocket.h"
 
+// IOCP 이벤트 발생 시 소켓 State Enum
 enum SocketState
 {
 	ACEP = 1000,
@@ -10,6 +11,7 @@ enum SocketState
 	SEND,
 };
 
+// 4가지 소켓 상태값을 저장할 Overlapped 구조체들의 부모
 struct Overlapped : public WSAOVERLAPPED
 {
 	std::shared_ptr<CBaseSocket> m_sock;
@@ -26,6 +28,7 @@ struct Overlapped : public WSAOVERLAPPED
 
 struct AcceptOverlapped : public Overlapped
 {
+	// AcceptEx 사용시 클라이언트의 주소 정보가 들어갈 변수
 	struct {
 		BYTE m_pLocal[sizeof(SOCKADDR_IN) + 16];
 		BYTE m_pRemote[sizeof(SOCKADDR_IN) + 16];
