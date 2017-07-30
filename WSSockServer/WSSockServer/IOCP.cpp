@@ -244,7 +244,7 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 		CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 	}
 	// 패킷 분석 및 적용
-	CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(ovrlap->m_sock, RecvBuffer, totalBufSize, isTCP);
+	CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(ovrlap->m_sock, RecvBuffer, totalBufSize, isTCP);
 	// Recv 대기
 	PostRead(ovrlap->m_sock, isTCP);
 	delete ovrlap;

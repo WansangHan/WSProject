@@ -139,7 +139,7 @@ void CEPOLL::Update()
 					sock->SetSOCKET(ep_events[i].data.fd);
 					
 					// 패킷 분석 및 적용
-					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE_TCP(sock, RecvBuffer, totalBufSize, true);
+					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(sock, RecvBuffer, totalBufSize, true);
 				}
 
 			}

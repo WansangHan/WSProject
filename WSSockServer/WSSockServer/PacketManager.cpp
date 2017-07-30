@@ -78,7 +78,7 @@ void CPacketManager::InitPacketManager()
 	th_udp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_UDP, this));
 }
 
-void CPacketManager::DEVIDE_PACKET_BUNDLE_TCP(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize, bool isTCP)
+void CPacketManager::DEVIDE_PACKET_BUNDLE(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize, bool isTCP)
 {
 	// 패킷이 뭉쳐서 왔을 때 분할해주는 함수
 	// 패킷 타입 4Byte / 패킷 사이즈 4Byte / 이후 protobuf 영역
