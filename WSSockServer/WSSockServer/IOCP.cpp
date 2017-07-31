@@ -204,6 +204,8 @@ void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 // Client Disconnect 시 후처리
 void CIOCP::ProcessDisconnect(DisconnectOverlapped* ovrlap)
 {
+	// 서비스 로직에서 클라이언트 delete
+	CInGame::getInstance().ExitPlayer(ovrlap->m_sock);
 	// 소켓 close
 	ovrlap->m_sock->CloseSocket();
 	delete ovrlap;
