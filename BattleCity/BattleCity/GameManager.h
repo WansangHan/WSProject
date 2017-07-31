@@ -41,6 +41,7 @@ public:
 
 	bool InitGameManager(HWND _hwnd);
 	void ExitGameManager();
+	void Timer(HWND _hwnd);
 	bool PaintAll();
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 	void LButtonDown(LPARAM lParam);

@@ -31,13 +31,21 @@ bool CGameManager::InitGameManager(HWND _hwnd)
 	m_uiManager->InitUIManager();
 	m_playManager->InitPlayerManager();
 
+	SetTimer(m_hwnd, 1, 1, NULL);
+
 	return false;
 }
 
 void CGameManager::ExitGameManager()
 {
+	KillTimer(m_hwnd, 1);
 	CNetworkManager::getInstance().ExitNetworkManager();
 	CPacketManager::getInstance().ExitPacketManager();
+}
+
+void CGameManager::Timer(HWND _hwnd)
+{
+	CPacketManager::getInstance().APPLY_PACKET();
 }
 
 bool CGameManager::PaintAll()

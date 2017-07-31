@@ -129,6 +129,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		CGameManager::getInstance().InitGameManager(hWnd);
 		break;
+	case WM_TIMER:
+		CGameManager::getInstance().Timer(hWnd);
+		return 0;
     case WM_COMMAND:
 		CGameManager::getInstance().CommandHandling(hWnd, wParam);
 		break;

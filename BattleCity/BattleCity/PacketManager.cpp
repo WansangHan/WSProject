@@ -8,31 +8,21 @@ CPacketManager::CPacketManager()
 {
 }
 
-void CPacketManager::APPLY_PACKET_TCP()
+void CPacketManager::APPLY_PACKET()
 {
-	while (isContinue)
+	// Queue에 쌓인 Receive TCP 패킷을 처리
+	if (!packet_queue_tcp.empty())
 	{
-		// Queue에 쌓인 Receive TCP 패킷을 처리하는 함수 (추후 메인 쓰레드에서 실행시킬 예정)
-		if (!packet_queue_tcp.empty())
-		{
-			std::shared_ptr<PacketInfo> info;
-			packet_queue_tcp.try_pop(info);
-			DEVIDE_PACKET_TYPE(info);
-		}
+		std::shared_ptr<PacketInfo> info;
+		packet_queue_tcp.try_pop(info);
+		DEVIDE_PACKET_TYPE(info);
 	}
-}
-
-void CPacketManager::APPLY_PACKET_UDP()
-{
-	while (isContinue)
+	// Queue에 쌓인 Receive UDP 패킷을 처리
+	if (!packet_queue_udp.empty())
 	{
-		// Queue에 쌓인 Receive UDP 패킷을 처리하는 함수 (추후 메인 쓰레드에서 실행시킬 예정)
-		if (!packet_queue_udp.empty())
-		{
-			std::shared_ptr<PacketInfo> info;
-			packet_queue_udp.try_pop(info);
-			DEVIDE_PACKET_TYPE(info);
-		}
+		std::shared_ptr<PacketInfo> info;
+		packet_queue_udp.try_pop(info);
+		DEVIDE_PACKET_TYPE(info);
 	}
 }
 
@@ -65,17 +55,12 @@ void CPacketManager::InitPacketManager()
 {
 	InitFunctionmap();
 	isContinue = true;
-	// TCP, UDP 패킷 처리하는 Thread 실행
-	th_tcp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_TCP, this));
-	th_udp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_UDP, this));
 }
 
 void CPacketManager::ExitPacketManager()
 {
 	isContinue = false;
 	// Thread의 안전한 종료를 위해 Join
-	th_tcp->join();
-	th_udp->join();
 }
 
 void CPacketManager::DEVIDE_PACKET_BUNDLE(char * packet, int packetSize, bool isTCP)

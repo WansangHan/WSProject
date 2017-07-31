@@ -46,10 +46,6 @@ class CPacketManager
 	static std::unique_ptr<CPacketManager> m_inst;
 	static std::once_flag m_once;
 
-	// 패킷 처리하는 함수를 Thread로 구현하기 위한 변수(추후 제거 예정)
-	std::unique_ptr<std::thread> th_tcp;
-	std::unique_ptr<std::thread> th_udp;
-
 	// 패킷 <-> 함수포인터를 매칭한 map
 	typedef std::function<void(char*)> Function;
 	std::map < RecvPacketType, Function > map_function;
@@ -61,10 +57,6 @@ class CPacketManager
 	bool isContinue;
 
 	CPacketManager();
-
-	// 패킷 처리하는 함수
-	void APPLY_PACKET_TCP();
-	void APPLY_PACKET_UDP();
 
 	// 패킷 타입에 따른 함수포인터를 호출하는 함수
 	void DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info);
@@ -78,6 +70,9 @@ public:
 		return *m_inst;
 	}
 	~CPacketManager();
+
+	// 패킷 처리하는 함수
+	void APPLY_PACKET();
 
 	void InitPacketManager();
 	void ExitPacketManager();
