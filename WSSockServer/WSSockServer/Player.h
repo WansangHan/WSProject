@@ -5,7 +5,7 @@ class CPlayer
 {
 	int m_id;
 	std::string m_name;
-	std::shared_ptr<CTCPSocket> m_sock;
+	std::shared_ptr<CBaseSocket> m_sock;
 public:
 	CPlayer();
 	~CPlayer();
