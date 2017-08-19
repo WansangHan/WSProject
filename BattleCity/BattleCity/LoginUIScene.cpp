@@ -92,6 +92,7 @@ void CLoginUIScene::CommandHandling(HWND _hwnd, WPARAM _wParam)
 			CGameManager::getInstance().GetPlayerManagerInstance()->GetOwnPlayer()->SetName(cid);
 			// 게임 입장
 			CGameManager::getInstance().EnterGame();
+			InvalidateRect(_hwnd, NULL, true);
 			MessageBox(_hwnd, L"Success.", L"Login", MB_OK);
 		}
 		else

@@ -22,7 +22,7 @@
 
 enum SendPacketType
 {
-	SD_ENTER_SERVER = 20000,
+	SD_STARTING_POSITION_SCALE = 20000,
 };
 
 enum RecvPacketType
@@ -71,7 +71,7 @@ class CPacketManager
 	std::unique_ptr<std::thread> th_udp;
 
 	// 패킷 타입과 그에 따른 함수 호출 바인딩을 위한 map
-	typedef std::function<void(std::shared_ptr<CBaseSocket>, char*)> Function;
+	typedef std::function<void(std::shared_ptr<CBaseSocket>, char*, int)> Function;
 	std::map < RecvPacketType, Function > map_function;
 
 	// Packet의 정보가 담긴 구조체 큐(리눅스에는 Thread Safe Queue가 없어서, 구글에서 가져온 코드 사용)

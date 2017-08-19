@@ -11,6 +11,8 @@ class CInGame
 
 	CInGame();
 	int FindIDToSOCKET(std::shared_ptr<CBaseSocket> _sock);
+	std::shared_ptr<CPlayer> FindPlayerToID(int _pID);
+	void SetStartingPositionScale(std::shared_ptr<CPlayer> _player);
 public:
 	static CInGame& getInstance()
 	{
@@ -19,7 +21,7 @@ public:
 	}
 	~CInGame();
 
-	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data);
+	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock);
 };
 

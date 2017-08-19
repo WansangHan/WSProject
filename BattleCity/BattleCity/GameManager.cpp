@@ -84,3 +84,13 @@ void CGameManager::EnterGame()
 	m_gameState = PLAY;
 	m_playManager->EnterGame();
 }
+
+void CGameManager::SetPositionScale(char* _data, int _size)
+{
+	BattleCity::SetPositionScale RecvData;
+	RecvData.ParseFromArray(_data, _size);
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData ID : %d", RecvData._id());
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData VectorX : %f", RecvData._vectorx());
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData VectorY : %f", RecvData._vectory());
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData Scale : %f", RecvData._scale());
+}

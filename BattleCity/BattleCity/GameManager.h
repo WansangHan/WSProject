@@ -47,6 +47,7 @@ public:
 	void LButtonDown(LPARAM lParam);
 
 	void EnterGame();
+	void SetPositionScale(char* _data, int _size);
 
 	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
 	CUIManager* GetUIManagerInstance() { return m_uiManager; }

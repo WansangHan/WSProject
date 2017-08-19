@@ -13,7 +13,7 @@
 
 enum RecvPacketType
 {
-	RC_ENTER_SERVER = 20000,
+	RC_STARTING_POSITION_SCALE = 20000,
 };
 
 enum SendPacketType
@@ -47,7 +47,7 @@ class CPacketManager
 	static std::once_flag m_once;
 
 	// 패킷 <-> 함수포인터를 매칭한 map
-	typedef std::function<void(char*)> Function;
+	typedef std::function<void(char*, int)> Function;
 	std::map < RecvPacketType, Function > map_function;
 
 	// Receive한 패킷이 담길 Queue

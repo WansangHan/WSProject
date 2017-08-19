@@ -54,16 +54,17 @@ void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 	if (it == map_function.end()) { CLogManager::getInstance().WriteLogMessage("ERROR", true, "map_function.end() : %d", packetType); return; }
 
 	// 패킷 중 protobuffer 영역만 잘라 함수 인자로 전달
-	std::shared_ptr<char> protoBuf = std::shared_ptr<char>(new char[info->dataSize - sizeof(int) - sizeof(RecvPacketType)], std::default_delete<char[]>());
-	memcpy(protoBuf.get(), info->data.get() + sizeof(int) + sizeof(RecvPacketType), info->dataSize - sizeof(int) - sizeof(RecvPacketType));
+	int charSize = info->dataSize - sizeof(int) - sizeof(RecvPacketType);
+	std::shared_ptr<char> protoBuf = std::shared_ptr<char>(new char[charSize], std::default_delete<char[]>());
+	memcpy(protoBuf.get(), info->data.get() + sizeof(int) + sizeof(RecvPacketType), charSize);
 
-	it->second(info->sock, protoBuf.get());
+	it->second(info->sock, protoBuf.get(), charSize);
 }
 
 void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용
-	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 }
 
 CPacketManager::~CPacketManager()

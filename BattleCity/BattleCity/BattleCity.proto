@@ -6,3 +6,11 @@ message EnterServer
 	int32 _id = 1;
 	string _name = 2;
 } 
+
+message SetPositionScale
+{
+	int32 _id = 1;
+	float _vectorX = 2;
+	float _vectorY = 3;
+	float _scale = 4;
+}

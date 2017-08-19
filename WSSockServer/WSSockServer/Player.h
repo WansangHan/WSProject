@@ -6,6 +6,10 @@ class CPlayer
 	int m_id;
 	std::string m_name;
 	std::shared_ptr<CBaseSocket> m_sock;
+
+	float m_vectorX;
+	float m_vectorY;
+	float m_scale;
 public:
 	CPlayer();
 	~CPlayer();
@@ -16,5 +20,11 @@ public:
 	std::string GetName() { return m_name; }
 	void SetSocket(std::shared_ptr<CBaseSocket> _sock) { m_sock = _sock; }
 	std::shared_ptr<CBaseSocket> GetSocket() { return m_sock; }
+
+	void SetXY(float _vectorX, float _vectorY) { m_vectorX = _vectorX; m_vectorY = _vectorY; }
+	float GetX() { return m_vectorX; }
+	float GetY() { return m_vectorY; }
+	void SetScale(float _scale) { m_scale = _scale; }
+	float GetScale() { return m_scale; }
 };
 
