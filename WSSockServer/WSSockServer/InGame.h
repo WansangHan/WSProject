@@ -1,6 +1,21 @@
 #pragma once
 #include "PacketManager.h"
 #include "Player.h"
+
+// 플레이어 방향 상태값
+enum PlayerDirection
+{
+	IDLE = 100,
+	UPUP,
+	LEFT,
+	RGHT,
+	DOWN,
+	UPLE,
+	UPRG,
+	DWLE,
+	DWRG,
+};
+
 class CInGame
 {
 	static std::unique_ptr<CInGame> m_inst;

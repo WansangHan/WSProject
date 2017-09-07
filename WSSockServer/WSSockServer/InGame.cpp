@@ -53,11 +53,13 @@ void CInGame::SetStartingPositionScale(std::shared_ptr<CPlayer> _player)
 
 	_player->SetXY(vectorX, vectorY);
 	_player->SetScale(scale);
+	_player->SetDir(PlayerDirection::IDLE);
 
 	WSSockServer::SetPositionScale sendData;
 	sendData.set__id(_player->GetID());
 	sendData.set__vectorx(_player->GetX());
 	sendData.set__vectory(_player->GetY());
+	sendData.set__dir(_player->GetDir());
 	sendData.set__scale(_player->GetScale());
 
 	CPacketManager::getInstance().SendPacketToServer(_player->GetSocket(), SD_STARTING_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);

@@ -12,5 +12,6 @@ message SetPositionScale
 	int32 _id = 1;
 	float _vectorX = 2;
 	float _vectorY = 3;
-	float _scale = 4;
+	int32 _dir = 4;
+	float _scale = 5;
 }

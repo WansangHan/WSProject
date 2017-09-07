@@ -9,6 +9,7 @@ class CPlayer
 
 	float m_vectorX;
 	float m_vectorY;
+	int m_dir;
 	float m_scale;
 public:
 	CPlayer();
@@ -24,6 +25,8 @@ public:
 	void SetXY(float _vectorX, float _vectorY) { m_vectorX = _vectorX; m_vectorY = _vectorY; }
 	float GetX() { return m_vectorX; }
 	float GetY() { return m_vectorY; }
+	void SetDir(int _dir) { m_dir = _dir; }
+	int GetDir() { return m_dir; }
 	void SetScale(float _scale) { m_scale = _scale; }
 	float GetScale() { return m_scale; }
 };

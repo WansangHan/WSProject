@@ -6,10 +6,25 @@
 #include "UIManager.h"
 #include "PlayManager.h"
 
+// 게임 상태값
 enum GameState
 {
 	INTRO,
 	PLAY,
+};
+
+// 플레이어 방향 상태값
+enum PlayerDirection
+{
+	IDLE = 100,
+	UPUP,
+	LEFT,
+	RGHT,
+	DOWN,
+	UPLE,
+	UPRG,
+	DWLE,
+	DWRG,
 };
 
 class CNetWorkManager;

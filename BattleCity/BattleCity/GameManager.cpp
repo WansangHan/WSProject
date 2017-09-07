@@ -45,6 +45,13 @@ void CGameManager::ExitGameManager()
 
 void CGameManager::Timer(HWND _hwnd)
 {
+	switch (m_gameState)
+	{
+	case PLAY:
+		// 게임을 진행중일 땐 화면을 계속 지워줌
+		InvalidateRect(_hwnd, NULL, TRUE);
+		break;
+	}
 	CPacketManager::getInstance().APPLY_PACKET();
 }
 
@@ -85,12 +92,8 @@ void CGameManager::EnterGame()
 	m_playManager->EnterGame();
 }
 
+// 플레이어 이동 시 받은 패킷에 대해 처리
 void CGameManager::SetPositionScale(char* _data, int _size)
 {
-	BattleCity::SetPositionScale RecvData;
-	RecvData.ParseFromArray(_data, _size);
-	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData ID : %d", RecvData._id());
-	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData VectorX : %f", RecvData._vectorx());
-	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData VectorY : %f", RecvData._vectory());
-	CLogManager::getInstance().WriteLogMessage("INFO", true, "ServerData Scale : %f", RecvData._scale());
+	m_playManager->SetPositionScale(_data, _size);
 }
