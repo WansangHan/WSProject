@@ -58,6 +58,7 @@ public:
 	void ExitGameManager();
 	void Timer(HWND _hwnd);
 	bool PaintAll();
+	UINT Nchittest(HWND _hwnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 	void LButtonDown(LPARAM lParam);
 

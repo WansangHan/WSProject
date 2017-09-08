@@ -123,7 +123,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
     switch (message)
     {
 	case WM_CREATE:
@@ -141,6 +140,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
 		CGameManager::getInstance().PaintAll();
         break;
+	case WM_NCHITTEST:
+		return CGameManager::getInstance().Nchittest(hWnd, message, wParam, lParam);
     case WM_DESTROY:
 		CGameManager::getInstance().ExitGameManager();
         PostQuitMessage(0);

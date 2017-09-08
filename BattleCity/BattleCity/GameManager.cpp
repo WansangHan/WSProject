@@ -71,6 +71,15 @@ bool CGameManager::PaintAll()
 	return true;
 }
 
+UINT CGameManager::Nchittest(HWND _hwnd, UINT _message, WPARAM _wParam, LPARAM _lParam)
+{
+	// 윈도우 창 이동을 위한 코드
+	UINT nHit = DefWindowProc(_hwnd, _message, _wParam, _lParam);
+	if (nHit == HTCLIENT)
+		nHit = HTCAPTION;
+	return nHit;
+}
+
 void CGameManager::CommandHandling(HWND _hwnd, WPARAM _wParam)
 {
 	m_uiManager->CommandHandling(_hwnd, _wParam);
