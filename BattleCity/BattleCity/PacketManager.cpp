@@ -28,7 +28,7 @@ void CPacketManager::APPLY_PACKET()
 
 void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 {
-	RecvPacketType packetType = RC_STARTING_POSITION_SCALE;
+	RecvPacketType packetType = RC_POSITION_SCALE;
 	// 패킷 분리
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
 	// 함수 포인터 find
@@ -45,7 +45,7 @@ void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용하는 부분
-	map_function.insert(std::make_pair(RC_STARTING_POSITION_SCALE, std::bind(&CGameManager::SetPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	map_function.insert(std::make_pair(RC_POSITION_SCALE, std::bind(&CGameManager::SetPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 }
 
 CPacketManager::~CPacketManager()

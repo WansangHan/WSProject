@@ -22,12 +22,13 @@
 
 enum SendPacketType
 {
-	SD_STARTING_POSITION_SCALE = 20000,
+	SD_POSITION_SCALE = 20000,
 };
 
 enum RecvPacketType
 {
 	RC_ENTER_SERVER = 10000,
+	RC_POSITION_SCALE,
 };
 
 struct PacketInfo

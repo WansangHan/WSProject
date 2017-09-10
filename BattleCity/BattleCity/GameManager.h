@@ -13,20 +13,6 @@ enum GameState
 	PLAY,
 };
 
-// 플레이어 방향 상태값
-enum PlayerDirection
-{
-	IDLE = 100,
-	UPUP,
-	LEFT,
-	RGHT,
-	DOWN,
-	UPLE,
-	UPRG,
-	DWLE,
-	DWRG,
-};
-
 class CNetWorkManager;
 class CUIManager;
 class CPlayManager;
@@ -61,6 +47,7 @@ public:
 	UINT Nchittest(HWND _hwnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 	void LButtonDown(LPARAM lParam);
+	void KeyChange();
 
 	void EnterGame();
 	void SetPositionScale(char* _data, int _size);

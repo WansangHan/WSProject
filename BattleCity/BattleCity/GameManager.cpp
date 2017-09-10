@@ -50,6 +50,7 @@ void CGameManager::Timer(HWND _hwnd)
 	case PLAY:
 		// 게임을 진행중일 땐 화면을 계속 지워줌
 		InvalidateRect(_hwnd, NULL, TRUE);
+		m_playManager->UpdatePlay();
 		break;
 	}
 	CPacketManager::getInstance().APPLY_PACKET();
@@ -91,6 +92,17 @@ void CGameManager::LButtonDown(LPARAM lParam)
 	{
 	case INTRO:
 		m_uiManager->MouceLButtonDown(m_hwnd, lParam);
+		break;
+	}
+}
+
+// 키보드 이벤트 시
+void CGameManager::KeyChange()
+{
+	switch (m_gameState)
+	{
+	case PLAY:
+		m_playManager->CheckKey();
 		break;
 	}
 }

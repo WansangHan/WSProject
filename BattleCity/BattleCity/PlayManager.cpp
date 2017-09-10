@@ -22,6 +22,12 @@ void CPlayManager::PaintPlay(HWND _hwnd, HDC _hdc)
 	m_ownPlayer->PaintPlayer(_hwnd, _hdc);
 }
 
+// 게임 플레이 시 매 프레임 업데이트 되는 부분
+void CPlayManager::UpdatePlay()
+{
+	m_ownPlayer->PlayerMove();
+}
+
 void CPlayManager::EnterGame()
 {
 	BattleCity::EnterServer sendData;
@@ -45,4 +51,10 @@ void CPlayManager::SetPositionScale(char * _data, int _size)
 		m_ownPlayer->SetScale(RecvData._scale());
 		m_ownPlayer->SetDir(RecvData._dir());
 	}
+}
+
+// 키보드 이벤트 시
+void CPlayManager::CheckKey()
+{
+	m_ownPlayer->KeyCheck();
 }

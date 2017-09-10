@@ -1,5 +1,21 @@
 #pragma once
 #include <string>
+#include "PacketManager.h"
+
+// 플레이어 방향 상태값
+enum PlayerDirection
+{
+	IDLE = 100,
+	UPUP,
+	LEFT,
+	RGHT,
+	DOWN,
+	UPLE,
+	UPRG,
+	DWLE,
+	DWRG,
+};
+
 class CPlayer
 {
 	int m_ID;
@@ -27,5 +43,7 @@ public:
 	float GetScale() { return m_scale; }
 
 	void PaintPlayer(HWND _hwnd, HDC _hdc);
+	void KeyCheck();
+	void PlayerMove();
 };
 

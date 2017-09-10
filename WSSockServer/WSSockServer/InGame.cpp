@@ -62,7 +62,17 @@ void CInGame::SetStartingPositionScale(std::shared_ptr<CPlayer> _player)
 	sendData.set__dir(_player->GetDir());
 	sendData.set__scale(_player->GetScale());
 
-	CPacketManager::getInstance().SendPacketToServer(_player->GetSocket(), SD_STARTING_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(_player->GetSocket(), SD_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
+}
+
+// 접속한 모든 플레이어에게 전송
+void CInGame::SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_in * _sockaddr, bool _isTCP)
+{
+	for (auto Pr : m_players)
+	{
+		std::shared_ptr<CBaseSocket> socket = Pr.second->GetSocket();
+		CPacketManager::getInstance().SendPacketToServer(socket, _type, _str, _sockaddr, _isTCP);
+	}
 }
 
 // 플레이어 입장 시
@@ -88,4 +98,17 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 	// 소켓 핸들 값으로 아이디를 찾은 후 erase
 	int pID = FindIDToSOCKET(_sock);
 	m_players.erase(pID);
+}
+
+// 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송
+void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
+{
+	WSSockServer::SetPositionScale RecvData;
+	RecvData.ParseFromArray(_data, _size);
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	player->SetXY(RecvData._vectorx(), RecvData._vectory());
+	player->SetScale(RecvData._scale());
+	player->SetDir(RecvData._dir());
+
+	SendToAllPlayer(SD_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 }

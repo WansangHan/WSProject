@@ -137,6 +137,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		CGameManager::getInstance().LButtonDown(lParam);
 		break;
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+		CGameManager::getInstance().KeyChange();
+		break;
     case WM_PAINT:
 		CGameManager::getInstance().PaintAll();
         break;

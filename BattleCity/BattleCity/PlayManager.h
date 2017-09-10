@@ -3,6 +3,7 @@
 #include "Player.h"
 
 class CGameManager;
+class CPlayer;
 
 class CPlayManager
 {
@@ -13,9 +14,11 @@ public:
 
 	void InitPlayerManager();
 	void PaintPlay(HWND _hwnd, HDC _hdc);
+	void UpdatePlay();
 
 	void EnterGame();
 	void SetPositionScale(char* _data, int _size);
+	void CheckKey();
 
 	CPlayer* GetOwnPlayer() { return m_ownPlayer; }
 };

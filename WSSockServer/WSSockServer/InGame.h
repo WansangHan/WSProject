@@ -2,6 +2,8 @@
 #include "PacketManager.h"
 #include "Player.h"
 
+enum SendPacketType;
+
 // 플레이어 방향 상태값
 enum PlayerDirection
 {
@@ -28,6 +30,7 @@ class CInGame
 	int FindIDToSOCKET(std::shared_ptr<CBaseSocket> _sock);
 	std::shared_ptr<CPlayer> FindPlayerToID(int _pID);
 	void SetStartingPositionScale(std::shared_ptr<CPlayer> _player);
+	void SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_in* _sockaddr, bool _isTCP);
 public:
 	static CInGame& getInstance()
 	{
@@ -38,5 +41,7 @@ public:
 
 	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock);
+	
+	void ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 };
 

@@ -13,12 +13,13 @@
 
 enum RecvPacketType
 {
-	RC_STARTING_POSITION_SCALE = 20000,
+	RC_POSITION_SCALE = 20000,
 };
 
 enum SendPacketType
 {
-	SD_ENTER_SERVER = 10000,	
+	SD_ENTER_SERVER = 10000,
+	SD_POSITION_SCALE,
 };
 // Receive한 패킷이 Queue에 enqueue 될 때의 구조체
 struct PacketInfo
