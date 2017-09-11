@@ -13,7 +13,8 @@
 
 enum RecvPacketType
 {
-	RC_POSITION_SCALE = 20000,
+	RC_ENTER_SERVER = 20000,
+	RC_POSITION_SCALE,
 };
 
 enum SendPacketType

@@ -51,16 +51,16 @@ void CInGame::SetStartingPositionScale(std::shared_ptr<CPlayer> _player)
 	float vectorY = 100.f;
 	float scale = 10.f;
 
-	_player->SetXY(vectorX, vectorY);
-	_player->SetScale(scale);
-	_player->SetDir(PlayerDirection::IDLE);
+	PlayerTransform playerTransform(vectorX, vectorY, scale, PlayerDirection::IDLE);
+
+	_player->SetTransform(playerTransform);
 
 	WSSockServer::SetPositionScale sendData;
 	sendData.set__id(_player->GetID());
-	sendData.set__vectorx(_player->GetX());
-	sendData.set__vectory(_player->GetY());
-	sendData.set__dir(_player->GetDir());
-	sendData.set__scale(_player->GetScale());
+	sendData.set__vectorx(_player->GetTransform().m_vectorX);
+	sendData.set__vectory(_player->GetTransform().m_vectorY);
+	sendData.set__dir(_player->GetTransform().m_dir);
+	sendData.set__scale(_player->GetTransform().m_scale);
 
 	CPacketManager::getInstance().SendPacketToServer(_player->GetSocket(), SD_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
 }
@@ -105,10 +105,9 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char*
 {
 	WSSockServer::SetPositionScale RecvData;
 	RecvData.ParseFromArray(_data, _size);
+	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
-	player->SetXY(RecvData._vectorx(), RecvData._vectory());
-	player->SetScale(RecvData._scale());
-	player->SetDir(RecvData._dir());
-
+	PlayerTransform playerTransform(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
+	player->SetTransform(playerTransform);
 	SendToAllPlayer(SD_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 }

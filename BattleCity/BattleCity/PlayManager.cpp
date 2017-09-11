@@ -47,9 +47,8 @@ void CPlayManager::SetPositionScale(char * _data, int _size)
 
 	if (m_ownPlayer->GetID() == RecvData._id())
 	{
-		m_ownPlayer->SetXY(RecvData._vectorx(), RecvData._vectory());
-		m_ownPlayer->SetScale(RecvData._scale());
-		m_ownPlayer->SetDir(RecvData._dir());
+		PlayerTransform playerTransform(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
+		m_ownPlayer->SetTransform(playerTransform);
 	}
 }
 

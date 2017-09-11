@@ -22,7 +22,8 @@
 
 enum SendPacketType
 {
-	SD_POSITION_SCALE = 20000,
+	SD_ENTER_SERVER = 20000,
+	SD_POSITION_SCALE,
 };
 
 enum RecvPacketType

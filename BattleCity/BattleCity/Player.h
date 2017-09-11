@@ -16,15 +16,28 @@ enum PlayerDirection
 	DWRG,
 };
 
+struct PlayerTransform
+{
+	float m_vectorX;
+	float m_vectorY;
+	float m_scale;
+	PlayerDirection m_dir;
+	PlayerTransform() {}
+	PlayerTransform(float _vectorX, float _vectorY, float _scale, int _dir)
+	{
+		m_vectorX = _vectorX;
+		m_vectorY = _vectorY;
+		m_scale = _scale;
+		m_dir = (PlayerDirection)_dir;
+	}
+};
+
 class CPlayer
 {
 	int m_ID;
 	std::string m_name;
 
-	float m_vectorX;
-	float m_vectorY;
-	float m_scale;
-	int m_dir;
+	PlayerTransform m_playerTransform;
 public:
 	CPlayer();
 	~CPlayer();
@@ -33,14 +46,15 @@ public:
 	int GetID() { return m_ID; }
 	void SetName(std::string _name) { m_name = _name; }
 	std::string GetName() { return m_name; }
-	
-	void SetXY(float _vectorX, float _vectorY) { m_vectorX = _vectorX; m_vectorY = _vectorY; }
-	float GetX() { return m_vectorX; }
-	float GetY() { return m_vectorY; }
-	void SetDir(int _dir) { m_dir = _dir; }
-	int GetDir() { return m_dir; }
-	void SetScale(float _scale) { m_scale = _scale; }
-	float GetScale() { return m_scale; }
+
+	void SetTransform(PlayerTransform _playerTransform)
+	{
+		m_playerTransform.m_vectorX = _playerTransform.m_vectorX;
+		m_playerTransform.m_vectorY = _playerTransform.m_vectorY;
+		m_playerTransform.m_scale = _playerTransform.m_scale;
+		m_playerTransform.m_dir = _playerTransform.m_dir;
+	}
+	PlayerTransform GetTransform() { return m_playerTransform; }
 
 	void PaintPlayer(HWND _hwnd, HDC _hdc);
 	void KeyCheck();

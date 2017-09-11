@@ -1,16 +1,44 @@
 #pragma once
 #include <string>
 #include "BaseSocket.h"
+
+// 플레이어 방향 상태값
+enum PlayerDirection
+{
+	IDLE = 100,
+	UPUP,
+	LEFT,
+	RGHT,
+	DOWN,
+	UPLE,
+	UPRG,
+	DWLE,
+	DWRG,
+};
+
+struct PlayerTransform
+{
+	float m_vectorX;
+	float m_vectorY;
+	float m_scale;
+	PlayerDirection m_dir;
+	PlayerTransform(){}
+	PlayerTransform(float _vectorX, float _vectorY, float _scale, int _dir)
+	{
+		m_vectorX = _vectorX;
+		m_vectorY = _vectorY;
+		m_scale = _scale;
+		m_dir = (PlayerDirection)_dir;
+	}
+};
+
 class CPlayer
 {
 	int m_id;
 	std::string m_name;
 	std::shared_ptr<CBaseSocket> m_sock;
 
-	float m_vectorX;
-	float m_vectorY;
-	int m_dir;
-	float m_scale;
+	PlayerTransform m_playerTransform;
 public:
 	CPlayer();
 	~CPlayer();
@@ -22,12 +50,13 @@ public:
 	void SetSocket(std::shared_ptr<CBaseSocket> _sock) { m_sock = _sock; }
 	std::shared_ptr<CBaseSocket> GetSocket() { return m_sock; }
 
-	void SetXY(float _vectorX, float _vectorY) { m_vectorX = _vectorX; m_vectorY = _vectorY; }
-	float GetX() { return m_vectorX; }
-	float GetY() { return m_vectorY; }
-	void SetDir(int _dir) { m_dir = _dir; }
-	int GetDir() { return m_dir; }
-	void SetScale(float _scale) { m_scale = _scale; }
-	float GetScale() { return m_scale; }
+	void SetTransform(PlayerTransform _playerTransform) 
+	{ 
+		m_playerTransform.m_vectorX = _playerTransform.m_vectorX;
+		m_playerTransform.m_vectorY = _playerTransform.m_vectorY;
+		m_playerTransform.m_scale = _playerTransform.m_scale;
+		m_playerTransform.m_dir = _playerTransform.m_dir;
+	}
+	PlayerTransform GetTransform() { return m_playerTransform; }
 };
 
