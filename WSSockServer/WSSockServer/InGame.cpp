@@ -45,7 +45,7 @@ std::shared_ptr<CPlayer> CInGame::FindPlayerToID(int _pID)
 }
 
 // 접속한 클라이언트의 초기 시작위치와 크기를 정하고 전송
-void CInGame::SetStartingPositionScale(std::shared_ptr<CPlayer> _player)
+PlayerTransform CInGame::SetStartingTransform()
 {
 	float vectorX = 100.f;
 	float vectorY = 100.f;
@@ -53,16 +53,7 @@ void CInGame::SetStartingPositionScale(std::shared_ptr<CPlayer> _player)
 
 	PlayerTransform playerTransform(vectorX, vectorY, scale, PlayerDirection::IDLE);
 
-	_player->SetTransform(playerTransform);
-
-	WSSockServer::SetPositionScale sendData;
-	sendData.set__id(_player->GetID());
-	sendData.set__vectorx(_player->GetTransform().m_vectorX);
-	sendData.set__vectory(_player->GetTransform().m_vectorY);
-	sendData.set__dir(_player->GetTransform().m_dir);
-	sendData.set__scale(_player->GetTransform().m_scale);
-
-	CPacketManager::getInstance().SendPacketToServer(_player->GetSocket(), SD_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
+	return playerTransform;
 }
 
 // 접속한 모든 플레이어에게 전송
@@ -87,10 +78,45 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	player->SetName(RecvData._name());
 	player->SetSocket(_sock);
 
+	// 현재 들어온 플레이어에 대한 정보를 이미 접속해 있던 플레이어에게 전송
+	SendToAllPlayer(SD_ENTER_SERVER, RecvData.SerializeAsString(), nullptr, true);
+
+	// 현재 들어온 플레이어에게 각 플레이어들의 정보를 전송
+	for (auto Pr : m_players)
+	{
+		std::shared_ptr<CPlayer> player = Pr.second;
+
+		WSSockServer::EnterServer SendData_ES;
+		SendData_ES.set__id(player->GetID());
+		SendData_ES.set__name(player->GetName());
+		// 플레이어 아이디, 이름 전송
+		CPacketManager::getInstance().SendPacketToServer(_sock, SD_ENTER_SERVER, SendData_ES.SerializeAsString(), nullptr, true);
+
+		WSSockServer::SetPositionScale SendData_SP;
+		SendData_SP.set__id(player->GetID());
+		SendData_SP.set__vectorx(player->GetTransform().m_vectorX);
+		SendData_SP.set__vectory(player->GetTransform().m_vectorY);
+		SendData_SP.set__scale(player->GetTransform().m_scale);
+		SendData_SP.set__dir(player->GetTransform().m_dir);
+		// 플레이어 Transform 정보 전송
+		CPacketManager::getInstance().SendPacketToServer(_sock, SD_POSITION_SCALE, SendData_SP.SerializeAsString(), nullptr, true);
+	}
+
 	// map 변수에 플레이어 Insert
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
 
-	SetStartingPositionScale(player);
+	PlayerTransform playerTransform = SetStartingTransform();
+	player->SetTransform(playerTransform);
+
+	WSSockServer::SetPositionScale sendData;
+	sendData.set__id(player->GetID());
+	sendData.set__vectorx(player->GetTransform().m_vectorX);
+	sendData.set__vectory(player->GetTransform().m_vectorY);
+	sendData.set__dir(player->GetTransform().m_dir);
+	sendData.set__scale(player->GetTransform().m_scale);
+
+	// 접속중인 모든 플레이어에게 현재 들어온 플레이어의 위치 정보 전달
+	SendToAllPlayer(SD_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
 }
 
 void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)

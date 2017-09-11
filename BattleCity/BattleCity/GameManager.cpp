@@ -113,6 +113,12 @@ void CGameManager::EnterGame()
 	m_playManager->EnterGame();
 }
 
+// 플레이어가 들어왔을 때
+void CGameManager::EnterPlayer(char * _data, int _size)
+{
+	m_playManager->EnterPlayer(_data, _size);
+}
+
 // 플레이어 이동 시 받은 패킷에 대해 처리
 void CGameManager::SetPositionScale(char* _data, int _size)
 {

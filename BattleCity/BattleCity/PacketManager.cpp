@@ -45,6 +45,7 @@ void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용하는 부분
+	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CGameManager::EnterPlayer, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_POSITION_SCALE, std::bind(&CGameManager::SetPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 }
 

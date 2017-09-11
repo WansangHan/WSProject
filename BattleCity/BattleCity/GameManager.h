@@ -50,6 +50,7 @@ public:
 	void KeyChange();
 
 	void EnterGame();
+	void EnterPlayer(char* _data, int _size);
 	void SetPositionScale(char* _data, int _size);
 
 	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
