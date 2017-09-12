@@ -67,7 +67,7 @@ void CInGame::SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_i
 // 플레이어 입장 시
 void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
 {
-	WSSockServer::EnterServer RecvData;
+	WSSockServer::PlayerInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
 	// 넘어온 ID, name값을 Player 변수에 넣음
@@ -84,13 +84,13 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	{
 		std::shared_ptr<CPlayer> player = Pr.second;
 
-		WSSockServer::EnterServer SendData_ES;
+		WSSockServer::PlayerInformation SendData_ES;
 		SendData_ES.set__id(player->GetID());
 		SendData_ES.set__name(player->GetName());
 		// 플레이어 아이디, 이름 전송
 		CPacketManager::getInstance().SendPacketToServer(_sock, SD_ENTER_SERVER, SendData_ES.SerializeAsString(), nullptr, true);
 
-		WSSockServer::SetPositionScale SendData_SP;
+		WSSockServer::PlayerTransform SendData_SP;
 		SendData_SP.set__id(player->GetID());
 		SendData_SP.set__vectorx(player->GetTransform().m_vectorX);
 		SendData_SP.set__vectory(player->GetTransform().m_vectorY);
@@ -106,7 +106,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	PlayerTransform playerTransform = SetStartingTransform();
 	player->SetTransform(playerTransform);
 
-	WSSockServer::SetPositionScale sendData;
+	WSSockServer::PlayerTransform sendData;
 	sendData.set__id(player->GetID());
 	sendData.set__vectorx(player->GetTransform().m_vectorX);
 	sendData.set__vectory(player->GetTransform().m_vectorY);
@@ -124,7 +124,7 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 	m_players.erase(pID);
 
 	// 나간 플레이어의 ID를 남아있는 모든 클라이언트에게 전송
-	WSSockServer::EnterServer SendData;
+	WSSockServer::PlayerInformation SendData;
 	SendData.set__id(pID);
 	SendToAllPlayer(SD_EXIT_PLAYER, SendData.SerializeAsString(), nullptr, true);
 }
@@ -132,7 +132,7 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 // 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송
 void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
 {
-	WSSockServer::SetPositionScale RecvData;
+	WSSockServer::PlayerTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());

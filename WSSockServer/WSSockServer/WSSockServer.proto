@@ -1,13 +1,13 @@
 syntax="proto3";
 package WSSockServer;
  
-message EnterServer
+message PlayerInformation
 {
 	int32 _id = 1;
 	string _name = 2;
 }
 
-message SetPositionScale
+message PlayerTransform
 {
 	int32 _id = 1;
 	float _vectorX = 2;

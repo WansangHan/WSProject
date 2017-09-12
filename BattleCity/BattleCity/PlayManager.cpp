@@ -49,7 +49,7 @@ void CPlayManager::UpdatePlay()
 
 void CPlayManager::EnterGame()
 {
-	BattleCity::EnterServer sendData;
+	BattleCity::PlayerInformation sendData;
 
 	sendData.set__id(m_ownPlayer->GetID());
 	sendData.set__name(m_ownPlayer->GetName());
@@ -61,7 +61,7 @@ void CPlayManager::EnterGame()
 // 자기 자신이 아닌 상대 플레이어에 대한 정보를 list에 저장한다
 void CPlayManager::EnterPlayer(char * _data, int _size)
 {
-	BattleCity::EnterServer RecvData;
+	BattleCity::PlayerInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
 	std::shared_ptr<CPlayer> player = std::make_shared<CPlayer>();
@@ -75,7 +75,7 @@ void CPlayManager::EnterPlayer(char * _data, int _size)
 // 다른 플레이어들이 나갔을 때 처리
 void CPlayManager::ExitPlayer(char * _data, int _size)
 {
-	BattleCity::EnterServer RecvData;
+	BattleCity::PlayerInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
 	// 나간 플레이어를 찾아 삭제
@@ -86,7 +86,7 @@ void CPlayManager::ExitPlayer(char * _data, int _size)
 // 서버로부터 받은 좌표, 크기, 방향 정보를 플레이어에 저장
 void CPlayManager::SetPositionScale(char * _data, int _size)
 {
-	BattleCity::SetPositionScale RecvData;
+	BattleCity::PlayerTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
 	PlayerTransform playerTransform(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
