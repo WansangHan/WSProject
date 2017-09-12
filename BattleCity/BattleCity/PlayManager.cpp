@@ -11,6 +11,18 @@ CPlayManager::~CPlayManager()
 {
 }
 
+// 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
+std::shared_ptr<CPlayer> CPlayManager::FindPlayerToID(int _pID)
+{
+	for (auto Pr : m_otherPlayer)
+	{
+		if (Pr->GetID() == _pID)
+			return Pr;
+	}
+	CLogManager::getInstance().WriteLogMessage("WARN", true, "Return nullptr in FindPlayer()");
+	return nullptr;
+}
+
 void CPlayManager::InitPlayerManager()
 {
 	m_ownPlayer = std::make_shared<CPlayer>();
@@ -58,6 +70,17 @@ void CPlayManager::EnterPlayer(char * _data, int _size)
 	
 	// 상대 플레이어를 리스트에 추가
 	m_otherPlayer.push_back(player);
+}
+
+// 다른 플레이어들이 나갔을 때 처리
+void CPlayManager::ExitPlayer(char * _data, int _size)
+{
+	BattleCity::EnterServer RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	// 나간 플레이어를 찾아 삭제
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	m_otherPlayer.remove(player);
 }
 
 // 서버로부터 받은 좌표, 크기, 방향 정보를 플레이어에 저장

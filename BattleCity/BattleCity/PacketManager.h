@@ -14,6 +14,7 @@
 enum RecvPacketType
 {
 	RC_ENTER_SERVER = 20000,
+	RC_EXIT_PLAYER,
 	RC_POSITION_SCALE,
 };
 

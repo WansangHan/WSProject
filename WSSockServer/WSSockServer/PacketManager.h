@@ -23,6 +23,7 @@
 enum SendPacketType
 {
 	SD_ENTER_SERVER = 20000,
+	SD_EXIT_PLAYER,
 	SD_POSITION_SCALE,
 };
 

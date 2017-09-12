@@ -119,6 +119,12 @@ void CGameManager::EnterPlayer(char * _data, int _size)
 	m_playManager->EnterPlayer(_data, _size);
 }
 
+// 다른 플레이어들이 나갔을 때 처리
+void CGameManager::ExitPlayer(char * _data, int _size)
+{
+	m_playManager->ExitPlayer(_data, _size);
+}
+
 // 플레이어 이동 시 받은 패킷에 대해 처리
 void CGameManager::SetPositionScale(char* _data, int _size)
 {

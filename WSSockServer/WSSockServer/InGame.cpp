@@ -40,8 +40,6 @@ std::shared_ptr<CPlayer> CInGame::FindPlayerToID(int _pID)
 		CLogManager::getInstance().WriteLogMessage("WARN", true, "Return nullptr in FindPlayer()");
 		return nullptr;
 	}
-	
-	return std::shared_ptr<CPlayer>();
 }
 
 // 접속한 클라이언트의 초기 시작위치와 크기를 정하고 전송
@@ -124,6 +122,11 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 	// 소켓 핸들 값으로 아이디를 찾은 후 erase
 	int pID = FindIDToSOCKET(_sock);
 	m_players.erase(pID);
+
+	// 나간 플레이어의 ID를 남아있는 모든 클라이언트에게 전송
+	WSSockServer::EnterServer SendData;
+	SendData.set__id(pID);
+	SendToAllPlayer(SD_EXIT_PLAYER, SendData.SerializeAsString(), nullptr, true);
 }
 
 // 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송
