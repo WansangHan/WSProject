@@ -3,7 +3,7 @@
 #include "PacketManager.h"
 #include "Player.h"
 
-enum SendPacketType;
+enum class SendPacketType : int;
 
 class CInGame
 {

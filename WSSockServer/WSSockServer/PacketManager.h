@@ -21,14 +21,14 @@
 #endif
 #include "WSSockServer.pb.h"
 
-enum SendPacketType
+enum class SendPacketType : int
 {
 	SD_ENTER_SERVER = 20000,
 	SD_EXIT_PLAYER,
 	SD_POSITION_SCALE,
 };
 
-enum RecvPacketType
+enum class RecvPacketType : int
 {
 	RC_ENTER_SERVER = 10000,
 	RC_POSITION_SCALE,

@@ -46,7 +46,7 @@ void CPacketManager::APPLY_PACKET_UDP()
 
 void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 {
-	RecvPacketType packetType = RC_ENTER_SERVER;
+	RecvPacketType packetType = RecvPacketType::RC_ENTER_SERVER;
 	// 패킷 분리
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
 	// 함수 포인터 find
@@ -64,8 +64,8 @@ void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용
-	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 }
 
 CPacketManager::~CPacketManager()
