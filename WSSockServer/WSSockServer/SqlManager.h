@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SQLMANAGER_H
+#define SQLMANAGER_H
 #pragma comment(lib, "libmysql.lib")
 #include <my_global.h>
 #include <mysql.h>
@@ -19,4 +20,4 @@ public:
 	bool InitSQLManager();
 	bool SendLogMessage(const char* _message, char* _level);
 };
-
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORKMANAGER_H
+#define NETWORKMANAGER_H
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
 #include <windows.h>
@@ -58,4 +59,4 @@ public:
 	// IOCP / EPOLL , TCP, UDP¿¡ µû¶ó Send
 	bool SendToServer(const char* data, int dataSize, bool isTCP, bool isIOCP);
 };
-
+#endif

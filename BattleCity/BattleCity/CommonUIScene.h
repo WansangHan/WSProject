@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMMONUISCENE_H
+#define COMMONUISCENE_H
 #include "UIScene.h"
 #include "UIManager.h"
 
@@ -13,4 +14,4 @@ public:
 	void MouseLButtonDownUIScene(HWND _hwnd, LPARAM _lParam);
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 };
-
+#endif

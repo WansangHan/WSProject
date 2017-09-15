@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TARGETVER_H
+#define TARGETVER_H
 
 // SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
 
@@ -6,3 +7,5 @@
 // WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
 
 #include <SDKDDKVer.h>
+
+#endif

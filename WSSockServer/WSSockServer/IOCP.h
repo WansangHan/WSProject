@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IOCP_H
+#define IOCP_H
 #pragma comment(lib, "libprotobufd")
 #include <WinSock2.h>
 #include <windows.h>
@@ -71,4 +72,4 @@ public:
 	void Update();
 	void CloseServer();
 };
-
+#endif

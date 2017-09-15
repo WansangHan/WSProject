@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SAFEQUEUE_H
+#define SAFEQUEUE_H
 #include <queue>
 #include <mutex>
 #include <condition_variable>
@@ -48,3 +49,4 @@ public:
 		return q.empty();
 	}
 };
+#endif

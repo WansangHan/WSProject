@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAMEMANAGER_H
+#define GAMEMANAGER_H
 #pragma comment(lib, "libprotobufd")
 #include "LogManager.h"
 #include "NetworkManager.h"
@@ -57,4 +58,4 @@ public:
 	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
 	CUIManager* GetUIManagerInstance() { return m_uiManager; }
 };
-
+#endif

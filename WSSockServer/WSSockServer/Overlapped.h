@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OVERLAPPED_H
+#define OVERLAPPED_H
 #include "stdafx.h"
 #include "BaseSocket.h"
 
@@ -88,3 +89,4 @@ struct WriteOverlapped : public Overlapped
 		strcpy_s(this->m_buffer, v.m_buffer);
 	}
 };
+#endif

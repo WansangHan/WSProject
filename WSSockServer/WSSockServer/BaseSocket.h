@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BASESOCKET_H
+#define BASESOCKET_H
 #ifdef IOCP_SERVER
 #include <WinSock2.h>
 #include <windows.h>
@@ -41,4 +42,4 @@ public:
 	int GetSOCKET() { return m_socket; }
 #endif
 };
-
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INGAME_H
+#define INGAME_H
 #include "PacketManager.h"
 #include "Player.h"
 
@@ -30,4 +31,4 @@ public:
 	
 	void ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 };
-
+#endif

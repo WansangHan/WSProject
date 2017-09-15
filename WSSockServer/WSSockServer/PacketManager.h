@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETMANAGER_H
+#define PACKETMANAGER_H
 #include <list>
 #include <thread>
 #include <mutex>
@@ -110,4 +111,4 @@ public:
 	// Send ÇÔ¼ö
 	void SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str, sockaddr_in* sockaddr, bool isTCP);
 };
-
+#endif

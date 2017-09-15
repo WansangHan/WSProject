@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETMANAGER_H
+#define PACKETMANAGER_H
 #include <list>
 #include <thread>
 #include <mutex>
@@ -85,4 +86,4 @@ public:
 	// 받은 protobuffer 패킷 형태를, 미리 정의한 패킷 형태로 만들어 서버로 보내는 함수
 	void SendPacketToServer(SendPacketType type, std::string str, bool isTCP, bool isIOCP);
 };
-
+#endif

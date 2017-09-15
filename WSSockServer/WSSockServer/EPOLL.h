@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef EPOLL_H
+#define EPOLL_H
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -46,4 +46,4 @@ public:
 
 	bool SendToClient(void* buf, int len, std::shared_ptr<CBaseSocket> sock, sockaddr_in* soaddr, bool isTCP);
 };
-
+#endif

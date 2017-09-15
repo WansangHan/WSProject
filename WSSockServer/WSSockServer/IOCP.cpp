@@ -220,7 +220,6 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 	// 임시 코드
 	if (!isTCP)
 		m_clientUDPSockAddr = ovrlap->m_addr;
-	int addrSize = sizeof(m_listenUDPSocketAddr);
 	int socketRemainBuffer = datalen;
 	int totalBufSize = datalen;
 	std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[datalen], std::default_delete<char[]>());

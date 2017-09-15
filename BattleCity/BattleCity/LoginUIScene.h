@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LOGINUISCENE_H
+#define LOGINUISCENE_H
 #include "UIScene.h"
 #include "UIManager.h"
 // 회원가입 관련 TextBox 문자열 제한 길이
@@ -26,4 +27,4 @@ public:
 	void MouseLButtonDownUIScene(HWND _hwnd, LPARAM _lParam);
 	void CommandHandling(HWND _hwnd, WPARAM _wParam);
 };
-
+#endif

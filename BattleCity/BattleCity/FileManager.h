@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FILEMANAGER_H
+#define FILEMANAGER_H
 #include "LogManager.h"
 
 class CFileManager
@@ -9,4 +10,4 @@ public:
 
 	bool WriteFileLog(const char* _message, char* _level);
 };
-
+#endif

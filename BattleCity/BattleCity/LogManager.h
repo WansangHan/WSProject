@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LOGMANAGER_H
+#define LOGMANAGER_H
 #include "FileManager.h"
 #include "CurlManager.h"
 #include <memory>
@@ -31,4 +32,4 @@ public:
 	// 가변 인자로 넘어온 정수, 문자열 형태의 변수를 로그에 합쳐 ApplyLogMessage 함수를 호출
 	bool WriteLogMessage(char* _level, bool _sendsql, const char* _message, ...);
 };
-
+#endif

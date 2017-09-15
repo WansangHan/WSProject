@@ -3,7 +3,8 @@
 // 들어 있는 포함 파일입니다.
 //
 
-#pragma once
+#ifndef STDAFX_H
+#define STDAFX_H
 
 #include "targetver.h"
 
@@ -24,3 +25,4 @@ void currentDateTime(char* curTime);
 #define MAX_SOCKET_BUFFER_SIZE 3472
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+#endif

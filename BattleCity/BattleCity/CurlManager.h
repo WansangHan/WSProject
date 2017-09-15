@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CURLMANAGER_H
+#define CURLMANAGER_H
 #pragma comment(lib, "json_vc71_libmtd")
 #include <json/json.h>
 #define CURL_STATICLIB
@@ -36,4 +37,4 @@ public:
 	Json::Value SendNewAccountJsonString(char* _id, char* _pw, char* _ml);
 	Json::Value SendLoginJsonString(char* _id, char* _pw);
 };
-
+#endif

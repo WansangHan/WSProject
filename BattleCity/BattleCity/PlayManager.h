@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PLAYMANAGER_H
+#define PLAYMANAGER_H
 #include <list>
 #include "PacketManager.h"
 #include "Player.h"
@@ -28,4 +29,4 @@ public:
 
 	std::shared_ptr<CPlayer> GetOwnPlayer() { return m_ownPlayer; }
 };
-
+#endif
