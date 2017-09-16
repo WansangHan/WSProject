@@ -32,6 +32,8 @@ class CGameManager
 
 	GameState m_gameState;		// 게임 상태
 
+	bool isConnected;	// 서버와 연결 되어있는 지
+
 	CGameManager();
 public:
 	static CGameManager& getInstance()

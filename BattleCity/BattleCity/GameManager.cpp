@@ -19,14 +19,13 @@ bool CGameManager::InitGameManager(HWND _hwnd)
 {
 	CCurlManager::getInstance().InitCurlManager();
 	CLogManager::getInstance().InitLogManager();
-	CNetworkManager::getInstance().InitNetworkManager();
-	CPacketManager::getInstance().InitPacketManager();
 
 	m_uiManager = new CUIManager;
 	m_playManager = new CPlayManager;
 
 	m_hwnd = _hwnd;
 	m_gameState = INTRO;
+	isConnected = false;
 
 	m_uiManager->InitUIManager();
 	m_playManager->InitPlayerManager();
@@ -39,8 +38,12 @@ bool CGameManager::InitGameManager(HWND _hwnd)
 void CGameManager::ExitGameManager()
 {
 	KillTimer(m_hwnd, 1);
-	CNetworkManager::getInstance().ExitNetworkManager();
-	CPacketManager::getInstance().ExitPacketManager();
+	// 서버와 연결 되어있었다면
+	if (isConnected)
+	{
+		CNetworkManager::getInstance().ExitNetworkManager();
+		CPacketManager::getInstance().ExitPacketManager();
+	}
 }
 
 void CGameManager::Timer(HWND _hwnd)
@@ -110,6 +113,10 @@ void CGameManager::KeyChange()
 void CGameManager::EnterGame()
 {
 	m_gameState = PLAY;
+	// 서버와 연결
+	CNetworkManager::getInstance().InitNetworkManager();
+	CPacketManager::getInstance().InitPacketManager();
+	isConnected = true;
 	m_playManager->EnterGame();
 }
 
