@@ -8,6 +8,7 @@
 #include "Overlapped.h"
 #include "LogManager.h"
 #include "PacketManager.h"
+#include "CalculateServer.h"
 #include "TCPSocket.h"
 #include "UDPSocket.h"
 
