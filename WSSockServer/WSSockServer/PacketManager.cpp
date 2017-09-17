@@ -46,7 +46,11 @@ void CPacketManager::APPLY_PACKET_UDP()
 
 void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 {
+#ifdef IOCP_SERVER
 	RecvPacketType packetType = RecvPacketType::RC_ENTER_SERVER;
+#else
+	RecvPacketType packetType = RecvPacketType::RC_SYNCSERVER_ENTER;
+#endif
 	// 패킷 분리
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
 	// 함수 포인터 find
@@ -64,8 +68,15 @@ void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용
+#ifdef IOCP_SERVER
+	// CLIENT -> IOCP
 	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_TEST, std::bind(&CCalculateServer::Test, &CCalculateServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+#else
+	// IOCP -> EPOLL
+	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+#endif
 }
 
 CPacketManager::~CPacketManager()

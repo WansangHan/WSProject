@@ -13,25 +13,43 @@
 #endif
 #include "LogManager.h"
 #include "BaseSocket.h"
-#include "InGame.h"
 #ifdef IOCP_SERVER
 #include "IOCP.h"
+#include "CalculateServer.h"
+#include "InGame.h"
 #else
 #include "EPOLL.h"
+#include "SyncServer.h"
 #endif
 #include "WSSockServer.pb.h"
 
 enum class SendPacketType : int
 {
+#ifdef IOCP_SERVER
+	// IOCP -> CLIENT
 	SD_ENTER_SERVER = 20000,
 	SD_EXIT_PLAYER,
 	SD_POSITION_SCALE,
+	// IOCP -> EPOLL
+	SD_SYNCSERVER_ENTER = 30000,
+#else
+	// EPOLL -> IOCP
+	SD_TEST = 40000,
+#endif
 };
 
 enum class RecvPacketType : int
 {
+#ifdef IOCP_SERVER
+	// CLIENT -> IOCP
 	RC_ENTER_SERVER = 10000,
 	RC_POSITION_SCALE,
+	// EPOLL -> IOCP
+	RC_TEST = 40000,
+#else
+	// IOCP -> EPOLL
+	RC_SYNCSERVER_ENTER = 30000,
+#endif
 };
 
 struct PacketInfo

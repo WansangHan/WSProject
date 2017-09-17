@@ -1,13 +1,17 @@
 #ifndef CALCULATESERVER_H
 #define CALCULATESERVER_H
+#include "PacketManager.h"
 #include "TCPSocket.h"
 #include "UDPSocket.h"
+
+enum class SendPacketType : int;
+
 class CCalculateServer
 {
 	static std::unique_ptr<CCalculateServer> m_inst;
 	static std::once_flag m_once;
 
-	std::shared_ptr<CTCPSocket> m_TCPSocket;
+	std::shared_ptr<CBaseSocket> m_TCPSocket;
 
 	std::shared_ptr<sockaddr_in> m_TCPSockAddr;
 	std::shared_ptr<sockaddr_in> m_UDPSockAddr;
@@ -22,5 +26,6 @@ public:
 	~CCalculateServer();
 
 	void InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort, CUDPSocket _udpSocket);
+	void SendToCalculateServer(SendPacketType type, std::string str, bool isTCP);
 };
 #endif

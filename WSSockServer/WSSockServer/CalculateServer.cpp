@@ -32,8 +32,12 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer TCP connect() error : %d", WSAGetLastError());
 	}
 
-	// IOCP 오브젝트에 등록
+	// IOCP 오브젝트에 등록 및 Read 대기
 	CreateIoCompletionPort((HANDLE)m_TCPSocket->GetSOCKET(), _compPort, 0, 0);
+	CIOCP::getInstance().PostRead(m_TCPSocket, true);
+
+	// EPOLL 서버에 IOCP 서버 접속을 알림
+	SendToCalculateServer(SendPacketType::SD_SYNCSERVER_ENTER, "", true);
 
 	memset(m_UDPSockAddr.get(), 0, sizeof(m_UDPSockAddr.get()));
 	m_UDPSockAddr->sin_family = AF_INET;
@@ -45,4 +49,13 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer UDP connect() error : %d", WSAGetLastError());
 	}
+}
+
+// EPOLL 서버에 패킷을 전송하는 함수
+void CCalculateServer::SendToCalculateServer(SendPacketType type, std::string str, bool isTCP)
+{
+	if(isTCP)
+		CPacketManager::getInstance().SendPacketToServer(m_TCPSocket, type, str, nullptr, isTCP);
+	else
+		CPacketManager::getInstance().SendPacketToServer(nullptr, type, str, m_UDPSockAddr.get(), isTCP);
 }
