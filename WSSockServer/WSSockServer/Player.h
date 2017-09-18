@@ -4,7 +4,7 @@
 #include "BaseSocket.h"
 
 // 플레이어 방향 상태값
-enum PlayerDirection
+enum class ObjectDirection : int
 {
 	IDLE = 100,
 	UPUP,
@@ -17,19 +17,19 @@ enum PlayerDirection
 	DWRG,
 };
 
-struct PlayerTransform
+struct ObjectTransform
 {
 	float m_vectorX;
 	float m_vectorY;
 	float m_scale;
-	PlayerDirection m_dir;
-	PlayerTransform(){}
-	PlayerTransform(float _vectorX, float _vectorY, float _scale, int _dir)
+	ObjectDirection m_dir;
+	ObjectTransform(){}
+	ObjectTransform(float _vectorX, float _vectorY, float _scale, ObjectDirection _dir)
 	{
 		m_vectorX = _vectorX;
 		m_vectorY = _vectorY;
 		m_scale = _scale;
-		m_dir = (PlayerDirection)_dir;
+		m_dir = _dir;
 	}
 };
 
@@ -39,7 +39,7 @@ class CPlayer
 	std::string m_name;
 	std::shared_ptr<CBaseSocket> m_sock;
 
-	PlayerTransform m_playerTransform;
+	ObjectTransform m_playerTransform;
 public:
 	CPlayer();
 	~CPlayer();
@@ -51,13 +51,13 @@ public:
 	void SetSocket(std::shared_ptr<CBaseSocket> _sock) { m_sock = _sock; }
 	std::shared_ptr<CBaseSocket> GetSocket() { return m_sock; }
 
-	void SetTransform(PlayerTransform _playerTransform) 
+	void SetTransform(ObjectTransform _playerTransform) 
 	{ 
 		m_playerTransform.m_vectorX = _playerTransform.m_vectorX;
 		m_playerTransform.m_vectorY = _playerTransform.m_vectorY;
 		m_playerTransform.m_scale = _playerTransform.m_scale;
 		m_playerTransform.m_dir = _playerTransform.m_dir;
 	}
-	PlayerTransform GetTransform() { return m_playerTransform; }
+	ObjectTransform GetTransform() { return m_playerTransform; }
 };
 #endif
