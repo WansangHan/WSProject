@@ -2,36 +2,9 @@
 #define PLAYER_H
 #include <string>
 #include "BaseSocket.h"
+#include "InGame.h"
 
-// 플레이어 방향 상태값
-enum class ObjectDirection : int
-{
-	IDLE = 100,
-	UPUP,
-	LEFT,
-	RGHT,
-	DOWN,
-	UPLE,
-	UPRG,
-	DWLE,
-	DWRG,
-};
-
-struct ObjectTransform
-{
-	float m_vectorX;
-	float m_vectorY;
-	float m_scale;
-	ObjectDirection m_dir;
-	ObjectTransform(){}
-	ObjectTransform(float _vectorX, float _vectorY, float _scale, ObjectDirection _dir)
-	{
-		m_vectorX = _vectorX;
-		m_vectorY = _vectorY;
-		m_scale = _scale;
-		m_dir = _dir;
-	}
-};
+struct ObjectTransform;
 
 class CPlayer
 {
@@ -39,7 +12,7 @@ class CPlayer
 	std::string m_name;
 	std::shared_ptr<CBaseSocket> m_sock;
 
-	ObjectTransform m_playerTransform;
+	std::shared_ptr<ObjectTransform> m_playerTransform;
 public:
 	CPlayer();
 	~CPlayer();
@@ -51,13 +24,7 @@ public:
 	void SetSocket(std::shared_ptr<CBaseSocket> _sock) { m_sock = _sock; }
 	std::shared_ptr<CBaseSocket> GetSocket() { return m_sock; }
 
-	void SetTransform(ObjectTransform _playerTransform) 
-	{ 
-		m_playerTransform.m_vectorX = _playerTransform.m_vectorX;
-		m_playerTransform.m_vectorY = _playerTransform.m_vectorY;
-		m_playerTransform.m_scale = _playerTransform.m_scale;
-		m_playerTransform.m_dir = _playerTransform.m_dir;
-	}
-	ObjectTransform GetTransform() { return m_playerTransform; }
+	void SetTransform(std::shared_ptr<ObjectTransform> _playerTransform) { m_playerTransform = _playerTransform; }
+	std::shared_ptr<ObjectTransform> GetTransform() { return m_playerTransform; }
 };
 #endif

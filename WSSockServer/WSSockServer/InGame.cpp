@@ -43,13 +43,13 @@ std::shared_ptr<CPlayer> CInGame::FindPlayerToID(int _pID)
 }
 
 // 접속한 클라이언트의 초기 시작위치와 크기를 정하고 전송
-ObjectTransform CInGame::SetStartingTransform()
+std::shared_ptr<ObjectTransform> CInGame::SetStartingTransform()
 {
 	float vectorX = 100.f;
 	float vectorY = 100.f;
 	float scale = 10.f;
 
-	ObjectTransform playerTransform(vectorX, vectorY, scale, ObjectDirection::IDLE);
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(vectorX, vectorY, scale, ObjectDirection::IDLE);
 
 	return playerTransform;
 }
@@ -92,10 +92,10 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 
 		WSSockServer::PlayerTransform SendData_SP;
 		SendData_SP.set__id(player->GetID());
-		SendData_SP.set__vectorx(player->GetTransform().m_vectorX);
-		SendData_SP.set__vectory(player->GetTransform().m_vectorY);
-		SendData_SP.set__scale(player->GetTransform().m_scale);
-		SendData_SP.set__dir((int)player->GetTransform().m_dir);
+		SendData_SP.set__vectorx(player->GetTransform()->m_vectorX);
+		SendData_SP.set__vectory(player->GetTransform()->m_vectorY);
+		SendData_SP.set__scale(player->GetTransform()->m_scale);
+		SendData_SP.set__dir((int)player->GetTransform()->m_dir);
 		// 플레이어 Transform 정보 전송
 		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_POSITION_SCALE, SendData_SP.SerializeAsString(), nullptr, true);
 	}
@@ -103,15 +103,15 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	// map 변수에 플레이어 Insert
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
 
-	ObjectTransform playerTransform = SetStartingTransform();
+	std::shared_ptr<ObjectTransform> playerTransform = SetStartingTransform();
 	player->SetTransform(playerTransform);
 
 	WSSockServer::PlayerTransform sendData;
 	sendData.set__id(player->GetID());
-	sendData.set__vectorx(player->GetTransform().m_vectorX);
-	sendData.set__vectory(player->GetTransform().m_vectorY);
-	sendData.set__dir((int)player->GetTransform().m_dir);
-	sendData.set__scale(player->GetTransform().m_scale);
+	sendData.set__vectorx(player->GetTransform()->m_vectorX);
+	sendData.set__vectory(player->GetTransform()->m_vectorY);
+	sendData.set__dir((int)player->GetTransform()->m_dir);
+	sendData.set__scale(player->GetTransform()->m_scale);
 
 	// 접속중인 모든 플레이어에게 현재 들어온 플레이어의 위치 정보 전달
 	SendToAllPlayer(SendPacketType::SD_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
@@ -136,7 +136,7 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char*
 	RecvData.ParseFromArray(_data, _size);
 	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
-	ObjectTransform playerTransform(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
 	player->SetTransform(playerTransform);
 	SendToAllPlayer(SendPacketType::SD_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 }
