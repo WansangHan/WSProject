@@ -72,7 +72,6 @@ void CPacketManager::InitFunctionmap()
 	// CLIENT -> IOCP
 	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_TEST, std::bind(&CCalculateServer::Test, &CCalculateServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 #else
 	// IOCP -> EPOLL
 	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
