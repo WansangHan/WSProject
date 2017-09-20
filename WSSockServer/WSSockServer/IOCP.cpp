@@ -365,6 +365,7 @@ bool CIOCP::InitServer()
 	// PacketManager 초기화
 	CPacketManager::getInstance().InitPacketManager();
 	CCalculateServer::getInstance().InitCalculateServer("192.168.68.128", 22222, 33333, m_CompPort, *m_listenUDPSocket.get());
+	CInGame::getInstance().InitInGame();
 
 	// 소켓 하나에 대해 AcceptEx 호출
 	PostAccept();

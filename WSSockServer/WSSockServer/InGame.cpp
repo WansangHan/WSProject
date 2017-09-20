@@ -13,6 +13,12 @@ CInGame::~CInGame()
 {
 }
 
+// InGame 클래스 초기화
+void CInGame::InitInGame()
+{
+	AllocateAIObject();
+}
+
 // 소켓 핸들값으로 클라이언트의 아이디를 찾는 함수
 int CInGame::FindIDToSOCKET(std::shared_ptr<CBaseSocket> _sock)
 {
@@ -42,6 +48,31 @@ std::shared_ptr<CPlayer> CInGame::FindPlayerToID(int _pID)
 	}
 }
 
+// AI 아이디와 매칭되는 AIObject 클래스 변수를 찾는 함수
+std::shared_ptr<CAIObject> CInGame::FindAIObjectToID(int _pID)
+{
+	auto Ao = m_AIObjects.find(_pID);
+	if (Ao != m_AIObjects.end())
+		return Ao->second;
+	else
+	{
+		CLogManager::getInstance().WriteLogMessage("WARN", true, "Return nullptr in FindAIObject()");
+		return nullptr;
+	}
+}
+
+// AI에게 부여할 ID 값을 리턴해주는 함수
+int CInGame::MakeAIObjectID()
+{
+	for (int i = 0;; i++) // 0부터 무한대 숫자까지 ++
+	{
+		auto curVal = m_AIObjects.find(i);
+
+		if (curVal == m_AIObjects.end())	// 중복되는 ID가 없다면 리턴
+			return i;
+	}
+}
+
 // 접속한 클라이언트의 초기 시작위치와 크기를 정하고 전송
 std::shared_ptr<ObjectTransform> CInGame::SetStartingTransform()
 {
@@ -62,6 +93,23 @@ void CInGame::SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_i
 		std::shared_ptr<CBaseSocket> socket = Pr.second->GetSocket();
 		CPacketManager::getInstance().SendPacketToServer(socket, _type, _str, _sockaddr, _isTCP);
 	}
+}
+
+// AI 생성
+void CInGame::AllocateAIObject()
+{
+	std::shared_ptr<CAIObject> aiObject = std::make_shared<CAIObject>();
+
+	int AIObjectID = MakeAIObjectID();
+	aiObject->SetID(AIObjectID);
+
+	// 생성한 AIObject를 map 변수에 저장
+	m_AIObjects.insert(std::map<int, std::shared_ptr<CAIObject>>::value_type(aiObject->GetID(), aiObject));
+
+	// AIObject의 시작 위치, 크기를 받아오기 위해 EPOLL 서버로 패킷을 보낸다.
+	WSSockServer::ObjectInformation sendData;
+	sendData.set__id(aiObject->GetID());
+	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_MAKE_AIOBJECT, sendData.SerializeAsString(), true);
 }
 
 // 플레이어 입장 시
@@ -139,4 +187,15 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char*
 	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
 	player->SetTransform(playerTransform);
 	SendToAllPlayer(SendPacketType::SD_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
+}
+
+// EPOLL 서버에서 받은 좌표를 AIObject에 적용시킴
+void CInGame::ApplyAIObjectPositionScale(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+{
+	WSSockServer::ObjectTransform RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	std::shared_ptr<CAIObject> aiObject = FindAIObjectToID(RecvData._id());
+	std::shared_ptr<ObjectTransform> obejectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
+	aiObject->SetTransform(obejectTransform);
 }

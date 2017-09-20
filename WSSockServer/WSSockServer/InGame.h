@@ -2,9 +2,11 @@
 #define INGAME_H
 #include "PacketManager.h"
 #include "Player.h"
+#include "AIObject.h"
 
 enum class SendPacketType : int;
 class CPlayer;
+class CAIObject;
 
 // 플레이어 방향 상태값
 enum class ObjectDirection : int
@@ -44,11 +46,17 @@ class CInGame
 	// 접속 중인 클라이언트를 저장하기 위한 map 변수
 	std::map<int, std::shared_ptr<CPlayer>> m_players;
 
+	// 생성된 AI Object를 저장하기 위한 map 변수
+	std::map<int, std::shared_ptr<CAIObject>> m_AIObjects;
+
 	CInGame();
 	int FindIDToSOCKET(std::shared_ptr<CBaseSocket> _sock);
 	std::shared_ptr<CPlayer> FindPlayerToID(int _pID);
+	std::shared_ptr<CAIObject> FindAIObjectToID(int _pID);
+	int MakeAIObjectID();
 	std::shared_ptr<ObjectTransform> SetStartingTransform();
 	void SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_in* _sockaddr, bool _isTCP);
+	void AllocateAIObject();
 public:
 	static CInGame& getInstance()
 	{
@@ -57,9 +65,12 @@ public:
 	}
 	~CInGame();
 
+	void InitInGame();
+
 	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock);
 	
 	void ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
+	void ApplyAIObjectPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 };
 #endif

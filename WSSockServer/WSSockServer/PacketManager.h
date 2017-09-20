@@ -20,6 +20,7 @@
 #else
 #include "EPOLL.h"
 #include "SyncServer.h"
+#include "Calculating.h"
 #endif
 #include "WSSockServer.pb.h"
 
@@ -32,9 +33,10 @@ enum class SendPacketType : int
 	SD_POSITION_SCALE,
 	// IOCP -> EPOLL
 	SD_SYNCSERVER_ENTER = 30000,
+	SD_MAKE_AIOBJECT,
 #else
 	// EPOLL -> IOCP
-	SD_TEST = 40000,
+	SD_AI_STARTING = 40000,
 #endif
 };
 
@@ -45,10 +47,11 @@ enum class RecvPacketType : int
 	RC_ENTER_SERVER = 10000,
 	RC_POSITION_SCALE,
 	// EPOLL -> IOCP
-	RC_TEST = 40000,
+	RC_AI_STARTING = 40000,
 #else
 	// IOCP -> EPOLL
 	RC_SYNCSERVER_ENTER = 30000,
+	RC_MAKE_AIOBJECT,
 #endif
 };
 
