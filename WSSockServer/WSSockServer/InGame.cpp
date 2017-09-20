@@ -90,7 +90,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 		// 플레이어 아이디, 이름 전송
 		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_ENTER_SERVER, SendData_ES.SerializeAsString(), nullptr, true);
 
-		WSSockServer::PlayerTransform SendData_SP;
+		WSSockServer::ObjectTransform SendData_SP;
 		SendData_SP.set__id(player->GetID());
 		SendData_SP.set__vectorx(player->GetTransform()->m_vectorX);
 		SendData_SP.set__vectory(player->GetTransform()->m_vectorY);
@@ -106,7 +106,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	std::shared_ptr<ObjectTransform> playerTransform = SetStartingTransform();
 	player->SetTransform(playerTransform);
 
-	WSSockServer::PlayerTransform sendData;
+	WSSockServer::ObjectTransform sendData;
 	sendData.set__id(player->GetID());
 	sendData.set__vectorx(player->GetTransform()->m_vectorX);
 	sendData.set__vectory(player->GetTransform()->m_vectorY);
@@ -132,7 +132,7 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 // 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송
 void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
 {
-	WSSockServer::PlayerTransform RecvData;
+	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
