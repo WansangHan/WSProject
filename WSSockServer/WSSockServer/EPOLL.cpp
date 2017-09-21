@@ -57,6 +57,7 @@ bool CEPOLL::InitServer()
 	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenUDPSocket->GetSOCKET(), &event);
 
 	CPacketManager::getInstance().InitPacketManager();
+	CCalculating::getInstance().InitCalculating();
 
 	return true;
 }
