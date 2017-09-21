@@ -35,6 +35,10 @@ void CPlayManager::PaintPlay(HWND _hwnd, HDC _hdc)
 	{
 		Pr->PaintPlayer(_hwnd, _hdc);
 	}
+	for (auto Ao : m_AIObjects)
+	{
+		Ao->PaintAIObject(_hwnd, _hdc);
+	}
 }
 
 // 게임 플레이 시 매 프레임 업데이트 되는 부분
@@ -84,12 +88,12 @@ void CPlayManager::ExitPlayer(char * _data, int _size)
 }
 
 // 서버로부터 받은 좌표, 크기, 방향 정보를 플레이어에 저장
-void CPlayManager::SetPositionScale(char * _data, int _size)
+void CPlayManager::SetPlayerPositionScale(char * _data, int _size)
 {
 	BattleCity::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	PlayerTransform playerTransform(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
 	// 자기 자신에 대한 위치 정보라면
 	if (m_ownPlayer->GetID() == RecvData._id())
 	{
@@ -106,6 +110,21 @@ void CPlayManager::SetPositionScale(char * _data, int _size)
 			}
 		}
 	}
+}
+
+// 서버로부터 받은 Transform 정보를 토대로 AIObject를 만들어 List에 저장
+void CPlayManager::SetAIObjectPositionScale(char * _data, int _size)
+{
+	BattleCity::ObjectTransform RecvData;
+
+	RecvData.ParseFromArray(_data, _size);
+	std::shared_ptr<ObjectTransform> aiObjectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
+	
+	std::shared_ptr<CAIObject> aiObject = std::make_shared<CAIObject>();
+	aiObject->SetID(RecvData._id());
+	aiObject->SetTransform(aiObjectTransform);
+
+	m_AIObjects.push_back(aiObject);
 }
 
 // 키보드 이벤트 시

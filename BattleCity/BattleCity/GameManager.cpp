@@ -132,8 +132,14 @@ void CGameManager::ExitPlayer(char * _data, int _size)
 	m_playManager->ExitPlayer(_data, _size);
 }
 
-// 플레이어 이동 시 받은 패킷에 대해 처리
-void CGameManager::SetPositionScale(char* _data, int _size)
+// Player Transform 패킷에 대해 처리
+void CGameManager::SetPlayerPositionScale(char* _data, int _size)
 {
-	m_playManager->SetPositionScale(_data, _size);
+	m_playManager->SetPlayerPositionScale(_data, _size);
+}
+
+// AI Transform 패킷에 대해 처리
+void CGameManager::SetAIObjectPositionScale(char * _data, int _size)
+{
+	m_playManager->SetAIObjectPositionScale(_data, _size);
 }

@@ -55,7 +55,8 @@ public:
 	void EnterGame();
 	void EnterPlayer(char* _data, int _size);
 	void ExitPlayer(char* _data, int _size);
-	void SetPositionScale(char* _data, int _size);
+	void SetPlayerPositionScale(char* _data, int _size);
+	void SetAIObjectPositionScale(char* _data, int _size);
 
 	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
 	CUIManager* GetUIManagerInstance() { return m_uiManager; }

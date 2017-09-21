@@ -145,7 +145,20 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 		SendData_SP.set__scale(player->GetTransform()->m_scale);
 		SendData_SP.set__dir((int)player->GetTransform()->m_dir);
 		// 플레이어 Transform 정보 전송
-		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_POSITION_SCALE, SendData_SP.SerializeAsString(), nullptr, true);
+		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_PLAYER_POSITION_SCALE, SendData_SP.SerializeAsString(), nullptr, true);
+	}
+
+	// 현재 살아있는 AIObject 변수를 접속한 플레이어에게 전달
+	for (auto Ao : m_AIObjects)
+	{
+		std::shared_ptr <CAIObject> aiObject = Ao.second;
+
+		WSSockServer::ObjectTransform SendData;
+		SendData.set__vectorx(aiObject->GetTransform()->m_vectorX);
+		SendData.set__vectory(aiObject->GetTransform()->m_vectorY);
+		SendData.set__scale(aiObject->GetTransform()->m_scale);
+		SendData.set__dir((int)aiObject->GetTransform()->m_dir);
+		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_AIOBJECT_POSITION_SCALE, SendData.SerializeAsString(), nullptr, true);
 	}
 
 	// map 변수에 플레이어 Insert
@@ -162,7 +175,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	sendData.set__scale(player->GetTransform()->m_scale);
 
 	// 접속중인 모든 플레이어에게 현재 들어온 플레이어의 위치 정보 전달
-	SendToAllPlayer(SendPacketType::SD_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
+	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
 }
 
 void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
@@ -186,7 +199,7 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char*
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
 	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
 	player->SetTransform(playerTransform);
-	SendToAllPlayer(SendPacketType::SD_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
+	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 }
 
 // EPOLL 서버에서 받은 좌표를 AIObject에 적용시킴
