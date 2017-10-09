@@ -17,12 +17,9 @@ class CLogManager
 	CSqlManager* m_sqlmanager;
 	CFileManager* m_filemanager;
 
+	std::mutex m_mtx_lock;
+
 	CLogManager();
-#ifdef IOCP_SERVER
-	CRITICAL_SECTION cs;
-#else
-	pthread_mutex_t m_mutex;
-#endif
 
 	// SQL Send 여부를 판단하고 SQL과 File에 로그를 저장하는 함수
 	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);

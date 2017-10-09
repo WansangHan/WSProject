@@ -8,10 +8,6 @@ CLogManager::CLogManager()
 {
 	m_sqlmanager = new CSqlManager;
 	m_filemanager = new CFileManager;
-#ifdef IOCP_SERVER
-	InitializeCriticalSection(&cs);
-#else
-#endif
 }
 
 
@@ -57,21 +53,12 @@ bool CLogManager::WriteLogMessage(char * _level, bool _sendsql, const char * _me
 
 bool CLogManager::ApplyLogMessage(char * _level, bool _sendsql, const char* _message)
 {
-#ifdef IOCP_SERVER
-	EnterCriticalSection(&cs);
-#else
-	pthread_mutex_lock(&m_mutex);
-#endif
+	std::lock_guard<std::mutex> guard(m_mtx_lock);
 	// 데이터 베이스에 저장할 로그라면
 	if(_sendsql)
 		m_sqlmanager->SendLogMessage(_message, _level);
 
 	// 파일에 저장
 	m_filemanager->WriteFileLog(_message, _level);
-#ifdef IOCP_SERVER
-	LeaveCriticalSection(&cs);
-#else
-	pthread_mutex_unlock(&m_mutex);
-#endif
 	return true;
 }

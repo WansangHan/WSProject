@@ -16,11 +16,11 @@ class CLogManager
 
 	CFileManager* m_filemanager;
 
+	std::mutex m_mtx_lock;
+
 	CLogManager();
 	// SQL Send 여부를 판단하고 SQL과 File에 로그를 저장하는 함수
 	bool ApplyLogMessage(char * _level, bool _sendsql, const char* _message);
-
-	CRITICAL_SECTION cs;
 public:
 	static CLogManager& getInstance()
 	{
