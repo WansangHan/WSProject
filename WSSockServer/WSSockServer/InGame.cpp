@@ -112,7 +112,7 @@ void CInGame::AllocateAIObject()
 	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_MAKE_AIOBJECT, sendData.SerializeAsString(), true);
 }
 
-// 플레이어 입장 시
+// 플레이어 입장 시 (클라이언트의 접속 요청)
 void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
 {
 	WSSockServer::PlayerInformation RecvData;
@@ -176,6 +176,20 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 
 	// 접속중인 모든 플레이어에게 현재 들어온 플레이어의 위치 정보 전달
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
+
+	// 접속한 클라이언트의 정보를 EPOLL 서버로 보냄
+	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_ENTER_PEER, RecvData.SerializeAsString(), true);
+}
+
+// 클라이언트의 EPOLL 서버 접속 성공
+void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+{
+	WSSockServer::ObjectInformation RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	// EPOLL 서버에 접속을 성공한 플레이어에게 성공했다는 패킷을 보냄
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CONNECTOIN, "", nullptr, true);
 }
 
 void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)

@@ -11,6 +11,7 @@
 enum GameState
 {
 	INTRO,
+	LODDING,
 	PLAY,
 };
 
@@ -53,6 +54,7 @@ public:
 	void KeyChange();
 
 	void EnterGame();
+	void CompleteConnect(char* _data, int _size);
 	void EnterPlayer(char* _data, int _size);
 	void ExitPlayer(char* _data, int _size);
 	void SetPlayerPositionScale(char* _data, int _size);

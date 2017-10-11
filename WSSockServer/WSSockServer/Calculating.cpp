@@ -36,3 +36,17 @@ void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, char 
 	SendData.set__dir((int)ObjectDirection::IDLE);
 	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_AI_STARTING, SendData.SerializeAsString(), true);
 }
+
+// 플레이어 접속 시 EPOLL 서버에도 클라이언트 정보를 저장
+void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+{
+	WSSockServer::ObjectInformation RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	std::shared_ptr<CPlayer> player = std::make_shared<CPlayer>();
+	player->SetID(RecvData._id());
+
+	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
+
+	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, RecvData.SerializeAsString(), true);
+}

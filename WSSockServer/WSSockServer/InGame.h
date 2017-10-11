@@ -68,6 +68,7 @@ public:
 	void InitInGame();
 
 	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
+	void SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock);
 	
 	void ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);

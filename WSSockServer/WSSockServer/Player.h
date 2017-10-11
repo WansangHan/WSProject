@@ -2,7 +2,10 @@
 #define PLAYER_H
 #include <string>
 #include "BaseSocket.h"
+#ifdef IOCP_SERVER
 #include "InGame.h"
+#else
+#endif
 
 struct ObjectTransform;
 

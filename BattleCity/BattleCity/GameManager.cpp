@@ -112,12 +112,18 @@ void CGameManager::KeyChange()
 
 void CGameManager::EnterGame()
 {
-	m_gameState = PLAY;
+	m_gameState = LODDING;
 	// 서버와 연결
 	CNetworkManager::getInstance().InitNetworkManager();
 	CPacketManager::getInstance().InitPacketManager();
 	isConnected = true;
 	m_playManager->EnterGame();
+}
+
+// EPOLL 서버에도 접속이 완료 되면, 플레이로 전환
+void CGameManager::CompleteConnect(char * _data, int _size)
+{
+	m_gameState = PLAY;
 }
 
 // 플레이어가 들어왔을 때
