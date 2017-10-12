@@ -50,3 +50,12 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data,
 
 	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, RecvData.SerializeAsString(), true);
 }
+
+// 플레이어가 나갔을 때, 해당 아이디에 맞는 플레이어 삭제
+void CCalculating::ExitPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+{
+	WSSockServer::ObjectInformation RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	m_players.erase(RecvData._id());
+}

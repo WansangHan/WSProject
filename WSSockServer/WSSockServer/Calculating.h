@@ -39,5 +39,6 @@ public:
 	void SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 
 	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
+	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
 };
 #endif

@@ -202,6 +202,7 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 	WSSockServer::PlayerInformation SendData;
 	SendData.set__id(pID);
 	SendToAllPlayer(SendPacketType::SD_EXIT_PLAYER, SendData.SerializeAsString(), nullptr, true);
+	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_EXIT_PEER, SendData.SerializeAsString(), true);
 }
 
 // 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송

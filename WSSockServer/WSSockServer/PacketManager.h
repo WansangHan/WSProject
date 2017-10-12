@@ -37,6 +37,7 @@ enum class SendPacketType : int
 	SD_SYNCSERVER_ENTER = 30000,
 	SD_MAKE_AIOBJECT,
 	SD_ENTER_PEER,
+	SD_EXIT_PEER,
 #else
 	// EPOLL -> IOCP
 	SD_AI_STARTING = 40000,
@@ -58,6 +59,7 @@ enum class RecvPacketType : int
 	RC_SYNCSERVER_ENTER = 30000,
 	RC_MAKE_AIOBJECT,
 	RC_ENTER_PEER,
+	RC_EXIT_PEER,
 #endif
 };
 

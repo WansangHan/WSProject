@@ -79,6 +79,7 @@ void CPacketManager::InitFunctionmap()
 	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_MAKE_AIOBJECT, std::bind(&CCalculating::SetStartingPosition, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PEER, std::bind(&CCalculating::EnterPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_EXIT_PEER, std::bind(&CCalculating::ExitPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 #endif
 }
 
