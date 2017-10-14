@@ -5,6 +5,7 @@
 #ifdef IOCP_SERVER
 #include "InGame.h"
 #else
+#include "Calculating.h"
 #endif
 
 struct ObjectTransform;

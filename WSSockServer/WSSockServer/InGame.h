@@ -54,7 +54,6 @@ class CInGame
 	std::shared_ptr<CPlayer> FindPlayerToID(int _pID);
 	std::shared_ptr<CAIObject> FindAIObjectToID(int _pID);
 	int MakeAIObjectID();
-	std::shared_ptr<ObjectTransform> SetStartingTransform();
 	void SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_in* _sockaddr, bool _isTCP);
 	void AllocateAIObject();
 public:

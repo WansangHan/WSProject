@@ -37,18 +37,30 @@ void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, char 
 	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_AI_STARTING, SendData.SerializeAsString(), true);
 }
 
-// 플레이어 접속 시 EPOLL 서버에도 클라이언트 정보를 저장
+// 플레이어 접속 시 EPOLL 서버에도 클라이언트 정보를 저장 및 시작 좌표 리턴
 void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
 {
-	WSSockServer::ObjectInformation RecvData;
+	WSSockServer::PlayerInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
+
+	float vectorX = rand() % 601;
+	float vectorY = rand() % 601;
+	float scale = rand() % 50;
 
 	std::shared_ptr<CPlayer> player = std::make_shared<CPlayer>();
 	player->SetID(RecvData._id());
 
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(vectorX, vectorY, scale, ObjectDirection::IDLE);
+	player->SetTransform(playerTransform);
+
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
 
-	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, RecvData.SerializeAsString(), true);
+	WSSockServer::ObjectTransform SendData;
+	SendData.set__id(RecvData._id());
+	SendData.set__vectorx(vectorX);
+	SendData.set__vectory(vectorY);
+	SendData.set__scale(scale);
+	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, SendData.SerializeAsString(), true);
 }
 
 // 플레이어가 나갔을 때, 해당 아이디에 맞는 플레이어 삭제

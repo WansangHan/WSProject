@@ -73,18 +73,6 @@ int CInGame::MakeAIObjectID()
 	}
 }
 
-// 접속한 클라이언트의 초기 시작위치와 크기를 정하고 전송
-std::shared_ptr<ObjectTransform> CInGame::SetStartingTransform()
-{
-	float vectorX = 100.f;
-	float vectorY = 100.f;
-	float scale = 10.f;
-
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(vectorX, vectorY, scale, ObjectDirection::IDLE);
-
-	return playerTransform;
-}
-
 // 접속한 모든 플레이어에게 전송
 void CInGame::SendToAllPlayer(SendPacketType _type, std::string _str, sockaddr_in * _sockaddr, bool _isTCP)
 {
@@ -164,7 +152,21 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	// map 변수에 플레이어 Insert
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
 
-	std::shared_ptr<ObjectTransform> playerTransform = SetStartingTransform();
+	// 접속한 클라이언트의 정보를 EPOLL 서버로 보냄
+	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_ENTER_PEER, RecvData.SerializeAsString(), true);
+}
+
+// 클라이언트의 EPOLL 서버 접속 성공
+void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+{
+	WSSockServer::ObjectTransform RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	// EPOLL 서버에 접속을 성공한 플레이어에게 성공했다는 패킷을 보냄
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CONNECTOIN, "", nullptr, true);
+
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), ObjectDirection::IDLE);
 	player->SetTransform(playerTransform);
 
 	WSSockServer::ObjectTransform sendData;
@@ -176,26 +178,14 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 
 	// 접속중인 모든 플레이어에게 현재 들어온 플레이어의 위치 정보 전달
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
-
-	// 접속한 클라이언트의 정보를 EPOLL 서버로 보냄
-	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_ENTER_PEER, RecvData.SerializeAsString(), true);
-}
-
-// 클라이언트의 EPOLL 서버 접속 성공
-void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
-{
-	WSSockServer::ObjectInformation RecvData;
-	RecvData.ParseFromArray(_data, _size);
-
-	// EPOLL 서버에 접속을 성공한 플레이어에게 성공했다는 패킷을 보냄
-	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CONNECTOIN, "", nullptr, true);
 }
 
 void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 {
 	// 소켓 핸들 값으로 아이디를 찾은 후 erase
 	int pID = FindIDToSOCKET(_sock);
+	if (pID == -1) return;	// 소켓에 해당하는 아이디가 없을 시 리턴 (EPOLL 서버도 이 예외처리에 걸림)
+
 	m_players.erase(pID);
 
 	// 나간 플레이어의 ID를 남아있는 모든 클라이언트에게 전송

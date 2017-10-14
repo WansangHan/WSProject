@@ -4,6 +4,8 @@
 #include "PacketManager.h"
 #include "Player.h"
 
+class CPlayer;
+
 // 플레이어 방향 상태값
 enum class ObjectDirection : int
 {
@@ -16,6 +18,22 @@ enum class ObjectDirection : int
 	UPRG,
 	DWLE,
 	DWRG,
+};
+
+struct ObjectTransform
+{
+	float m_vectorX;
+	float m_vectorY;
+	float m_scale;
+	ObjectDirection m_dir;
+	ObjectTransform() {}
+	ObjectTransform(float _vectorX, float _vectorY, float _scale, ObjectDirection _dir)
+	{
+		m_vectorX = _vectorX;
+		m_vectorY = _vectorY;
+		m_scale = _scale;
+		m_dir = _dir;
+	}
 };
 
 class CCalculating
