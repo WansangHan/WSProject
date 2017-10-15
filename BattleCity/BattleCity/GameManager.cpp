@@ -120,6 +120,14 @@ void CGameManager::EnterGame()
 	m_playManager->EnterGame();
 }
 
+// IOCP 서버에 접속 성공 시
+void CGameManager::IOCPSuccess(char * _data, int _size)
+{
+	BattleCity::ObjectInformation SendData;
+	SendData.set__id(m_playManager->GetOwnPlayer()->GetID());
+	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_EPOLL_SERVER, SendData.SerializeAsString(), true, false);
+}
+
 // EPOLL 서버에도 접속이 완료 되면, 플레이로 전환
 void CGameManager::CompleteConnect(char * _data, int _size)
 {

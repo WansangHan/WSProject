@@ -113,7 +113,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 	player->SetSocket(_sock);
 
 	// 현재 들어온 플레이어에 대한 정보를 이미 접속해 있던 플레이어에게 전송
-	SendToAllPlayer(SendPacketType::SD_ENTER_SERVER, RecvData.SerializeAsString(), nullptr, true);
+	SendToAllPlayer(SendPacketType::SD_ENTER_IOCP_SERVER, RecvData.SerializeAsString(), nullptr, true);
 
 	// 현재 들어온 플레이어에게 각 플레이어들의 정보를 전송
 	for (auto Pr : m_players)
@@ -124,7 +124,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 		SendData_ES.set__id(player->GetID());
 		SendData_ES.set__name(player->GetName());
 		// 플레이어 아이디, 이름 전송
-		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_ENTER_SERVER, SendData_ES.SerializeAsString(), nullptr, true);
+		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_ENTER_IOCP_SERVER, SendData_ES.SerializeAsString(), nullptr, true);
 
 		WSSockServer::ObjectTransform SendData_SP;
 		SendData_SP.set__id(player->GetID());

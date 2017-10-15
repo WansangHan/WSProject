@@ -75,6 +75,8 @@ void CPacketManager::InitFunctionmap()
 	map_function.insert(std::make_pair(RecvPacketType::RC_AI_STARTING, std::bind(&CInGame::ApplyAIObjectPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_EPOLL, std::bind(&CInGame::SuccessEnterEpoll, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 #else
+	// CLIENT -> EPOLL
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_EPOLL_SERVER, std::bind(&CCalculating::SocketApply, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	// IOCP -> EPOLL
 	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_MAKE_AIOBJECT, std::bind(&CCalculating::SetStartingPosition, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
@@ -144,6 +146,10 @@ void CPacketManager::SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendP
 	memcpy(packet.get(), &ps, sizeof(PacketStructure));
 	// 이후 영역에 protocolbuffer 형태의 데이터를 이어붙임
 	memcpy(packet.get() + sizeof(PacketStructure), str.c_str(), str.length());
+
+	// UDP sockaddr이 정의되지 않았다면, TCP로 전송
+	if (isTCP == false && sockaddr == nullptr) isTCP = true;
+
 #ifdef IOCP_SERVER
 	CIOCP::getInstance().PostSend(packet.get(), ps.dataSize, sock, sockaddr, isTCP);
 #else

@@ -45,11 +45,14 @@ void CPacketManager::DEVIDE_PACKET_TYPE(std::shared_ptr<PacketInfo> info)
 void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용하는 부분
+	// IOCP -> CLIENT
 	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CGameManager::EnterPlayer, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_SUCCESS_CONNECTOIN, std::bind(&CGameManager::CompleteConnect, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_EXIT_PLAYER, std::bind(&CGameManager::ExitPlayer, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_PLAYER_POSITION_SCALE, std::bind(&CGameManager::SetPlayerPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_AIOBJECT_POSITION_SCALE, std::bind(&CGameManager::SetAIObjectPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	// EPOLL -> CLIENT
+	map_function.insert(std::make_pair(RC_SUCCESS_EPOLL_CONNECT, std::bind(&CGameManager::CompleteConnect, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 }
 
 CPacketManager::~CPacketManager()

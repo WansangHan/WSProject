@@ -54,6 +54,7 @@ public:
 	void KeyChange();
 
 	void EnterGame();
+	void IOCPSuccess(char* _data, int _size);
 	void CompleteConnect(char* _data, int _size);
 	void EnterPlayer(char* _data, int _size);
 	void ExitPlayer(char* _data, int _size);

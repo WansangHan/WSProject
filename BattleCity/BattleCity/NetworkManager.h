@@ -22,20 +22,20 @@ class CNetworkManager
 	// 통신에 쓰일 소켓
 	std::shared_ptr<SOCKET> m_IOCP_TCPSocket;
 	std::shared_ptr<SOCKET> m_IOCP_UDPSocket;
-	// std::shared_ptr<SOCKET> m_EPOL_TCPSocket;
-	// std::shared_ptr<SOCKET> m_EPOL_UDPSocket;
+	std::shared_ptr<SOCKET> m_EPOL_TCPSocket;
+	std::shared_ptr<SOCKET> m_EPOL_UDPSocket;
 	// 통신에 쓰일 소켓 어드레스
 	std::shared_ptr<sockaddr_in> m_IOCP_TCPSockAddr;
 	std::shared_ptr<sockaddr_in> m_IOCP_UDPSockAddr;
 	std::shared_ptr<sockaddr_in> m_IOCP_ClnSockAddr;
-	// std::shared_ptr<sockaddr_in> m_EPOL_TCPSockAddr;
-	// std::shared_ptr<sockaddr_in> m_EPOL_UDPSockAddr;
-	// std::shared_ptr<sockaddr_in> m_EPOL_ClnSockAddr;
+	std::shared_ptr<sockaddr_in> m_EPOL_TCPSockAddr;
+	std::shared_ptr<sockaddr_in> m_EPOL_UDPSockAddr;
+	std::shared_ptr<sockaddr_in> m_EPOL_ClnSockAddr;
 	// Receive를 위한 Thread
 	std::unique_ptr<std::thread> m_Recv_IOCP_TCPThread;
 	std::unique_ptr<std::thread> m_Recv_IOCP_UDPThread;
-	// std::unique_ptr<std::thread> m_Recv_EPOL_TCPThread;
-	// std::unique_ptr<std::thread> m_Recv_EPOL_UDPThread;
+	std::unique_ptr<std::thread> m_Recv_EPOL_TCPThread;
+	std::unique_ptr<std::thread> m_Recv_EPOL_UDPThread;
 
 	bool isContinue;
 	CNetworkManager();

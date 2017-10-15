@@ -20,22 +20,22 @@ bool CNetworkManager::InitNetworkManager()
 
 	m_IOCP_TCPSocket = std::make_shared<SOCKET>();
 	m_IOCP_UDPSocket = std::make_shared<SOCKET>();
-	// m_EPOL_TCPSocket = std::make_shared<SOCKET>();
-	// m_EPOL_UDPSocket = std::make_shared<SOCKET>();
+	m_EPOL_TCPSocket = std::make_shared<SOCKET>();
+	m_EPOL_UDPSocket = std::make_shared<SOCKET>();
 
 	m_IOCP_TCPSockAddr = std::make_shared<sockaddr_in>();
 	m_IOCP_UDPSockAddr = std::make_shared<sockaddr_in>();
 	m_IOCP_ClnSockAddr = std::make_shared<sockaddr_in>();
-	// m_EPOL_TCPSockAddr = std::make_shared<sockaddr_in>();
-	// m_EPOL_UDPSockAddr = std::make_shared<sockaddr_in>();
-	// m_EPOL_ClnSockAddr = std::make_shared<sockaddr_in>();
+	m_EPOL_TCPSockAddr = std::make_shared<sockaddr_in>();
+	m_EPOL_UDPSockAddr = std::make_shared<sockaddr_in>();
+	m_EPOL_ClnSockAddr = std::make_shared<sockaddr_in>();
 
 	// IOCP 서버에 접속
 	ConnectToServer(m_IOCP_TCPSocket.get(), m_IOCP_TCPSockAddr.get(), "127.0.0.1", 9999, true);
 	ConnectToServer(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get(), "127.0.0.1", 8888, false);
 	// EPOLL 서버에 접속
-	// ConnectToServer(m_EPOL_TCPSocket.get(), m_EPOL_TCPSockAddr.get(), "192.168.68.128", 22222, true);
-	// ConnectToServer(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get(), "192.168.68.128", 33333, false);
+	ConnectToServer(m_EPOL_TCPSocket.get(), m_EPOL_TCPSockAddr.get(), "192.168.68.128", 22222, true);
+	ConnectToServer(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get(), "192.168.68.128", 33333, false);
 
 	// Receive Thread 지속 여부
 	isContinue = true;
@@ -43,8 +43,8 @@ bool CNetworkManager::InitNetworkManager()
 	// 소켓마다 Receive 할 Thread 시작
 	m_Recv_IOCP_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_IOCP_TCPSocket.get()); }));
 	m_Recv_IOCP_UDPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvUDPThreadFunction(m_IOCP_UDPSocket.get(), m_IOCP_UDPSockAddr.get()); }));
-	// m_Recv_EPOL_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_EPOL_TCPSocket.get()); }));
-	// m_Recv_EPOL_UDPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvUDPThreadFunction(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get()); }));
+	m_Recv_EPOL_TCPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvTCPThreadFunction(m_EPOL_TCPSocket.get()); }));
+	m_Recv_EPOL_UDPThread = std::unique_ptr<std::thread>(new std::thread([&]() {RecvUDPThreadFunction(m_EPOL_UDPSocket.get(), m_EPOL_UDPSockAddr.get()); }));
 	return true;
 }
 
@@ -53,13 +53,13 @@ void CNetworkManager::ExitNetworkManager()
 	isContinue = false;
 	closesocket(*m_IOCP_TCPSocket.get());
 	closesocket(*m_IOCP_UDPSocket.get());
-	// closesocket(*m_EPOL_TCPSocket.get());
-	// closesocket(*m_EPOL_UDPSocket.get());
+	closesocket(*m_EPOL_TCPSocket.get());
+	closesocket(*m_EPOL_UDPSocket.get());
 	// 쓰레드의 안전한 종료를 위해 join
 	m_Recv_IOCP_TCPThread->join();
 	m_Recv_IOCP_UDPThread->join();
-	// m_Recv_EPOL_TCPThread->join();
-	// m_Recv_EPOL_UDPThread->join();
+	m_Recv_EPOL_TCPThread->join();
+	m_Recv_EPOL_UDPThread->join();
 }
 
 void CNetworkManager::ConnectToServer(SOCKET* _sock, sockaddr_in* _sockAddr, const char* _ip, int _port, bool _isTCP)
@@ -162,12 +162,12 @@ bool CNetworkManager::SendToServer(const char* data, int dataSize, bool isTCP, b
 		else
 			sendto(*m_IOCP_UDPSocket.get(), data, dataSize, NULL, (sockaddr*)m_IOCP_UDPSockAddr.get(), sizeof(*m_IOCP_UDPSockAddr.get()));
 	}
-	// else
-	// {
-	//	if (isTCP)
-	//		send(*m_EPOL_TCPSocket.get(), data, dataSize, NULL);
-	//	else
-	//		sendto(*m_EPOL_UDPSocket.get(), data, dataSize, NULL, (sockaddr*)m_EPOL_UDPSockAddr.get(), sizeof(*m_EPOL_UDPSockAddr.get()));
-	// }
+	else
+	{
+		if (isTCP)
+			send(*m_EPOL_TCPSocket.get(), data, dataSize, NULL);
+		else
+			sendto(*m_EPOL_UDPSocket.get(), data, dataSize, NULL, (sockaddr*)m_EPOL_UDPSockAddr.get(), sizeof(*m_EPOL_UDPSockAddr.get()));
+	}
 	return true;
 }

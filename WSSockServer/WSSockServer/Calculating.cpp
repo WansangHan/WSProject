@@ -13,6 +13,19 @@ CCalculating::~CCalculating()
 {
 }
 
+// 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
+std::shared_ptr<CPlayer> CCalculating::FindPlayerToID(int _pID)
+{
+	auto Pr = m_players.find(_pID);
+	if (Pr != m_players.end())
+		return Pr->second;
+	else
+	{
+		CLogManager::getInstance().WriteLogMessage("WARN", true, "Return nullptr in FindPlayer()");
+		return nullptr;
+	}
+}
+
 void CCalculating::InitCalculating()
 {
 	srand((unsigned int)time(NULL));
@@ -61,6 +74,19 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data,
 	SendData.set__vectory(vectorY);
 	SendData.set__scale(scale);
 	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, SendData.SerializeAsString(), true);
+}
+
+// 플레이어 변수에 소켓 적용
+void CCalculating::SocketApply(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+{
+	WSSockServer::ObjectInformation RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+
+	player->SetSocket(_sock);
+
+	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_SUCCESS_EPOLL_CONNECT, "", true);
 }
 
 // 플레이어가 나갔을 때, 해당 아이디에 맞는 플레이어 삭제
