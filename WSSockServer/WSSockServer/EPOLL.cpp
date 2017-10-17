@@ -99,8 +99,16 @@ void CEPOLL::Update()
 					// TCP 소켓에 Receive 이벤트 발생시
 					str_len = read(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE);
 				else
+				{
 					// UDP 소켓에 Receive 이벤트 발생시
 					str_len = recvfrom(ep_events[i].data.fd, RecvBuffer.get(), MAX_SOCKET_BUFFER_SIZE, 0, (sockaddr*)&m_clientUDPSockAddr, &addrSize);
+					
+					std::shared_ptr<CBaseSocket> sock = std::make_shared<CUDPSocket>();
+					sock->SetSOCKET(ep_events[i].data.fd);
+					// 패킷 분석 및 적용
+					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(sock, m_clientUDPSockAddr, RecvBuffer, str_len, false);
+					continue;
+				}
 				if (str_len == 0)
 				{
 					// 클라이언트 종료
@@ -132,15 +140,11 @@ void CEPOLL::Update()
 						totalBufSize += socketRemainBuffer;
 						CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 					}
-					std::shared_ptr<CBaseSocket> sock;
-					if (ep_events[i].data.fd != m_listenUDPSocket->GetSOCKET())
-						sock = std::make_shared<CTCPSocket>();
-					else
-						sock = std::make_shared<CUDPSocket>();
+					std::shared_ptr<CBaseSocket> sock = std::make_shared<CTCPSocket>();
 					sock->SetSOCKET(ep_events[i].data.fd);
 					
 					// 패킷 분석 및 적용
-					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(sock, RecvBuffer, totalBufSize, true);
+					CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(sock, sockaddr_in(), RecvBuffer, totalBufSize, true);
 				}
 
 			}

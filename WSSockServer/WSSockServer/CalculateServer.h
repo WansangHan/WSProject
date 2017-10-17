@@ -12,6 +12,7 @@ class CCalculateServer
 	static std::once_flag m_once;
 
 	std::shared_ptr<CBaseSocket> m_TCPSocket;
+	std::shared_ptr<CBaseSocket> m_UDPSocket;
 
 	std::shared_ptr<sockaddr_in> m_TCPSockAddr;
 	std::shared_ptr<sockaddr_in> m_UDPSockAddr;
@@ -25,7 +26,7 @@ public:
 	}
 	~CCalculateServer();
 
-	void InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort, CUDPSocket _udpSocket);
+	void InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort);
 	void SendToCalculateServer(SendPacketType type, std::string str, bool isTCP);
 };
 #endif

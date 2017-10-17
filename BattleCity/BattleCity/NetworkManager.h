@@ -37,6 +37,13 @@ class CNetworkManager
 	std::unique_ptr<std::thread> m_Recv_EPOL_TCPThread;
 	std::unique_ptr<std::thread> m_Recv_EPOL_UDPThread;
 
+	// UDP 정보를 보내기 위한 Thread
+	std::unique_ptr<std::thread> m_Apply_Thread;
+
+	// 서버에 UDP 정보가 저장 되었는지
+	bool isIOCPUDPSuccess;
+	bool isEPOLUDPSuccess;
+
 	bool isContinue;
 	CNetworkManager();
 public:
@@ -47,10 +54,16 @@ public:
 	}
 	~CNetworkManager();
 
+	void SetisIOCPUDPSuccessTrue(char * _data, int _size) { isIOCPUDPSuccess = true; }
+	void SetisEPOLUDPSuccessTrue(char * _data, int _size) { isEPOLUDPSuccess = true; }
+	bool GetisIOCPUDPSuccess() { return isIOCPUDPSuccess; }
+	bool GetisEPOLUDPSuccess() { return isEPOLUDPSuccess; }
 	bool GetisContinue() { return isContinue; }
 
 	bool InitNetworkManager();
 	void ExitNetworkManager();
+	// 서버에게 UDP 패킷을 전송하는 함수(서버에 클라이언트의 UDP address 정보를 저장하기 위함)
+	void NotifyUDPSocket();
 	// 서버와 connect를 진행하는 함수
 	void ConnectToServer(SOCKET* _sock, sockaddr_in* _sockAddr, const char* _ip, int _port, bool _isTCP);
 	// TCP, UDP Receive 함수

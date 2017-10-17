@@ -19,7 +19,7 @@ void CSyncServer::InitSyncServer()
 }
 
 // IOCP 서버가 접속했을 때 호출되는 함수
-void CSyncServer::EnterSyncServerTCP(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
+void CSyncServer::EnterSyncServerTCP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	CLogManager::getInstance().WriteLogMessage("INFO", true, "Enter SyncServer TCP");
 

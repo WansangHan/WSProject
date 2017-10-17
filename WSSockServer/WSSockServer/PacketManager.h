@@ -29,7 +29,8 @@ enum class SendPacketType : int
 #ifdef IOCP_SERVER
 	// IOCP -> CLIENT
 	SD_ENTER_IOCP_SERVER = 20000,
-	SD_SUCCESS_CONNECTOIN,
+	SD_SUCCESS_IOCP_CONNECT,
+	SD_SUCCESS_IOCP_UDP,
 	SD_EXIT_PLAYER,
 	SD_PLAYER_POSITION_SCALE,
 	SD_AIOBJECT_POSITION_SCALE,
@@ -41,6 +42,7 @@ enum class SendPacketType : int
 #else
 	// EPOLL -> CLIENT
 	SD_SUCCESS_EPOLL_CONNECT = 60000,
+	SD_SUCCESS_EPOLL_UDP,
 	// EPOLL -> IOCP
 	SD_AI_STARTING = 40000,
 	SD_ENTER_PLAYER_EPOLL,
@@ -52,6 +54,7 @@ enum class RecvPacketType : int
 #ifdef IOCP_SERVER
 	// CLIENT -> IOCP
 	RC_ENTER_SERVER = 10000,
+	RC_APPLY_IOCP_UDP_SOCKET,
 	RC_POSITION_SCALE,
 	// EPOLL -> IOCP
 	RC_AI_STARTING = 40000,
@@ -59,6 +62,7 @@ enum class RecvPacketType : int
 #else
 	// CLIENT -> EPOLL
 	RC_ENTER_EPOLL_SERVER = 50000,
+	RC_APPLY_EPOLL_UDP_SOCKET,
 	// IOCP -> EPOLL
 	RC_SYNCSERVER_ENTER = 30000,
 	RC_MAKE_AIOBJECT,
@@ -70,11 +74,13 @@ enum class RecvPacketType : int
 struct PacketInfo
 {
 	std::shared_ptr<CBaseSocket> sock;
+	sockaddr_in addr;
 	std::shared_ptr<char> data;
 	int dataSize;
-	void SetVal(std::shared_ptr<CBaseSocket> _sock, std::shared_ptr<char> _data, int _dataSize)
+	void SetVal(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, std::shared_ptr<char> _data, int _dataSize)
 	{
 		sock = _sock;
+		addr = _addr;
 		data = _data;
 		dataSize = _dataSize;
 	}
@@ -108,7 +114,7 @@ class CPacketManager
 	std::unique_ptr<std::thread> th_udp;
 
 	// 패킷 타입과 그에 따른 함수 호출 바인딩을 위한 map
-	typedef std::function<void(std::shared_ptr<CBaseSocket>, char*, int)> Function;
+	typedef std::function<void(std::shared_ptr<CBaseSocket>, sockaddr_in, char*, int)> Function;
 	std::map < RecvPacketType, Function > map_function;
 
 	// Packet의 정보가 담긴 구조체 큐(리눅스에는 Thread Safe Queue가 없어서, 구글에서 가져온 코드 사용)
@@ -140,7 +146,7 @@ public:
 	~CPacketManager();
 
 	void InitPacketManager();
-	void DEVIDE_PACKET_BUNDLE(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize, bool isTCP);
+	void DEVIDE_PACKET_BUNDLE(std::shared_ptr<CBaseSocket> sock, sockaddr_in addr, std::shared_ptr<char> packet, int packetSize, bool isTCP);
 	// Send 함수
 	void SendPacketToServer(std::shared_ptr<CBaseSocket> sock, SendPacketType type, std::string str, sockaddr_in* sockaddr, bool isTCP);
 };

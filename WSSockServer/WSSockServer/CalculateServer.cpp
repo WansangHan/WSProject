@@ -14,9 +14,10 @@ CCalculateServer::~CCalculateServer()
 }
 
 // IOCP 서버에서 EPOLL 서버로 접속
-void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort, CUDPSocket _udpSocket)
+void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort)
 {
 	m_TCPSocket = std::make_shared<CTCPSocket>();
+	m_UDPSocket = std::make_shared<CUDPSocket>();
 
 	m_TCPSockAddr = std::make_shared<sockaddr_in>();
 	m_UDPSockAddr = std::make_shared<sockaddr_in>();
@@ -45,10 +46,12 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 	m_UDPSockAddr->sin_port = htons(_udpPort);
 
 	// CalculateServer에 UDP 접속
-	if (connect(_udpSocket.GetSOCKET(), (SOCKADDR*)m_UDPSockAddr.get(), sizeof(*m_UDPSockAddr.get())) == SOCKET_ERROR)
+	if (connect(m_UDPSocket->GetSOCKET(), (SOCKADDR*)m_UDPSockAddr.get(), sizeof(*m_UDPSockAddr.get())) == SOCKET_ERROR)
 	{
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer UDP connect() error : %d", WSAGetLastError());
 	}
+
+	CreateIoCompletionPort((HANDLE)m_UDPSocket->GetSOCKET(), _compPort, 0, 0);
 }
 
 // EPOLL 서버에 패킷을 전송하는 함수

@@ -151,7 +151,7 @@ int CIOCP::PostSend(void* buf, int len, std::shared_ptr<CBaseSocket> sock, socka
 	}
 	else
 	{
-		if (WSASendTo(m_listenUDPSocket->GetSOCKET(), &writeOverlapped->m_wsabuf, 1, &writeOverlapped->m_packetSize, WritedwFlags, (SOCKADDR*)&m_clientUDPSockAddr, sizeof(*soaddr), writeOverlapped, NULL) == SOCKET_ERROR)
+		if (WSASendTo(m_listenUDPSocket->GetSOCKET(), &writeOverlapped->m_wsabuf, 1, &writeOverlapped->m_packetSize, WritedwFlags, (SOCKADDR*)&soaddr, sizeof(*soaddr), writeOverlapped, NULL) == SOCKET_ERROR)
 		{
 			DWORD Err;
 			if ((Err = WSAGetLastError()) != WSA_IO_PENDING)
@@ -217,9 +217,6 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 	if (datalen == 0) { PostDisconnect(ovrlap->m_sock); return; }
 
 	bool isTCP = ovrlap->m_isTCP;
-	// 임시 코드
-	if (!isTCP)
-		m_clientUDPSockAddr = ovrlap->m_addr;
 	int socketRemainBuffer = datalen;
 	int totalBufSize = datalen;
 	std::shared_ptr<char> RecvBuffer = std::shared_ptr<char>(new char[datalen], std::default_delete<char[]>());
@@ -245,7 +242,7 @@ void CIOCP::ProcessRead(ReadOverlapped* ovrlap, int datalen)
 		CLogManager::getInstance().WriteLogMessage("INFO", true, "Packet Link Size : %d", totalBufSize);
 	}
 	// 패킷 분석 및 적용
-	CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(ovrlap->m_sock, RecvBuffer, totalBufSize, isTCP);
+	CPacketManager::getInstance().DEVIDE_PACKET_BUNDLE(ovrlap->m_sock, ovrlap->m_addr, RecvBuffer, totalBufSize, isTCP);
 	// Recv 대기
 	PostRead(ovrlap->m_sock, isTCP);
 	delete ovrlap;
@@ -364,7 +361,7 @@ bool CIOCP::InitServer()
 	}
 	// PacketManager 초기화
 	CPacketManager::getInstance().InitPacketManager();
-	CCalculateServer::getInstance().InitCalculateServer("192.168.68.128", 22222, 33333, m_CompPort, *m_listenUDPSocket.get());
+	CCalculateServer::getInstance().InitCalculateServer("192.168.68.128", 22222, 33333, m_CompPort);
 	CInGame::getInstance().InitInGame();
 
 	// 소켓 하나에 대해 AcceptEx 호출

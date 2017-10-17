@@ -62,7 +62,7 @@ void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 	std::shared_ptr<char> protoBuf = std::shared_ptr<char>(new char[charSize], std::default_delete<char[]>());
 	memcpy(protoBuf.get(), info->data.get() + sizeof(int) + sizeof(RecvPacketType), charSize);
 
-	it->second(info->sock, protoBuf.get(), charSize);
+	it->second(info->sock, info->addr, protoBuf.get(), charSize);
 }
 
 void CPacketManager::InitFunctionmap()
@@ -70,18 +70,21 @@ void CPacketManager::InitFunctionmap()
 	// std::map에 패킷 타입에 따른 함수포인터를 적용
 #ifdef IOCP_SERVER
 	// CLIENT -> IOCP
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_AI_STARTING, std::bind(&CInGame::ApplyAIObjectPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_EPOLL, std::bind(&CInGame::SuccessEnterEpoll, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_APPLY_IOCP_UDP_SOCKET, std::bind(&CInGame::ApplyPlayerUDP, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	// EPOLL -> IOCP
+	map_function.insert(std::make_pair(RecvPacketType::RC_AI_STARTING, std::bind(&CInGame::ApplyAIObjectPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_EPOLL, std::bind(&CInGame::SuccessEnterEpoll, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 #else
 	// CLIENT -> EPOLL
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_EPOLL_SERVER, std::bind(&CCalculating::SocketApply, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_EPOLL_SERVER, std::bind(&CCalculating::ApplyPlayerSocket, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_APPLY_EPOLL_UDP_SOCKET, std::bind(&CCalculating::ApplyPlayerUDP, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	// IOCP -> EPOLL
-	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_MAKE_AIOBJECT, std::bind(&CCalculating::SetStartingPosition, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PEER, std::bind(&CCalculating::EnterPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_EXIT_PEER, std::bind(&CCalculating::ExitPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_MAKE_AIOBJECT, std::bind(&CCalculating::SetStartingPosition, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PEER, std::bind(&CCalculating::EnterPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_EXIT_PEER, std::bind(&CCalculating::ExitPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 #endif
 }
 
@@ -97,7 +100,7 @@ void CPacketManager::InitPacketManager()
 	th_udp = std::unique_ptr<std::thread>(new std::thread(&CPacketManager::APPLY_PACKET_UDP, this));
 }
 
-void CPacketManager::DEVIDE_PACKET_BUNDLE(std::shared_ptr<CBaseSocket> sock, std::shared_ptr<char> packet, int packetSize, bool isTCP)
+void CPacketManager::DEVIDE_PACKET_BUNDLE(std::shared_ptr<CBaseSocket> sock, sockaddr_in addr, std::shared_ptr<char> packet, int packetSize, bool isTCP)
 {
 	// 패킷이 뭉쳐서 왔을 때 분할해주는 함수
 	// 패킷 타입 4Byte / 패킷 사이즈 4Byte / 이후 protobuf 영역
@@ -113,7 +116,7 @@ void CPacketManager::DEVIDE_PACKET_BUNDLE(std::shared_ptr<CBaseSocket> sock, std
 		// 패킷 분리
 		memcpy(data.get(), packet.get() + curToken, Typesize);
 		std::shared_ptr<PacketInfo> info = std::make_shared<PacketInfo>();
-		info->SetVal(sock, data, Typesize);
+		info->SetVal(sock, addr, data, Typesize);
 		// 패킷 정보를 Queue에 push
 		if (isTCP)
 		{

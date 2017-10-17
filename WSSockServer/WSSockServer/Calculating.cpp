@@ -32,7 +32,7 @@ void CCalculating::InitCalculating()
 }
 
 // 오브젝트들의 시작 위치를 정해서 IOCP로 보내준다
-void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
@@ -51,7 +51,7 @@ void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, char 
 }
 
 // 플레이어 접속 시 EPOLL 서버에도 클라이언트 정보를 저장 및 시작 좌표 리턴
-void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::PlayerInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
@@ -77,7 +77,7 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data,
 }
 
 // 플레이어 변수에 소켓 적용
-void CCalculating::SocketApply(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+void CCalculating::ApplyPlayerSocket(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
@@ -86,11 +86,23 @@ void CCalculating::SocketApply(std::shared_ptr<CBaseSocket> _sock, char * _data,
 
 	player->SetSocket(_sock);
 
-	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_SUCCESS_EPOLL_CONNECT, "", true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_EPOLL_CONNECT, "", nullptr, true);
+}
+
+// 플레이어 변수에 UDP 어드레스 적용
+void CCalculating::ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char * _data, int _size)
+{
+	WSSockServer::ObjectInformation RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	player->SetAddr(_addr);
+
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_EPOLL_UDP, "", nullptr, true);
 }
 
 // 플레이어가 나갔을 때, 해당 아이디에 맞는 플레이어 삭제
-void CCalculating::ExitPlayer(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+void CCalculating::ExitPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);

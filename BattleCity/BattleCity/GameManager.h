@@ -15,7 +15,7 @@ enum GameState
 	PLAY,
 };
 
-class CNetWorkManager;
+class CNetworkManager;
 class CUIManager;
 class CPlayManager;
 

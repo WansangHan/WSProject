@@ -101,7 +101,7 @@ void CInGame::AllocateAIObject()
 }
 
 // 플레이어 입장 시 (클라이언트의 접속 요청)
-void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
+void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::PlayerInformation RecvData;
 	RecvData.ParseFromArray(_data, _size);
@@ -157,14 +157,14 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _
 }
 
 // 클라이언트의 EPOLL 서버 접속 성공
-void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
 	// EPOLL 서버에 접속을 성공한 플레이어에게 성공했다는 패킷을 보냄
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CONNECTOIN, "", nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_CONNECT, "", nullptr, true);
 
 	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), ObjectDirection::IDLE);
 	player->SetTransform(playerTransform);
@@ -195,8 +195,20 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_EXIT_PEER, SendData.SerializeAsString(), true);
 }
 
+// 플레이어 변수에 UDP 어드레스 적용
+void CInGame::ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char * _data, int _size)
+{
+	WSSockServer::ObjectInformation RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	player->SetAddr(_addr);
+
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_UDP, "", nullptr, true);
+}
+
 // 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송
-void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size)
+void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
@@ -208,7 +220,7 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, char*
 }
 
 // EPOLL 서버에서 받은 좌표를 AIObject에 적용시킴
-void CInGame::ApplyAIObjectPositionScale(std::shared_ptr<CBaseSocket> _sock, char * _data, int _size)
+void CInGame::ApplyAIObjectPositionScale(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);

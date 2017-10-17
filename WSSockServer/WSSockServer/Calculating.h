@@ -4,6 +4,7 @@
 #include "PacketManager.h"
 #include "Player.h"
 
+enum class SendPacketType : int;
 class CPlayer;
 
 // 플레이어 방향 상태값
@@ -55,10 +56,11 @@ public:
 	~CCalculating();
 
 	void InitCalculating();
-	void SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
+	void SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 
-	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
-	void SocketApply(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
-	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock, char* _data, int _size);
+	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
+	void ApplyPlayerSocket(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
+	void ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
+	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 };
 #endif
