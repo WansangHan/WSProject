@@ -27,7 +27,7 @@ bool CEPOLL::InitServer()
 	m_listenTCPSocketAddr.sin_port = htons(22222);
 
 	if (bind(m_listenTCPSocket->GetSOCKET(), (sockaddr*)&m_listenTCPSocketAddr, sizeof(m_listenTCPSocketAddr)) == -1)
-		CLogManager::getInstance().WriteLogMessage("ERROR", true, "bind() error");
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "TCP bind() error");
 	if (listen(m_listenTCPSocket->GetSOCKET(), 5) == -1)
 		CLogManager::getInstance().WriteLogMessage("ERROR", true, "listen() error");
 
@@ -40,7 +40,7 @@ bool CEPOLL::InitServer()
 	m_listenUDPSocketAddr.sin_port = htons(33333);
 
 	if (bind(m_listenUDPSocket->GetSOCKET(), (sockaddr*)&m_listenUDPSocketAddr, sizeof(m_listenUDPSocketAddr)) == -1)
-		CLogManager::getInstance().WriteLogMessage("ERROR", true, "bind() error");
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "UDP bind() error");
 
 	m_epfd = epoll_create(50);
 	ep_events = new epoll_event[50];
