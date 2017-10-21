@@ -21,6 +21,9 @@ bool CEPOLL::InitServer()
 	// TCP 家南 bind listen
 	m_listenTCPSocket = std::make_shared<CTCPSocket>();
 
+	int option = 1;          // SO_REUSEADDR 狼 可记 蔼阑 TRUE 肺
+	setsockopt(m_listenTCPSocket->GetSOCKET(), SOL_SOCKET, SO_REUSEADDR, (const char*)&option, sizeof(option));
+
 	memset(&m_listenTCPSocketAddr, 0, sizeof(m_listenTCPSocketAddr));
 	m_listenTCPSocketAddr.sin_family = AF_INET;
 	m_listenTCPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -33,6 +36,8 @@ bool CEPOLL::InitServer()
 
 	// UDP 家南 bind
 	m_listenUDPSocket = std::make_shared<CUDPSocket>();
+
+	setsockopt(m_listenUDPSocket->GetSOCKET(), SOL_SOCKET, SO_REUSEADDR, (const char*)&option, sizeof(option));
 
 	memset(&m_listenUDPSocketAddr, 0, sizeof(m_listenUDPSocketAddr));
 	m_listenUDPSocketAddr.sin_family = AF_INET;
