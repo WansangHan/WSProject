@@ -118,21 +118,21 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr,
 	// 현재 들어온 플레이어에게 각 플레이어들의 정보를 전송
 	for (auto Pr : m_players)
 	{
-		std::shared_ptr<CPlayer> player = Pr.second;
-
 		WSSockServer::PlayerInformation SendData_ES;
-		SendData_ES.set__id(player->GetID());
-		SendData_ES.set__name(player->GetName());
+		SendData_ES.set__id(Pr.second->GetID());
+		SendData_ES.set__name(Pr.second->GetName());
 		// 플레이어 아이디, 이름 전송
 		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_ENTER_IOCP_SERVER, SendData_ES.SerializeAsString(), nullptr, true);
 
+		WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
+		pos->set__id(Pr.second->GetID());
+		pos->set__vectorx(Pr.second->GetTransform()->m_vectorX);
+		pos->set__vectory(Pr.second->GetTransform()->m_vectorY);
 		WSSockServer::ObjectTransform SendData_SP;
-		SendData_SP.set__id(player->GetID());
-		SendData_SP.set__vectorx(player->GetTransform()->m_vectorX);
-		SendData_SP.set__vectory(player->GetTransform()->m_vectorY);
-		SendData_SP.set__scale(player->GetTransform()->m_scale);
-		SendData_SP.set__speed(player->GetTransform()->m_speed);
-		SendData_SP.set__dir((int)player->GetTransform()->m_dir);
+		SendData_SP.set_allocated__position(pos);
+		SendData_SP.set__scale(Pr.second->GetTransform()->m_scale);
+		SendData_SP.set__speed(Pr.second->GetTransform()->m_speed);
+		SendData_SP.set__dir((int)Pr.second->GetTransform()->m_dir);
 		// 플레이어 Transform 정보 전송
 		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_PLAYER_POSITION_SCALE, SendData_SP.SerializeAsString(), nullptr, true);
 	}
@@ -142,9 +142,12 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr,
 	{
 		std::shared_ptr <CAIObject> aiObject = Ao.second;
 
+		WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
+		pos->set__id(aiObject->GetID());
+		pos->set__vectorx(aiObject->GetTransform()->m_vectorX);
+		pos->set__vectory(aiObject->GetTransform()->m_vectorY);
 		WSSockServer::ObjectTransform SendData;
-		SendData.set__vectorx(aiObject->GetTransform()->m_vectorX);
-		SendData.set__vectory(aiObject->GetTransform()->m_vectorY);
+		SendData.set_allocated__position(pos);
 		SendData.set__scale(aiObject->GetTransform()->m_scale);
 		SendData.set__speed(aiObject->GetTransform()->m_speed);
 		SendData.set__dir((int)aiObject->GetTransform()->m_dir);
@@ -165,16 +168,18 @@ void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, sockaddr_in 
 	RecvData.ParseFromArray(_data, _size);
 
 	// EPOLL 서버에 접속을 성공한 플레이어에게 성공했다는 패킷을 보냄
-	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
 	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_CONNECT, "", nullptr, true);
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
 	player->SetTransform(playerTransform);
 
+	WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
+	pos->set__id(player->GetID());
+	pos->set__vectorx(player->GetTransform()->m_vectorX);
+	pos->set__vectory(player->GetTransform()->m_vectorY);
 	WSSockServer::ObjectTransform sendData;
-	sendData.set__id(player->GetID());
-	sendData.set__vectorx(player->GetTransform()->m_vectorX);
-	sendData.set__vectory(player->GetTransform()->m_vectorY);
+	sendData.set_allocated__position(pos);
 	sendData.set__dir((int)player->GetTransform()->m_dir);
 	sendData.set__scale(player->GetTransform()->m_scale);
 	sendData.set__speed(player->GetTransform()->m_speed);
@@ -216,8 +221,8 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, socka
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 	
-	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	player->SetTransform(playerTransform);
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 
@@ -230,7 +235,7 @@ void CInGame::ApplyAIObjectPositionScale(std::shared_ptr<CBaseSocket> _sock, soc
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	std::shared_ptr<CAIObject> aiObject = FindAIObjectToID(RecvData._id());
-	std::shared_ptr<ObjectTransform> obejectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<CAIObject> aiObject = FindAIObjectToID(RecvData._position()._id());
+	std::shared_ptr<ObjectTransform> obejectTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	aiObject->SetTransform(obejectTransform);
 }

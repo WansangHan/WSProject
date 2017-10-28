@@ -48,11 +48,12 @@ void CPlayer::KeyCheck() {
 	if (dir == m_playerTransform->m_dir) return;
 
 	// 좌표, 방향, 크기값을 담아 서버로 전송
+	BattleCity::ObjectPosition* pos = new BattleCity::ObjectPosition;
+	pos->set__id(m_ID);
+	pos->set__vectorx(m_curPosition->m_vectorX);
+	pos->set__vectory(m_curPosition->m_vectorY);
 	BattleCity::ObjectTransform sendData;
-
-	sendData.set__id(m_ID);
-	sendData.set__vectorx(m_curPosition->m_vectorX);
-	sendData.set__vectory(m_curPosition->m_vectorY);
+	sendData.set_allocated__position(pos);
 	sendData.set__dir((int)dir);
 	sendData.set__scale(m_playerTransform->m_scale);
 	sendData.set__speed(m_playerTransform->m_speed);

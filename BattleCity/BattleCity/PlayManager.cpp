@@ -95,9 +95,9 @@ void CPlayManager::SetPlayerPositionScale(char * _data, int _size)
 	BattleCity::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	// 자기 자신에 대한 위치 정보라면
-	if (m_ownPlayer->GetID() == RecvData._id())
+	if (m_ownPlayer->GetID() == RecvData._position()._id())
 	{
 		m_ownPlayer->SetTransform(playerTransform);
 		m_ownPlayer->SetLastGetTickCount(GetTickCount());
@@ -107,7 +107,7 @@ void CPlayManager::SetPlayerPositionScale(char * _data, int _size)
 		// 자기 자신이 아니라면 플레이어를 찾아 Trasform 정보를 적용한다
 		for (auto Pr : m_otherPlayer)
 		{
-			if (Pr->GetID() == RecvData._id())
+			if (Pr->GetID() == RecvData._position()._id())
 			{
 				Pr->SetTransform(playerTransform);
 				Pr->SetLastGetTickCount(GetTickCount());
@@ -122,10 +122,10 @@ void CPlayManager::SetAIObjectPositionScale(char * _data, int _size)
 	BattleCity::ObjectTransform RecvData;
 
 	RecvData.ParseFromArray(_data, _size);
-	std::shared_ptr<ObjectTransform> aiObjectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<ObjectTransform> aiObjectTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	
 	std::shared_ptr<CAIObject> aiObject = std::make_shared<CAIObject>();
-	aiObject->SetID(RecvData._id());
+	aiObject->SetID(RecvData._position()._id());
 	aiObject->SetTransform(aiObjectTransform);
 
 	m_AIObjects.push_back(aiObject);

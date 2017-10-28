@@ -62,10 +62,12 @@ void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, socka
 	float scale = rand() % 50;
 	float speed = 20;
 
+	WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
+	pos->set__id(RecvData._id());
+	pos->set__vectorx(vectorX);
+	pos->set__vectory(vectorY);
 	WSSockServer::ObjectTransform SendData;
-	SendData.set__id(RecvData._id());
-	SendData.set__vectorx(vectorX);
-	SendData.set__vectory(vectorY);
+	SendData.set_allocated__position(pos);
 	SendData.set__scale(scale);
 	SendData.set__speed(speed);
 	SendData.set__dir((int)ObjectDirection::IDLE);
@@ -93,10 +95,12 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _
 
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
 
+	WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
+	pos->set__id(RecvData._id());
+	pos->set__vectorx(vectorX);
+	pos->set__vectory(vectorY);
 	WSSockServer::ObjectTransform SendData;
-	SendData.set__id(RecvData._id());
-	SendData.set__vectorx(vectorX);
-	SendData.set__vectory(vectorY);
+	SendData.set_allocated__position(pos);
 	SendData.set__scale(scale);
 	SendData.set__speed(speed);
 	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, SendData.SerializeAsString(), true);
@@ -142,8 +146,8 @@ void CCalculating::ApplyPlayerTrasform(std::shared_ptr<CBaseSocket> _sock, socka
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
 	player->SetLastGetTickCount(GetTickCount());
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	player->SetTransform(playerTransform);
 }

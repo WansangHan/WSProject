@@ -12,12 +12,17 @@ message ObjectInformation
 	int32 _id = 1;
 }
 
-message ObjectTransform
+message ObjectPosition
 {
 	int32 _id = 1;
 	float _vectorX = 2;
 	float _vectorY = 3;
-	int32 _dir = 4;
-	float _scale = 5;
-	float _speed = 6;
+}
+
+message ObjectTransform
+{
+	ObjectPosition _position = 1;
+	int32 _dir = 2;
+	float _scale = 3;
+	float _speed = 4;
 }
