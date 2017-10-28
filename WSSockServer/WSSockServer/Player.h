@@ -19,6 +19,10 @@ class CPlayer
 	sockaddr_in m_addr;
 
 	std::shared_ptr<ObjectTransform> m_playerTransform;
+#ifndef IOCP_SERVER
+	std::shared_ptr<ObjectTransform> m_curPosition;
+	unsigned int m_lastGetTickCount;
+#endif
 public:
 	CPlayer();
 	~CPlayer();
@@ -35,5 +39,12 @@ public:
 
 	void SetTransform(std::shared_ptr<ObjectTransform> _playerTransform) { m_playerTransform = _playerTransform; }
 	std::shared_ptr<ObjectTransform> GetTransform() { return m_playerTransform; }
+#ifndef IOCP_SERVER
+	void SetCurTransform(std::shared_ptr<ObjectTransform> _curPosition) { m_curPosition = _curPosition; }
+	std::shared_ptr<ObjectTransform> GetCurTransform() { return m_curPosition; }
+	void SetLastGetTickCount(unsigned int _lastGetTickCount) { m_lastGetTickCount = _lastGetTickCount; }
+	unsigned int GetLastGetTickCount() { return m_lastGetTickCount; }
+	void CalculateCurrentPosition();
+#endif
 };
 #endif

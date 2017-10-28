@@ -23,3 +23,18 @@ void currentDateTime(char* curTime)
 	memcpy(curTime, buf, 20);
 	curTime[19] = '\0';
 }
+
+#ifndef IOCP_SERVER
+// Linux에 없는 GetTickCount 구현
+unsigned int GetTickCount()
+{
+	timeval gettick;
+	unsigned int tick;
+	int ret;
+	gettimeofday(&gettick, NULL);
+
+	tick = gettick.tv_sec * 1000 + gettick.tv_usec / 1000;
+
+	return tick;
+}
+#endif

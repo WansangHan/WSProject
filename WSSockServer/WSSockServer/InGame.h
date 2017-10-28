@@ -27,13 +27,15 @@ struct ObjectTransform
 	float m_vectorX;
 	float m_vectorY;
 	float m_scale;
+	float m_speed;
 	ObjectDirection m_dir;
 	ObjectTransform() {}
-	ObjectTransform(float _vectorX, float _vectorY, float _scale, ObjectDirection _dir)
+	ObjectTransform(float _vectorX, float _vectorY, float _scale, float _speed, ObjectDirection _dir)
 	{
 		m_vectorX = _vectorX;
 		m_vectorY = _vectorY;
 		m_scale = _scale;
+		m_speed = _speed;
 		m_dir = _dir;
 	}
 };

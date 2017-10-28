@@ -16,6 +16,8 @@
 
 #include <tchar.h>
 #else
+#include <sys/time.h>
+#include <unistd.h>
 #endif
 
 #include <memory.h>
@@ -33,6 +35,11 @@
 
 // 현재 시간을 받아오는 함수
 void currentDateTime(char* curTime);
+
+#ifndef IOCP_SERVER
+// Linux에서만 사용하는 GetTickCount함수
+unsigned int GetTickCount();
+#endif
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 #endif

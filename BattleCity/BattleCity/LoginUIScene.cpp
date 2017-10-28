@@ -88,10 +88,8 @@ void CLoginUIScene::CommandHandling(HWND _hwnd, WPARAM _wParam)
 			DestroyWindow(m_loginButton);
 			// 서버에서 각 클라이언트를 구분하기 위한 ID값과 로그인 시 입력한 ID를 받아 적용
 			Json::Value idJ = val["id"];
-			CGameManager::getInstance().GetPlayerManagerInstance()->GetOwnPlayer()->SetID(idJ.asInt());
-			CGameManager::getInstance().GetPlayerManagerInstance()->GetOwnPlayer()->SetName(cid);
 			// 게임 입장
-			CGameManager::getInstance().EnterGame();
+			CGameManager::getInstance().EnterGame(idJ.asInt(), cid);
 			InvalidateRect(_hwnd, NULL, true);
 			MessageBox(_hwnd, L"Success.", L"Login", MB_OK);
 		}

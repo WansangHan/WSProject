@@ -53,7 +53,7 @@ public:
 	void LButtonDown(LPARAM lParam);
 	void KeyChange();
 
-	void EnterGame();
+	void EnterGame(int _id, std::string _name);
 	void IOCPSuccess(char* _data, int _size);
 	void CompleteConnect(char* _data, int _size);
 	void EnterPlayer(char* _data, int _size);

@@ -10,7 +10,7 @@ class CPlayer;
 class CAIObject;
 
 // 오브젝트 방향 상태값
-enum ObjectDirection
+enum class ObjectDirection : int
 {
 	IDLE = 100,
 	UPUP,
@@ -29,14 +29,16 @@ struct ObjectTransform
 	float m_vectorX;
 	float m_vectorY;
 	float m_scale;
+	float m_speed;
 	ObjectDirection m_dir;
 	ObjectTransform() {}
-	ObjectTransform(float _vectorX, float _vectorY, float _scale, int _dir)
+	ObjectTransform(float _vectorX, float _vectorY, float _scale, float _speed, ObjectDirection _dir)
 	{
 		m_vectorX = _vectorX;
 		m_vectorY = _vectorY;
 		m_scale = _scale;
-		m_dir = (ObjectDirection)_dir;
+		m_speed = _speed;
+		m_dir = _dir;
 	}
 };
 
@@ -55,7 +57,7 @@ public:
 	void PaintPlay(HWND _hwnd, HDC _hdc);
 	void UpdatePlay();
 
-	void EnterGame();
+	void EnterGame(int _id, std::string _name);
 	void EnterPlayer(char* _data, int _size);
 	void ExitPlayer(char* _data, int _size);
 	void SetPlayerPositionScale(char* _data, int _size);

@@ -131,6 +131,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr,
 		SendData_SP.set__vectorx(player->GetTransform()->m_vectorX);
 		SendData_SP.set__vectory(player->GetTransform()->m_vectorY);
 		SendData_SP.set__scale(player->GetTransform()->m_scale);
+		SendData_SP.set__speed(player->GetTransform()->m_speed);
 		SendData_SP.set__dir((int)player->GetTransform()->m_dir);
 		// 플레이어 Transform 정보 전송
 		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_PLAYER_POSITION_SCALE, SendData_SP.SerializeAsString(), nullptr, true);
@@ -145,6 +146,7 @@ void CInGame::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr,
 		SendData.set__vectorx(aiObject->GetTransform()->m_vectorX);
 		SendData.set__vectory(aiObject->GetTransform()->m_vectorY);
 		SendData.set__scale(aiObject->GetTransform()->m_scale);
+		SendData.set__speed(aiObject->GetTransform()->m_speed);
 		SendData.set__dir((int)aiObject->GetTransform()->m_dir);
 		CPacketManager::getInstance().SendPacketToServer(_sock, SendPacketType::SD_AIOBJECT_POSITION_SCALE, SendData.SerializeAsString(), nullptr, true);
 	}
@@ -166,7 +168,7 @@ void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, sockaddr_in 
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
 	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_CONNECT, "", nullptr, true);
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), ObjectDirection::IDLE);
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
 	player->SetTransform(playerTransform);
 
 	WSSockServer::ObjectTransform sendData;
@@ -175,6 +177,7 @@ void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, sockaddr_in 
 	sendData.set__vectory(player->GetTransform()->m_vectorY);
 	sendData.set__dir((int)player->GetTransform()->m_dir);
 	sendData.set__scale(player->GetTransform()->m_scale);
+	sendData.set__speed(player->GetTransform()->m_speed);
 
 	// 접속중인 모든 플레이어에게 현재 들어온 플레이어의 위치 정보 전달
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, sendData.SerializeAsString(), nullptr, true);
@@ -207,16 +210,18 @@ void CInGame::ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _ad
 	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_UDP, "", nullptr, true);
 }
 
-// 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어에게 전송
+// 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어, EPOLL 서버에 전송
 void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	player->SetTransform(playerTransform);
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
+
+	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_NOTIFY_PLAYER_TRANSFORM, RecvData.SerializeAsString(), true);
 }
 
 // EPOLL 서버에서 받은 좌표를 AIObject에 적용시킴
@@ -226,6 +231,6 @@ void CInGame::ApplyAIObjectPositionScale(std::shared_ptr<CBaseSocket> _sock, soc
 	RecvData.ParseFromArray(_data, _size);
 
 	std::shared_ptr<CAIObject> aiObject = FindAIObjectToID(RecvData._id());
-	std::shared_ptr<ObjectTransform> obejectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), (ObjectDirection)RecvData._dir());
+	std::shared_ptr<ObjectTransform> obejectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	aiObject->SetTransform(obejectTransform);
 }

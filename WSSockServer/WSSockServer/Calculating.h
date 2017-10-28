@@ -26,13 +26,15 @@ struct ObjectTransform
 	float m_vectorX;
 	float m_vectorY;
 	float m_scale;
+	float m_speed;
 	ObjectDirection m_dir;
 	ObjectTransform() {}
-	ObjectTransform(float _vectorX, float _vectorY, float _scale, ObjectDirection _dir)
+	ObjectTransform(float _vectorX, float _vectorY, float _scale, float _speed, ObjectDirection _dir)
 	{
 		m_vectorX = _vectorX;
 		m_vectorY = _vectorY;
 		m_scale = _scale;
+		m_speed = _speed;
 		m_dir = _dir;
 	}
 };
@@ -45,6 +47,10 @@ class CCalculating
 	// 접속 중인 클라이언트를 저장하기 위한 map 변수
 	std::map<int, std::shared_ptr<CPlayer>> m_players;
 
+	// 연산 Thread 함수
+	std::unique_ptr<std::thread> m_calculate_Thread;
+	bool isContinue;
+
 	CCalculating();
 	std::shared_ptr<CPlayer> FindPlayerToID(int _pID);
 public:
@@ -56,11 +62,15 @@ public:
 	~CCalculating();
 
 	void InitCalculating();
+	void CalculateAll();
+
 	void SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 
 	void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 	void ApplyPlayerSocket(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 	void ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 	void ExitPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
+
+	void ApplyPlayerTrasform(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 };
 #endif

@@ -85,6 +85,7 @@ void CPacketManager::InitFunctionmap()
 	map_function.insert(std::make_pair(RecvPacketType::RC_MAKE_AIOBJECT, std::bind(&CCalculating::SetStartingPosition, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PEER, std::bind(&CCalculating::EnterPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_EXIT_PEER, std::bind(&CCalculating::ExitPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_NOTIFY_PLAYER_TRANSFORM, std::bind(&CCalculating::ApplyPlayerTrasform, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 #endif
 }
 

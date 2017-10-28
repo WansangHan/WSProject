@@ -25,7 +25,6 @@ std::shared_ptr<CPlayer> CPlayManager::FindPlayerToID(int _pID)
 
 void CPlayManager::InitPlayerManager()
 {
-	m_ownPlayer = std::make_shared<CPlayer>();
 }
 
 void CPlayManager::PaintPlay(HWND _hwnd, HDC _hdc)
@@ -51,12 +50,15 @@ void CPlayManager::UpdatePlay()
 	}
 }
 
-void CPlayManager::EnterGame()
+void CPlayManager::EnterGame(int _id, std::string _name)
 {
-	BattleCity::PlayerInformation sendData;
+	m_ownPlayer = std::make_shared<CPlayer>();
+	m_ownPlayer->SetID(_id);
+	m_ownPlayer->SetName(_name);
 
-	sendData.set__id(m_ownPlayer->GetID());
-	sendData.set__name(m_ownPlayer->GetName());
+	BattleCity::PlayerInformation sendData;
+	sendData.set__id(_id);
+	sendData.set__name(_name);
 
 	// 현재 클라이언트의 정보를 받아 서버로 전달
 	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_IOCP_SERVER, sendData.SerializeAsString(), true, true);
@@ -93,11 +95,12 @@ void CPlayManager::SetPlayerPositionScale(char * _data, int _size)
 	BattleCity::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
+	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	// 자기 자신에 대한 위치 정보라면
 	if (m_ownPlayer->GetID() == RecvData._id())
 	{
 		m_ownPlayer->SetTransform(playerTransform);
+		m_ownPlayer->SetLastGetTickCount(GetTickCount());
 	}
 	else
 	{
@@ -107,6 +110,7 @@ void CPlayManager::SetPlayerPositionScale(char * _data, int _size)
 			if (Pr->GetID() == RecvData._id())
 			{
 				Pr->SetTransform(playerTransform);
+				Pr->SetLastGetTickCount(GetTickCount());
 			}
 		}
 	}
@@ -118,7 +122,7 @@ void CPlayManager::SetAIObjectPositionScale(char * _data, int _size)
 	BattleCity::ObjectTransform RecvData;
 
 	RecvData.ParseFromArray(_data, _size);
-	std::shared_ptr<ObjectTransform> aiObjectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._dir());
+	std::shared_ptr<ObjectTransform> aiObjectTransform = std::make_shared<ObjectTransform>(RecvData._vectorx(), RecvData._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	
 	std::shared_ptr<CAIObject> aiObject = std::make_shared<CAIObject>();
 	aiObject->SetID(RecvData._id());

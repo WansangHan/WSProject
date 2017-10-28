@@ -110,14 +110,14 @@ void CGameManager::KeyChange()
 	}
 }
 
-void CGameManager::EnterGame()
+void CGameManager::EnterGame(int _id, std::string _name)
 {
 	m_gameState = LODDING;
 	// 서버와 연결
 	CNetworkManager::getInstance().InitNetworkManager();
 	CPacketManager::getInstance().InitPacketManager();
 	isConnected = true;
-	m_playManager->EnterGame();
+	m_playManager->EnterGame(_id, _name);
 }
 
 // IOCP 서버에 접속 성공 시
