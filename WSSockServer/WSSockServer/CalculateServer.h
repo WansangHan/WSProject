@@ -26,6 +26,8 @@ public:
 	}
 	~CCalculateServer();
 
+	std::shared_ptr<CBaseSocket> GetTCPSocket() { return m_TCPSocket; }
+
 	void InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort);
 	void SendToCalculateServer(SendPacketType type, std::string str, bool isTCP);
 };

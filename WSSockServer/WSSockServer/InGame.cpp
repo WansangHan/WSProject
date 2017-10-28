@@ -192,7 +192,18 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 {
 	// 소켓 핸들 값으로 아이디를 찾은 후 erase
 	int pID = FindIDToSOCKET(_sock);
-	if (pID == -1) return;	// 소켓에 해당하는 아이디가 없을 시 리턴 (EPOLL 서버도 이 예외처리에 걸림)
+	// EPOLL 서버일 경우
+	if (_sock->GetSOCKET() == CCalculateServer::getInstance().GetTCPSocket()->GetSOCKET())
+	{
+		CLogManager::getInstance().WriteLogMessage("WARN", true, "EPOLL Server Exit");
+		return;
+	}
+	// 소켓에 해당하는 아이디가 없을 시 리턴
+	if (pID == -1)
+	{
+		CLogManager::getInstance().WriteLogMessage("WARN", true, "Unkown Socket Exit");
+		return;
+	}
 
 	m_players.erase(pID);
 

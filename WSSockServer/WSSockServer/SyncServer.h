@@ -24,6 +24,8 @@ public:
 	}
 	~CSyncServer();
 
+	std::shared_ptr<CBaseSocket> GetTCPSocket() { return m_TCPSocket; }
+
 	void InitSyncServer();
 	void EnterSyncServerTCP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 	void SendToSyncServer(SendPacketType type, std::string str, bool isTCP);

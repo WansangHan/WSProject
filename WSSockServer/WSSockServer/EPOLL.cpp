@@ -118,6 +118,11 @@ void CEPOLL::Update()
 				{
 					// 클라이언트 종료
 					// EPOLL 오브젝트에서 소켓 제거
+					if (ep_events[i].data.fd == CSyncServer::getInstance().GetTCPSocket()->GetSOCKET())
+					{
+						CLogManager::getInstance().WriteLogMessage("WARN", true, "IOCP Server Exit");
+					}
+
 					epoll_ctl(
 						m_epfd, EPOLL_CTL_DEL, ep_events[i].data.fd, NULL);
 					close(ep_events[i].data.fd);
