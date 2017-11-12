@@ -5,40 +5,6 @@
 #include "AIObject.h"
 
 enum class SendPacketType : int;
-class CPlayer;
-class CAIObject;
-
-// 플레이어 방향 상태값
-enum class ObjectDirection : int
-{
-	IDLE = 100,
-	UPUP,
-	LEFT,
-	RGHT,
-	DOWN,
-	UPLE,
-	UPRG,
-	DWLE,
-	DWRG,
-};
-
-struct ObjectTransform
-{
-	float m_vectorX;
-	float m_vectorY;
-	float m_scale;
-	float m_speed;
-	ObjectDirection m_dir;
-	ObjectTransform() {}
-	ObjectTransform(float _vectorX, float _vectorY, float _scale, float _speed, ObjectDirection _dir)
-	{
-		m_vectorX = _vectorX;
-		m_vectorY = _vectorY;
-		m_scale = _scale;
-		m_speed = _speed;
-		m_dir = _dir;
-	}
-};
 
 class CInGame
 {

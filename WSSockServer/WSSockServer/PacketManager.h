@@ -12,7 +12,6 @@
 #include "SafeQueue.h"
 #endif
 #include "LogManager.h"
-#include "BaseSocket.h"
 #ifdef IOCP_SERVER
 #include "IOCP.h"
 #include "CalculateServer.h"
