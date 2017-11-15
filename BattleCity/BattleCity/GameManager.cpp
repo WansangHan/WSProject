@@ -121,11 +121,11 @@ void CGameManager::EnterGame(int _id, std::string _name)
 }
 
 // IOCP 서버에 접속 성공 시
-void CGameManager::IOCPSuccess(char * _data, int _size)
+void CGameManager::SyncConnectSuccess(char * _data, int _size)
 {
 	BattleCity::ObjectInformation SendData;
 	SendData.set__id(m_playManager->GetOwnPlayer()->GetID());
-	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_EPOLL_SERVER, SendData.SerializeAsString(), true, false);
+	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_CALC_SERVER, SendData.SerializeAsString(), true, true);
 
 	CNetworkManager::getInstance().NotifyUDPSocket();
 }

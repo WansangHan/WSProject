@@ -204,8 +204,12 @@ void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 // Client Disconnect 시 후처리
 void CIOCP::ProcessDisconnect(DisconnectOverlapped* ovrlap)
 {
-	// 서비스 로직에서 클라이언트 delete
-	CInGame::getInstance().ExitPlayer(ovrlap->m_sock);
+	// EPOLL 서버일 경우
+	if (ovrlap->m_sock->GetSOCKET() == CSyncServer::getInstance().GetTCPSocket()->GetSOCKET())
+	{
+		CLogManager::getInstance().WriteLogMessage("WARN", true, "SyncServer Server Exit");
+		return;
+	}
 	// 소켓 close
 	ovrlap->m_sock->CloseSocket();
 	delete ovrlap;
@@ -361,8 +365,7 @@ bool CIOCP::InitServer()
 	}
 	// PacketManager 초기화
 	CPacketManager::getInstance().InitPacketManager();
-	CCalculateServer::getInstance().InitCalculateServer("192.168.68.128", 22222, 33333, m_CompPort);
-	CInGame::getInstance().InitInGame();
+	CCalculating::getInstance().InitCalculating();
 
 	// 소켓 하나에 대해 AcceptEx 호출
 	PostAccept();

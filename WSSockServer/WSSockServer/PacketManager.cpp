@@ -47,9 +47,9 @@ void CPacketManager::APPLY_PACKET_UDP()
 void CPacketManager::DEVIDE_PACKET_TYPE(PacketInfo * info)
 {
 #ifdef IOCP_SERVER
-	RecvPacketType packetType = RecvPacketType::RC_ENTER_SERVER;
+	RecvPacketType packetType = RecvPacketType::RC_ENTER_CALC_SERVER;
 #else
-	RecvPacketType packetType = RecvPacketType::RC_SYNCSERVER_ENTER;
+	RecvPacketType packetType = RecvPacketType::RC_ENTER_SYNC_SERVER;
 #endif
 	// 패킷 분리
 	memcpy(&packetType, info->data.get(), sizeof(RecvPacketType));
@@ -70,22 +70,22 @@ void CPacketManager::InitFunctionmap()
 	// std::map에 패킷 타입에 따른 함수포인터를 적용
 #ifdef IOCP_SERVER
 	// CLIENT -> IOCP
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_APPLY_IOCP_UDP_SOCKET, std::bind(&CInGame::ApplyPlayerUDP, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_CALC_SERVER, std::bind(&CCalculating::ApplyPlayerSocket, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_APPLY_CALC_UDP_SOCKET, std::bind(&CCalculating::ApplyPlayerUDP, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	// EPOLL -> IOCP
-	map_function.insert(std::make_pair(RecvPacketType::RC_AI_STARTING, std::bind(&CInGame::ApplyAIObjectPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_EPOLL, std::bind(&CInGame::SuccessEnterEpoll, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-#else
-	// CLIENT -> EPOLL
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_EPOLL_SERVER, std::bind(&CCalculating::ApplyPlayerSocket, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_APPLY_EPOLL_UDP_SOCKET, std::bind(&CCalculating::ApplyPlayerUDP, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-	// IOCP -> EPOLL
 	map_function.insert(std::make_pair(RecvPacketType::RC_SYNCSERVER_ENTER, std::bind(&CSyncServer::EnterSyncServerTCP, &CSyncServer::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_MAKE_AIOBJECT, std::bind(&CCalculating::SetStartingPosition, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PEER, std::bind(&CCalculating::EnterPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_EXIT_PEER, std::bind(&CCalculating::ExitPlayer, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	map_function.insert(std::make_pair(RecvPacketType::RC_NOTIFY_PLAYER_TRANSFORM, std::bind(&CCalculating::ApplyPlayerTrasform, &CCalculating::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+#else
+	// CLIENT -> EPOLL
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_SYNC_SERVER, std::bind(&CInGame::EnterPlayer, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_APPLY_SYNC_UDP_SOCKET, std::bind(&CInGame::ApplyPlayerUDP, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	// IOCP -> EPOLL
+	map_function.insert(std::make_pair(RecvPacketType::RC_AI_STARTING, std::bind(&CInGame::ApplyAIObjectPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_EPOLL, std::bind(&CInGame::SuccessEnterEpoll, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 #endif
 }
 

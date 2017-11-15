@@ -169,7 +169,7 @@ void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, sockaddr_in 
 
 	// EPOLL 서버에 접속을 성공한 플레이어에게 성공했다는 패킷을 보냄
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_CONNECT, "", nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_SYNC_CONNECT, "", nullptr, true);
 
 	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
 	player->SetTransform(playerTransform);
@@ -192,12 +192,6 @@ void CInGame::ExitPlayer(std::shared_ptr<CBaseSocket> _sock)
 {
 	// 소켓 핸들 값으로 아이디를 찾은 후 erase
 	int pID = FindIDToSOCKET(_sock);
-	// EPOLL 서버일 경우
-	if (_sock->GetSOCKET() == CCalculateServer::getInstance().GetTCPSocket()->GetSOCKET())
-	{
-		CLogManager::getInstance().WriteLogMessage("WARN", true, "EPOLL Server Exit");
-		return;
-	}
 	// 소켓에 해당하는 아이디가 없을 시 리턴
 	if (pID == -1)
 	{
@@ -223,7 +217,7 @@ void CInGame::ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _ad
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
 	player->SetAddr(_addr);
 
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_IOCP_UDP, "", nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_SYNC_UDP, "", nullptr, true);
 }
 
 // 클라이언트로부터 받은 플레이어 위치, 방향, 크기정보를 서버에 적용 후 모든 플레이어, EPOLL 서버에 전송

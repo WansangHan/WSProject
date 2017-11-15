@@ -1,11 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #ifdef IOCP_SERVER
+#include "Calculating.h"
+#else
 #include <string>
 #include "BaseSocket.h"
 #include "InGame.h"
-#else
-#include "Calculating.h"
 #endif
 
 struct ObjectTransform;
@@ -14,11 +14,11 @@ class CPlayer
 {
 	int m_id;
 
-#ifdef IOCP_SERVER
+#ifndef IOCP_SERVER
 	std::string m_name;
 #endif
 	std::shared_ptr<ObjectTransform> m_objectTransform;
-#ifndef IOCP_SERVER
+#ifdef IOCP_SERVER
 	std::shared_ptr<ObjectTransform> m_curPosition;
 	unsigned int m_lastGetTickCount;
 #endif
@@ -32,7 +32,7 @@ public:
 	void SetID(int _id) { m_id = _id; }
 	int GetID() { return m_id; }
 
-#ifdef IOCP_SERVER
+#ifndef IOCP_SERVER
 	void SetName(std::string _name) { m_name = _name; }
 	std::string GetName() { return m_name; }
 #endif
@@ -40,7 +40,7 @@ public:
 	void SetTransform(std::shared_ptr<ObjectTransform> _playerTransform) { m_objectTransform = _playerTransform; }
 	std::shared_ptr<ObjectTransform> GetTransform() { return m_objectTransform; }
 
-#ifndef IOCP_SERVER
+#ifdef IOCP_SERVER
 	void SetCurTransform(std::shared_ptr<ObjectTransform> _curPosition) { m_curPosition = _curPosition; }
 	std::shared_ptr<ObjectTransform> GetCurTransform() { return m_curPosition; }
 	void SetLastGetTickCount(unsigned int _lastGetTickCount) { m_lastGetTickCount = _lastGetTickCount; }

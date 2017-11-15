@@ -62,7 +62,9 @@ bool CEPOLL::InitServer()
 	epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_listenUDPSocket->GetSOCKET(), &event);
 
 	CPacketManager::getInstance().InitPacketManager();
-	CCalculating::getInstance().InitCalculating();
+
+	CCalculateServer::getInstance().InitCalculateServer("192.168.68.1", 9999, 8888, m_epfd);
+	CInGame::getInstance().InitInGame();
 
 	return true;
 }
@@ -118,9 +120,16 @@ void CEPOLL::Update()
 				{
 					// 클라이언트 종료
 					// EPOLL 오브젝트에서 소켓 제거
-					if (ep_events[i].data.fd == CSyncServer::getInstance().GetTCPSocket()->GetSOCKET())
+					if (ep_events[i].data.fd == CCalculateServer::getInstance().GetTCPSocket()->GetSOCKET())
 					{
-						CLogManager::getInstance().WriteLogMessage("WARN", true, "IOCP Server Exit");
+						CLogManager::getInstance().WriteLogMessage("WARN", true, "Calculate Server Exit");
+					}
+					else
+					{
+						std::shared_ptr<CBaseSocket> sock = std::make_shared<CTCPSocket>();
+						sock->SetSOCKET(ep_events[i].data.fd);
+						// 서비스 로직에서 클라이언트 delete
+						CInGame::getInstance().ExitPlayer(sock);
 					}
 
 					epoll_ctl(

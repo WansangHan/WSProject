@@ -14,7 +14,7 @@ CCalculateServer::~CCalculateServer()
 }
 
 // IOCP 서버에서 EPOLL 서버로 접속
-void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, HANDLE _compPort)
+void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, int _epfd)
 {
 	m_TCPSocket = std::make_shared<CTCPSocket>();
 	m_UDPSocket = std::make_shared<CUDPSocket>();
@@ -28,16 +28,19 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 	m_TCPSockAddr->sin_port = htons(_tcpPort);
 
 	// CalculateServer에 TCP 접속
-	if (connect(m_TCPSocket.get()->GetSOCKET(), (SOCKADDR*)m_TCPSockAddr.get(), sizeof(*m_TCPSockAddr.get())) == SOCKET_ERROR)
+	if (connect(m_TCPSocket.get()->GetSOCKET(), (struct sockaddr*)m_TCPSockAddr.get(), sizeof(*m_TCPSockAddr.get())) == -1)
 	{
-		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer TCP connect() error : %d", WSAGetLastError());
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer TCP connect() error");
 	}
 
-	// IOCP 오브젝트에 등록 및 Read 대기
-	CreateIoCompletionPort((HANDLE)m_TCPSocket->GetSOCKET(), _compPort, 0, 0);
-	CIOCP::getInstance().PostRead(m_TCPSocket, true);
+	// EPOLL 오브젝트에 등록 및 Read 대기
+	epoll_event event_tcp;
+	event_tcp.events = EPOLLIN;
+	event_tcp.data.fd = m_TCPSocket->GetSOCKET();
 
-	// EPOLL 서버에 IOCP 서버 접속을 알림
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, m_TCPSocket->GetSOCKET(), &event_tcp);
+
+	// IOCP 서버에 IOCP 서버 접속을 알림
 	SendToCalculateServer(SendPacketType::SD_SYNCSERVER_ENTER, "", true);
 
 	memset(m_UDPSockAddr.get(), 0, sizeof(m_UDPSockAddr.get()));
@@ -46,12 +49,16 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 	m_UDPSockAddr->sin_port = htons(_udpPort);
 
 	// CalculateServer에 UDP 접속
-	if (connect(m_UDPSocket->GetSOCKET(), (SOCKADDR*)m_UDPSockAddr.get(), sizeof(*m_UDPSockAddr.get())) == SOCKET_ERROR)
+	if (connect(m_UDPSocket->GetSOCKET(), (struct sockaddr*)m_UDPSockAddr.get(), sizeof(*m_UDPSockAddr.get())) == -1)
 	{
-		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer UDP connect() error : %d", WSAGetLastError());
+		CLogManager::getInstance().WriteLogMessage("ERROR", true, "CalculaterServer UDP connect() error");
 	}
 
-	CreateIoCompletionPort((HANDLE)m_UDPSocket->GetSOCKET(), _compPort, 0, 0);
+	epoll_event event_udp;
+	event_udp.events = EPOLLIN;
+	event_udp.data.fd = m_UDPSocket->GetSOCKET();
+
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, m_UDPSocket->GetSOCKET(), &event_udp);
 }
 
 // EPOLL 서버에 패킷을 전송하는 함수

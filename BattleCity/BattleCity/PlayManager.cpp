@@ -61,7 +61,7 @@ void CPlayManager::EnterGame(int _id, std::string _name)
 	sendData.set__name(_name);
 
 	// 현재 클라이언트의 정보를 받아 서버로 전달
-	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_IOCP_SERVER, sendData.SerializeAsString(), true, true);
+	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_SYNC_SERVER, sendData.SerializeAsString(), true, false);
 }
 
 // 자기 자신이 아닌 상대 플레이어에 대한 정보를 list에 저장한다

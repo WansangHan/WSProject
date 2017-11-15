@@ -116,7 +116,7 @@ void CCalculating::ApplyPlayerSocket(std::shared_ptr<CBaseSocket> _sock, sockadd
 
 	player->SetSocket(_sock);
 
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_EPOLL_CONNECT, "", nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CALC_CONNECT, "", nullptr, true);
 }
 
 // 플레이어 변수에 UDP 어드레스 적용
@@ -128,7 +128,7 @@ void CCalculating::ApplyPlayerUDP(std::shared_ptr<CBaseSocket> _sock, sockaddr_i
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
 	player->SetAddr(_addr);
 
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_EPOLL_UDP, "", nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CALC_UDP, "", nullptr, true);
 }
 
 // 플레이어가 나갔을 때, 해당 아이디에 맞는 플레이어 삭제

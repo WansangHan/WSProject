@@ -58,7 +58,7 @@ void CPlayer::KeyCheck() {
 	sendData.set__scale(m_playerTransform->m_scale);
 	sendData.set__speed(m_playerTransform->m_speed);
 
-	CPacketManager::getInstance().SendPacketToServer(SD_POSITION_SCALE, sendData.SerializeAsString(), true, true);
+	CPacketManager::getInstance().SendPacketToServer(SD_POSITION_SCALE, sendData.SerializeAsString(), true, false);
 }
 
 // 서버에서 받은 키보드 방향에 맞게 이동

@@ -9,7 +9,8 @@
 #include "TCPSocket.h"
 #include "UDPSocket.h"
 #include "PacketManager.h"
-#include "Calculating.h"
+#include "InGame.h"
+#include "CalculateServer.h"
 
 class CEPOLL
 {

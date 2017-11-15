@@ -78,13 +78,12 @@ void CNetworkManager::NotifyUDPSocket()
 		{
 			if (!this->GetisIOCPUDPSuccess())
 			{
-				CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_APPLY_IOCP_UDP_SOCKET, SendData.SerializeAsString(), false, true);
+				CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_APPLY_CALC_UDP_SOCKET, SendData.SerializeAsString(), false, true);
 			}
-
 
 			if (!this->GetisEPOLUDPSuccess())
 			{
-				CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_APPLY_EPOLL_UDP_SOCKET, SendData.SerializeAsString(), false, false);
+				CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_APPLY_SYNC_UDP_SOCKET, SendData.SerializeAsString(), false, false);
 			}
 
 			// 두 서버 다 받을 때 까지 실행

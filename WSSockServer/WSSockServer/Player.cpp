@@ -12,7 +12,7 @@ CPlayer::~CPlayer()
 }
 
 
-#ifndef IOCP_SERVER
+#ifdef IOCP_SERVER
 void CPlayer::CalculateCurrentPosition()
 {
 	unsigned int DurTime = GetTickCount() - m_lastGetTickCount;
