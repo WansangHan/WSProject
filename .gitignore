@@ -41,8 +41,8 @@
 WSSockServer/ipch/
 WSSockServer/WSSockServer/Debug
 WSSockServer/Debug
-WSSockServer/mysql-5.7.17-win32/
-WSSockServer/mysql-5.7.17-winx64/
+WSSockServer/mysql-5.7.20-win32/
+WSSockServer/mysql-5.7.20-winx64/
 WSSockServer/protobuf-3.3.0/
 WSSockServer/WSSockServer/x64/
 WSSockServer/WSSockServer/logs/

@@ -17,7 +17,7 @@ Simeple Windows API Game
 ~~~
 ~~~
 * 라이브러리, 프로그램
- + Mysql Client : 5.7.17
+ + Mysql Client : 5.7.20
  + protobuf : 3.3.0
  + jsoncpp : 0.5.0
  + curl : 7.54.0
