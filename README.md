@@ -22,6 +22,7 @@ Simeple Windows API Game
  + jsoncpp : 0.5.0
  + curl : 7.54.0
  + boost c++ : 1.65.1
+ * TBB : 2018_20170919oss_win
 ~~~
 
 2. 빌드

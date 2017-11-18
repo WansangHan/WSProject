@@ -12,15 +12,18 @@ CCalculating::CCalculating()
 CCalculating::~CCalculating()
 {
 	isContinue = false;
-	// m_calculate_Thread->join();
+	m_calculate_Thread->join();
 }
 
 // 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
 std::shared_ptr<CPlayer> CCalculating::FindPlayerToID(int _pID)
 {
-	auto Pr = m_players.find(_pID);
-	if (Pr != m_players.end())
-		return Pr->second;
+	tbb::concurrent_hash_map<int, std::shared_ptr<CPlayer>>::accessor a;
+
+	if (m_players.find(a, _pID))
+	{
+		return a->second;
+	}
 	else
 	{
 		CLogManager::getInstance().WriteLogMessage("WARN", true, "Return nullptr in FindPlayer()");
@@ -48,7 +51,7 @@ void CCalculating::InitCalculating()
 
 	isContinue = true;
 
-	// m_calculate_Thread = std::unique_ptr<std::thread>(new std::thread([&]() { this->CalculateAll(); }));
+	m_calculate_Thread = std::unique_ptr<std::thread>(new std::thread([&]() { this->CalculateAll(); }));
 }
 
 // 오브젝트들의 시작 위치를 정해서 IOCP로 보내준다

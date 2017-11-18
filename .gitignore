@@ -44,6 +44,7 @@ WSSockServer/Debug
 WSSockServer/mysql-5.7.20-win32/
 WSSockServer/mysql-5.7.20-winx64/
 WSSockServer/protobuf-3.3.0/
+WSSockServer/tbb2018_20170919oss_win/
 WSSockServer/WSSockServer/x64/
 WSSockServer/WSSockServer/logs/
 WSSockServer/WSSockServer/linuxBuild/

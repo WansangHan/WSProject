@@ -1,6 +1,11 @@
 #ifndef CALCULATING_H
 #define CALCULATING_H
 #include <stdlib.h>
+#pragma comment(lib, "tbb")
+#pragma comment(lib, "tbbmalloc")
+#include <tbb/concurrent_hash_map.h>
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_for.h>
 #include "PacketManager.h"
 #include "Player.h"
 #include "AIObject.h"
@@ -48,7 +53,7 @@ class CCalculating
 	static std::once_flag m_once;
 
 	// 접속 중인 클라이언트를 저장하기 위한 map 변수
-	std::map<int, std::shared_ptr<CPlayer>> m_players;
+	tbb::concurrent_hash_map<int, std::shared_ptr<CPlayer>> m_players;
 
 	// 연산 Thread 함수
 	std::unique_ptr<std::thread> m_calculate_Thread;
