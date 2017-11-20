@@ -91,6 +91,8 @@ void CInGame::AllocateAIObject()
 	int AIObjectID = MakeAIObjectID();
 	aiObject->SetID(AIObjectID);
 
+	CLogManager::getInstance().WriteLogMessage("INFO", true, "Allocate AIObject, ID : %d", AIObjectID);
+
 	// 생성한 AIObject를 map 변수에 저장
 	m_AIObjects.insert(std::map<int, std::shared_ptr<CAIObject>>::value_type(aiObject->GetID(), aiObject));
 

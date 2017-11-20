@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #ifdef IOCP_SERVER
-#include "Calculating.h"
+#include "Calculating.cuh"
 #else
 #include <string>
 #include "BaseSocket.h"
@@ -45,7 +45,6 @@ public:
 	std::shared_ptr<ObjectTransform> GetCurTransform() { return m_curPosition; }
 	void SetLastGetTickCount(unsigned int _lastGetTickCount) { m_lastGetTickCount = _lastGetTickCount; }
 	unsigned int GetLastGetTickCount() { return m_lastGetTickCount; }
-	void CalculateCurrentPosition();
 #endif
 	
 	void SetSocket(std::shared_ptr<CBaseSocket> _sock) { m_sock = _sock; }

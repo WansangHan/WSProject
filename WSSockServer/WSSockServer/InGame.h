@@ -29,7 +29,10 @@ struct ObjectTransform
 	float m_scale;
 	float m_speed;
 	ObjectDirection m_dir;
-	ObjectTransform() {}
+	ObjectTransform() 
+	{
+		memset(this, 0, sizeof(ObjectTransform));
+	}
 	ObjectTransform(float _vectorX, float _vectorY, float _scale, float _speed, ObjectDirection _dir)
 	{
 		m_vectorX = _vectorX;

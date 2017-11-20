@@ -1,5 +1,11 @@
 #include "stdafx.h"
-#include "Calculating.h"
+#include "Calculating.cuh"
+#include <cuda.h>
+#include <iostream>
+#include <cufft.h>
+#include <cublas_v2.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 std::unique_ptr<CCalculating> CCalculating::m_inst;
 std::once_flag CCalculating::m_once;
@@ -13,6 +19,55 @@ CCalculating::~CCalculating()
 {
 	isContinue = false;
 	m_calculate_Thread->join();
+}
+
+__global__ void CalculateCurPosition(ObjectTransform lastMove, ObjectTransform* CurPos, unsigned int _lastTickCount, unsigned int _curTickCount)
+{
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	CurPos += tid;
+	unsigned int DurTime = _curTickCount - _lastTickCount;
+	float MoveTime = DurTime * 0.001f;
+
+	float MoveSpeed = MoveTime* lastMove.m_speed;
+	switch (lastMove.m_dir)
+	{
+	case ObjectDirection::IDLE:
+		CurPos->m_vectorX = lastMove.m_vectorX;
+		CurPos->m_vectorY = lastMove.m_vectorY;
+		break;
+	case ObjectDirection::UPUP:
+		CurPos->m_vectorX = lastMove.m_vectorX;
+		CurPos->m_vectorY = lastMove.m_vectorY - MoveSpeed;
+		break;
+	case ObjectDirection::LEFT:
+		CurPos->m_vectorX = lastMove.m_vectorX - MoveSpeed;
+		CurPos->m_vectorY = lastMove.m_vectorY;
+		break;
+	case ObjectDirection::RGHT:
+		CurPos->m_vectorX = lastMove.m_vectorX + MoveSpeed;
+		CurPos->m_vectorY = lastMove.m_vectorY;
+		break;
+	case ObjectDirection::DOWN:
+		CurPos->m_vectorX = lastMove.m_vectorX;
+		CurPos->m_vectorY = lastMove.m_vectorY + MoveSpeed;
+		break;
+	case ObjectDirection::UPLE:
+		CurPos->m_vectorX = lastMove.m_vectorX - (MoveSpeed * (1 / sqrt(2.0f)));
+		CurPos->m_vectorY = lastMove.m_vectorY - (MoveSpeed * (1 / sqrt(2.0f)));
+		break;
+	case ObjectDirection::UPRG:
+		CurPos->m_vectorX = lastMove.m_vectorX + (MoveSpeed * (1 / sqrt(2.0f)));
+		CurPos->m_vectorY = lastMove.m_vectorY - (MoveSpeed * (1 / sqrt(2.0f)));
+		break;
+	case ObjectDirection::DWLE:
+		CurPos->m_vectorX = lastMove.m_vectorX - (MoveSpeed * (1 / sqrt(2.0f)));
+		CurPos->m_vectorY = lastMove.m_vectorY + (MoveSpeed * (1 / sqrt(2.0f)));
+		break;
+	case ObjectDirection::DWRG:
+		CurPos->m_vectorX = lastMove.m_vectorX + (MoveSpeed * (1 / sqrt(2.0f)));
+		CurPos->m_vectorY = lastMove.m_vectorY + (MoveSpeed * (1 / sqrt(2.0f)));
+		break;
+	}
 }
 
 // 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
@@ -39,8 +94,12 @@ void CCalculating::CalculateAll()
 		// 플레이어의 현재 좌표를 계산
 		for (auto Pr : m_players)
 		{
-			if(Pr.second != nullptr)
-				Pr.second->CalculateCurrentPosition();
+			ObjectTransform* temp;
+			cudaMalloc((void**)&temp, sizeof(ObjectTransform) * 1);
+			cudaMemcpy(temp, Pr.second->GetCurTransform().get(), sizeof(ObjectTransform) * 1, cudaMemcpyHostToDevice);
+			CalculateCurPosition << <1, 1 >> > (*(Pr.second->GetTransform().get()), temp, Pr.second->GetLastGetTickCount(), GetTickCount());
+			cudaMemcpy(Pr.second->GetCurTransform().get(), temp, sizeof(ObjectTransform) * 1, cudaMemcpyDeviceToHost);
+			cudaFree(temp);
 		}
 	}
 }

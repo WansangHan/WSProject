@@ -15,7 +15,7 @@
 #ifdef IOCP_SERVER
 #include "IOCP.h"
 #include "SyncServer.h"
-#include "Calculating.h"
+#include "Calculating.cuh"
 #else
 #include "EPOLL.h"
 #include "CalculateServer.h"
