@@ -165,3 +165,9 @@ void CGameManager::DeathNotify(char * _data, int _size)
 {
 	SendMessage(m_hwnd, WM_DESTROY, 0, 0);
 }
+
+// 플레이어의 크기 증가
+void CGameManager::IncreaseScale(char * _data, int _size)
+{
+	m_playManager->IncreaseScale(_data, _size);
+}

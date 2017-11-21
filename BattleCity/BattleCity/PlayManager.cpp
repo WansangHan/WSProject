@@ -131,6 +131,31 @@ void CPlayManager::SetAIObjectPositionScale(char * _data, int _size)
 	m_AIObjects.push_back(aiObject);
 }
 
+// 플레이어의 크기 증가
+void CPlayManager::IncreaseScale(char * _data, int _size)
+{
+	BattleCity::IncreaseScale RecvData;
+	RecvData.ParseFromArray(_data, _size);
+	// 자기 자신에 대한 위치 정보라면
+	if (m_ownPlayer->GetID() == RecvData._id())
+	{
+		std::shared_ptr<ObjectTransform> temp = m_ownPlayer->GetTransform();
+		temp->m_scale = RecvData._increase();
+	}
+	else
+	{
+		// 자기 자신이 아니라면 플레이어를 찾아 Trasform 정보를 적용한다
+		for (auto Pr : m_otherPlayer)
+		{
+			if (Pr->GetID() == RecvData._id())
+			{
+				std::shared_ptr<ObjectTransform> temp = Pr->GetTransform();
+				temp->m_scale = RecvData._increase();
+			}
+		}
+	}
+}
+
 // 키보드 이벤트 시
 void CPlayManager::CheckKey()
 {

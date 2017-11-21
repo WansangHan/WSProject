@@ -32,3 +32,9 @@ message CollisionNotify
 	int32 smallplayerid = 1;
 	int32 bigerplayerid = 2;
 }
+
+message IncreaseScale
+{
+	int32 _id = 1;
+	float _increase = 2;
+}

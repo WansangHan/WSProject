@@ -62,6 +62,7 @@ public:
 	void ExitPlayer(char* _data, int _size);
 	void SetPlayerPositionScale(char* _data, int _size);
 	void SetAIObjectPositionScale(char* _data, int _size);
+	void IncreaseScale(char* _data, int _size);
 	void CheckKey();
 
 	std::shared_ptr<CPlayer> GetOwnPlayer() { return m_ownPlayer; }

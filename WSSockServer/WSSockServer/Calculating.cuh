@@ -81,8 +81,6 @@ extern "C"
 		void InitCalculating();
 		void CalculateAll();
 
-		int sum_cuda(int a, int b, int * c);
-
 		void SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 
 		void EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
@@ -91,6 +89,7 @@ extern "C"
 		void ExitPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 
 		void ApplyPlayerTrasform(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
+		void IncreaseScale(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size);
 	};
 #ifdef __cplusplus 
 }

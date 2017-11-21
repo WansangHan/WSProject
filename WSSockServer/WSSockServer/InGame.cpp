@@ -253,22 +253,41 @@ void CInGame::CollisionNotify(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _a
 	WSSockServer::CollisionNotify RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData.smallplayerid());
-	// 이미 처리된 플레이어일 경우
-	if (player == nullptr)
+	std::shared_ptr<CPlayer> smallPlayer = FindPlayerToID(RecvData.smallplayerid());
+	std::shared_ptr<CPlayer> bigerPlayer = FindPlayerToID(RecvData.bigerplayerid());
+
+	// 플레이어 삭제
 	{
-		CLogManager::getInstance().WriteLogMessage("WARN", true, "Already Erase");
-		return;
+		// 이미 처리된 플레이어일 경우
+		if (smallPlayer == nullptr)
+		{
+			CLogManager::getInstance().WriteLogMessage("WARN", true, "Already Erase");
+			return;
+		}
+
+		// 죽은 플레이어에게 죽었다는 걸 알림
+		CPacketManager::getInstance().SendPacketToServer(smallPlayer->GetSocket(), SendPacketType::SD_DEATH_NOTIFY, "", nullptr, true);
+
+		m_players.erase(RecvData.smallplayerid());
+
+		WSSockServer::PlayerInformation SendData;
+		SendData.set__id(RecvData.smallplayerid());
+		// 죽은 플레이어의 ID를 남아있는 모든 클라이언트, 서버에 전송
+		SendToAllPlayer(SendPacketType::SD_EXIT_PLAYER, SendData.SerializeAsString(), nullptr, true);
+		CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_EXIT_PEER, SendData.SerializeAsString(), true);
 	}
 
-	// 죽은 플레이어에게 죽었다는 걸 알림
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_DEATH_NOTIFY, "", nullptr, true);
+	// 플레이어 크기 증가
+	{
+		std::shared_ptr<ObjectTransform> temp = bigerPlayer->GetTransform();
+		temp->m_scale += smallPlayer->GetTransform()->m_scale;
+		bigerPlayer->SetTransform(temp.get(), sizeof(ObjectTransform));
 
-	m_players.erase(RecvData.smallplayerid());
-
-	WSSockServer::PlayerInformation SendData;
-	SendData.set__id(RecvData.smallplayerid());
-	// 죽은 플레이어의 ID를 남아있는 모든 클라이언트에게 전송
-	SendToAllPlayer(SendPacketType::SD_EXIT_PLAYER, SendData.SerializeAsString(), nullptr, true);
-	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_EXIT_PEER, SendData.SerializeAsString(), true);
+		WSSockServer::IncreaseScale SendData;
+		SendData.set__id(bigerPlayer->GetID());
+		SendData.set__increase(temp->m_scale);
+		// 크기가 증가한 플레이어의 새로운 정보를 모든 클라이언트, 서버에 전송
+		SendToAllPlayer(SendPacketType::SD_INCREASE_SCALE_TO_PLAYER, SendData.SerializeAsString(), nullptr, true);
+		CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_INCREASE_SCALE_TO_CALC, SendData.SerializeAsString(), true);
+	}
 }

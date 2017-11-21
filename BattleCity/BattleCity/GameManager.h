@@ -61,6 +61,7 @@ public:
 	void SetPlayerPositionScale(char* _data, int _size);
 	void SetAIObjectPositionScale(char* _data, int _size);
 	void DeathNotify(char* _data, int _size);
+	void IncreaseScale(char* _data, int _size);
 
 	CPlayManager* GetPlayerManagerInstance() { return m_playManager; }
 	CUIManager* GetUIManagerInstance() { return m_uiManager; }

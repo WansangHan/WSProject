@@ -269,3 +269,16 @@ void CCalculating::ApplyPlayerTrasform(std::shared_ptr<CBaseSocket> _sock, socka
 	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
 	player->SetCurTransform(&playerTransform, sizeof(ObjectTransform));
 }
+
+// 증가한 플레이어의 크기 적용
+void CCalculating::IncreaseScale(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char * _data, int _size)
+{
+	WSSockServer::IncreaseScale RecvData;
+	RecvData.ParseFromArray(_data, _size);
+
+	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._id());
+
+	std::shared_ptr<ObjectTransform> temp = player->GetTransform();
+	temp->m_scale = RecvData._increase();
+	player->SetTransform(temp.get(), sizeof(ObjectTransform));
+}
