@@ -37,11 +37,17 @@ public:
 	std::string GetName() { return m_name; }
 #endif
 
-	void SetTransform(std::shared_ptr<ObjectTransform> _playerTransform) { m_objectTransform = _playerTransform; }
+	void SetTransform(ObjectTransform* _playerTransform, int size)
+	{
+		memcpy(m_objectTransform.get(), _playerTransform, size);
+	}
 	std::shared_ptr<ObjectTransform> GetTransform() { return m_objectTransform; }
 
 #ifdef IOCP_SERVER
-	void SetCurTransform(std::shared_ptr<ObjectTransform> _curPosition) { m_curPosition = _curPosition; }
+	void SetCurTransform(ObjectTransform* _curPosition, int size)
+	{
+		memcpy(m_curPosition.get(), _curPosition, size);
+	}
 	std::shared_ptr<ObjectTransform> GetCurTransform() { return m_curPosition; }
 	void SetLastGetTickCount(unsigned int _lastGetTickCount) { m_lastGetTickCount = _lastGetTickCount; }
 	unsigned int GetLastGetTickCount() { return m_lastGetTickCount; }

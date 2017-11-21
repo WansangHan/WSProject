@@ -21,6 +21,7 @@ CCalculating::~CCalculating()
 	m_calculate_Thread->join();
 }
 
+// Object 현재 위치 연산
 __global__ void CalculateCurPosition(ObjectTransform lastMove, ObjectTransform* CurPos, unsigned int _lastTickCount, unsigned int _curTickCount)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -70,6 +71,16 @@ __global__ void CalculateCurPosition(ObjectTransform lastMove, ObjectTransform* 
 	}
 }
 
+// 충돌 연산
+__global__ void CalculateCollision(ObjectTransform o1, ObjectTransform o2, bool* iscollision)
+{
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+	float Distance2 = pow(o2.m_vectorX - o1.m_vectorX, 2) + pow(o2.m_vectorY - o1.m_vectorY, 2);
+
+	iscollision[tid] = Distance2 < pow((o1.m_scale + o2.m_scale) * 0.5, 2);
+}
+
 // 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
 std::shared_ptr<CPlayer> CCalculating::FindPlayerToID(int _pID)
 {
@@ -100,6 +111,31 @@ void CCalculating::CalculateAll()
 			CalculateCurPosition << <1, 1 >> > (*(Pr.second->GetTransform().get()), temp, Pr.second->GetLastGetTickCount(), GetTickCount());
 			cudaMemcpy(Pr.second->GetCurTransform().get(), temp, sizeof(ObjectTransform) * 1, cudaMemcpyDeviceToHost);
 			cudaFree(temp);
+		}
+
+		// 플레이어간 충돌 연산
+		for (auto OutterPr : m_players)
+		{
+			for (auto InnerPr : m_players)
+			{
+				// 자기 자신과의 충돌 연산이 아니라면
+				if (OutterPr.first != InnerPr.first)
+				{
+					bool iscollision = false;
+					bool* temp;
+					cudaMalloc((void**)&temp, sizeof(bool) * 1);
+					cudaMemcpy(temp, &iscollision, sizeof(bool), cudaMemcpyHostToDevice);
+					CalculateCollision << <1, 1 >> > (*(OutterPr.second->GetCurTransform().get()), *(InnerPr.second->GetCurTransform().get()), temp);
+					cudaMemcpy(&iscollision, temp, sizeof(bool), cudaMemcpyDeviceToHost);
+					cudaFree(temp);
+
+					// 충돌 시
+					if (iscollision)
+					{
+
+					}
+				}
+			}
 		}
 	}
 }
@@ -150,9 +186,9 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _
 	std::shared_ptr<CPlayer> player = std::make_shared<CPlayer>();
 	player->SetID(RecvData._id());
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(vectorX, vectorY, scale, speed, ObjectDirection::IDLE);
-	player->SetTransform(playerTransform);
-	player->SetCurTransform(playerTransform);
+	ObjectTransform playerTransform(vectorX, vectorY, scale, speed, ObjectDirection::IDLE);
+	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
+	player->SetCurTransform(&playerTransform, sizeof(ObjectTransform));
 	player->SetLastGetTickCount(GetTickCount());
 
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
@@ -210,6 +246,7 @@ void CCalculating::ApplyPlayerTrasform(std::shared_ptr<CBaseSocket> _sock, socka
 
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
 	player->SetLastGetTickCount(GetTickCount());
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
-	player->SetTransform(playerTransform);
+	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
+	player->SetCurTransform(&playerTransform, sizeof(ObjectTransform));
 }

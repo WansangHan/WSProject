@@ -173,8 +173,8 @@ void CInGame::SuccessEnterEpoll(std::shared_ptr<CBaseSocket> _sock, sockaddr_in 
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
 	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_SYNC_CONNECT, "", nullptr, true);
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
-	player->SetTransform(playerTransform);
+	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
+	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
 
 	WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
 	pos->set__id(player->GetID());
@@ -229,8 +229,8 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, socka
 	RecvData.ParseFromArray(_data, _size);
 	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
-	player->SetTransform(playerTransform);
+	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 
 	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_NOTIFY_PLAYER_TRANSFORM, RecvData.SerializeAsString(), true);
