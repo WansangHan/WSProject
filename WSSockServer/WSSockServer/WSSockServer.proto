@@ -26,3 +26,9 @@ message ObjectTransform
 	float _scale = 3;
 	float _speed = 4;
 }
+
+message CollisionNotify
+{
+	int32 smallplayerid = 1;
+	int32 bigerplayerid = 2;
+}

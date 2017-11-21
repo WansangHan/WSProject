@@ -13,7 +13,7 @@ CCalculateServer::~CCalculateServer()
 {
 }
 
-// IOCP 서버에서 EPOLL 서버로 접속
+// 동기화 서버에서 연산 서버로 접속
 void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _udpPort, int _epfd)
 {
 	m_TCPSocket = std::make_shared<CTCPSocket>();
@@ -40,7 +40,7 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, m_TCPSocket->GetSOCKET(), &event_tcp);
 
-	// IOCP 서버에 IOCP 서버 접속을 알림
+	// 연산 서버에 접속을 알림
 	SendToCalculateServer(SendPacketType::SD_SYNCSERVER_ENTER, "", true);
 
 	memset(m_UDPSockAddr.get(), 0, sizeof(m_UDPSockAddr.get()));
@@ -61,7 +61,7 @@ void CCalculateServer::InitCalculateServer(const char* _ip, int _tcpPort, int _u
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, m_UDPSocket->GetSOCKET(), &event_udp);
 }
 
-// EPOLL 서버에 패킷을 전송하는 함수
+// 연산 서버에 패킷을 전송하는 함수
 void CCalculateServer::SendToCalculateServer(SendPacketType type, std::string str, bool isTCP)
 {
 	if(isTCP)

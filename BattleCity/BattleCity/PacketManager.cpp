@@ -46,14 +46,15 @@ void CPacketManager::InitFunctionmap()
 {
 	// std::map에 패킷 타입에 따른 함수포인터를 적용하는 부분
 	// IOCP -> CLIENT
-	map_function.insert(std::make_pair(RC_ENTER_SERVER, std::bind(&CGameManager::EnterPlayer, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
-	map_function.insert(std::make_pair(RC_SUCCESS_SYNC_CONNECT, std::bind(&CGameManager::SyncConnectSuccess, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	map_function.insert(std::make_pair(RC_ENTER_SYNC_SERVER, std::bind(&CGameManager::EnterPlayer, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	map_function.insert(std::make_pair(RC_SUCCESS_CALC_CONNECT, std::bind(&CGameManager::SyncConnectSuccess, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_SUCCESS_SYNC_UDP, std::bind(&CNetworkManager::SetisEPOLUDPSuccessTrue, &CNetworkManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_EXIT_PLAYER, std::bind(&CGameManager::ExitPlayer, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_PLAYER_POSITION_SCALE, std::bind(&CGameManager::SetPlayerPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_AIOBJECT_POSITION_SCALE, std::bind(&CGameManager::SetAIObjectPositionScale, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	map_function.insert(std::make_pair(RC_DEATH_NOTIFY, std::bind(&CGameManager::DeathNotify, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	// EPOLL -> CLIENT
-	map_function.insert(std::make_pair(RC_SUCCESS_CALC_CONNECT, std::bind(&CGameManager::CompleteConnect, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
+	map_function.insert(std::make_pair(RC_SUCCESS_CALC_TCP, std::bind(&CGameManager::CompleteConnect, &CGameManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 	map_function.insert(std::make_pair(RC_SUCCESS_CALC_UDP, std::bind(&CNetworkManager::SetisIOCPUDPSuccessTrue, &CNetworkManager::getInstance(), std::placeholders::_1, std::placeholders::_2)));
 }
 

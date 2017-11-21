@@ -76,9 +76,9 @@ __global__ void CalculateCollision(ObjectTransform o1, ObjectTransform o2, bool*
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-	float Distance2 = pow(o2.m_vectorX - o1.m_vectorX, 2) + pow(o2.m_vectorY - o1.m_vectorY, 2);
+	float Distance = sqrt(pow(o2.m_vectorX - o1.m_vectorX, 2) + pow(o2.m_vectorY - o1.m_vectorY, 2));
 
-	iscollision[tid] = Distance2 < pow((o1.m_scale + o2.m_scale) * 0.5, 2);
+	iscollision[tid] = Distance + (o1.m_scale * 0.5) < (o2.m_scale * 0.5);
 }
 
 // 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
@@ -121,18 +121,37 @@ void CCalculating::CalculateAll()
 				// 자기 자신과의 충돌 연산이 아니라면
 				if (OutterPr.first != InnerPr.first)
 				{
+					CPlayer smallPlayer;
+					CPlayer bigerPlayer;
+
+					// 작은 오브젝트와 큰 오브젝트 구별
+					if (InnerPr.second->GetTransform().get()->m_scale > OutterPr.second->GetTransform().get()->m_scale)
+					{
+						smallPlayer = *OutterPr.second.get();
+						bigerPlayer = *InnerPr.second.get();
+					}
+					else
+					{
+						smallPlayer = *InnerPr.second.get();
+						bigerPlayer = *OutterPr.second.get();
+					}
+
 					bool iscollision = false;
 					bool* temp;
 					cudaMalloc((void**)&temp, sizeof(bool) * 1);
 					cudaMemcpy(temp, &iscollision, sizeof(bool), cudaMemcpyHostToDevice);
-					CalculateCollision << <1, 1 >> > (*(OutterPr.second->GetCurTransform().get()), *(InnerPr.second->GetCurTransform().get()), temp);
+					CalculateCollision << <1, 1 >> > (*(smallPlayer.GetCurTransform().get()), *(bigerPlayer.GetCurTransform().get()), temp);
 					cudaMemcpy(&iscollision, temp, sizeof(bool), cudaMemcpyDeviceToHost);
 					cudaFree(temp);
 
 					// 충돌 시
 					if (iscollision)
 					{
-
+						WSSockServer::CollisionNotify SendData;
+						SendData.set_smallplayerid(smallPlayer.GetID());
+						SendData.set_bigerplayerid(bigerPlayer.GetID());
+						// Sync 서버에게 충돌이 일어난 오브젝트를 알림
+						CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_COLLISION_NOTIFY, SendData.SerializeAsString(), true);
 					}
 				}
 			}
@@ -149,7 +168,7 @@ void CCalculating::InitCalculating()
 	m_calculate_Thread = std::unique_ptr<std::thread>(new std::thread([&]() { this->CalculateAll(); }));
 }
 
-// 오브젝트들의 시작 위치를 정해서 IOCP로 보내준다
+// 오브젝트들의 시작 위치를 정해서 동기화 서버로 보내준다
 void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::ObjectInformation RecvData;
@@ -172,7 +191,7 @@ void CCalculating::SetStartingPosition(std::shared_ptr<CBaseSocket> _sock, socka
 	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_AI_STARTING, SendData.SerializeAsString(), true);
 }
 
-// 플레이어 접속 시 EPOLL 서버에도 클라이언트 정보를 저장 및 시작 좌표 리턴
+// 플레이어 접속 시 연산 서버에도 클라이언트 정보를 저장 및 시작 좌표 리턴
 void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _addr, char* _data, int _size)
 {
 	WSSockServer::PlayerInformation RecvData;
@@ -201,7 +220,7 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _
 	SendData.set_allocated__position(pos);
 	SendData.set__scale(scale);
 	SendData.set__speed(speed);
-	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_EPOLL, SendData.SerializeAsString(), true);
+	CSyncServer::getInstance().SendToSyncServer(SendPacketType::SD_ENTER_PLAYER_CALC, SendData.SerializeAsString(), true);
 }
 
 // 플레이어 변수에 소켓 적용
@@ -214,7 +233,7 @@ void CCalculating::ApplyPlayerSocket(std::shared_ptr<CBaseSocket> _sock, sockadd
 
 	player->SetSocket(_sock);
 
-	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CALC_CONNECT, "", nullptr, true);
+	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CALC_TCP, "", nullptr, true);
 }
 
 // 플레이어 변수에 UDP 어드레스 적용

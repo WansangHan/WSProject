@@ -120,7 +120,7 @@ void CGameManager::EnterGame(int _id, std::string _name)
 	m_playManager->EnterGame(_id, _name);
 }
 
-// IOCP 서버에 접속 성공 시
+// 동기화 서버에 접속 성공 시
 void CGameManager::SyncConnectSuccess(char * _data, int _size)
 {
 	BattleCity::ObjectInformation SendData;
@@ -158,4 +158,10 @@ void CGameManager::SetPlayerPositionScale(char* _data, int _size)
 void CGameManager::SetAIObjectPositionScale(char * _data, int _size)
 {
 	m_playManager->SetAIObjectPositionScale(_data, _size);
+}
+
+// 자기 자신 사망, 게임 종료처리
+void CGameManager::DeathNotify(char * _data, int _size)
+{
+	SendMessage(m_hwnd, WM_DESTROY, 0, 0);
 }

@@ -85,7 +85,8 @@ void CPacketManager::InitFunctionmap()
 	map_function.insert(std::make_pair(RecvPacketType::RC_POSITION_SCALE, std::bind(&CInGame::ApplyPlayerPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 	// IOCP -> EPOLL
 	map_function.insert(std::make_pair(RecvPacketType::RC_AI_STARTING, std::bind(&CInGame::ApplyAIObjectPositionScale, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
-	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_EPOLL, std::bind(&CInGame::SuccessEnterEpoll, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_ENTER_PLAYER_CALC, std::bind(&CInGame::SuccessEnterCalc, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+	map_function.insert(std::make_pair(RecvPacketType::RC_COLLISION_NOTIFY, std::bind(&CInGame::CollisionNotify, &CInGame::getInstance(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 #endif
 }
 

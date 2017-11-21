@@ -204,7 +204,7 @@ void CIOCP::ProcessAccept(AcceptOverlapped* ovrlap)
 // Client Disconnect 시 후처리
 void CIOCP::ProcessDisconnect(DisconnectOverlapped* ovrlap)
 {
-	// EPOLL 서버일 경우
+	// 동기화 서버일 경우
 	if (ovrlap->m_sock->GetSOCKET() == CSyncServer::getInstance().GetTCPSocket()->GetSOCKET())
 	{
 		CLogManager::getInstance().WriteLogMessage("WARN", true, "SyncServer Server Exit");
