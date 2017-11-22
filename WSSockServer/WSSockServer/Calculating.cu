@@ -76,9 +76,9 @@ __global__ void CalculateCollision(ObjectTransform o1, ObjectTransform o2, bool*
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-	float Distance = sqrt(pow(o2.m_vectorX - o1.m_vectorX, 2) + pow(o2.m_vectorY - o1.m_vectorY, 2));
+	float Distance = pow(o2.m_vectorX - o1.m_vectorX, 2) + pow(o2.m_vectorY - o1.m_vectorY, 2);
 
-	iscollision[tid] = Distance + (o1.m_scale * 0.5) < (o2.m_scale * 0.5);
+	iscollision[tid] = Distance < pow((o2.m_scale * 0.5) - (o1.m_scale * 0.5), 2);
 }
 
 // 플레이어 아이디와 매칭되는 Player 클래스 변수를 찾는 함수
