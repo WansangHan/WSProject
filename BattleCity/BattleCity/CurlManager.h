@@ -6,7 +6,7 @@
 #include <curl/curl.h>
 #pragma comment(lib, "wldap32.lib")
 #pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "libcurld.lib")
+#pragma comment(lib, "libcurl.lib")
 #include "LogManager.h"
 #include <memory>
 #include <thread>

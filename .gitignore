@@ -51,13 +51,14 @@ WSSockServer/WSSockServer/linuxBuild/
 WSSockServer/.vs/
 
 BattleCity/ipch/
-BattleCity/curl-7.54.0/
+BattleCity/curl-7.56.1/
 BattleCity/jsoncpp-src-0.5.0/
 BattleCity/protobuf-3.3.0/
 BattleCity/BattleCity/Debug
 BattleCity/Debug
 BattleCity/BattleCity/logs
 BattleCity/.vs/
+BattleCity/BattleCity/x64/
 
 www/system/
 www/application/language/

@@ -1,6 +1,6 @@
 #ifndef GAMEMANAGER_H
 #define GAMEMANAGER_H
-#pragma comment(lib, "libprotobufd")
+#pragma comment(lib, "libprotobuf")
 #include "LogManager.h"
 #include "NetworkManager.h"
 #include "PacketManager.h"
