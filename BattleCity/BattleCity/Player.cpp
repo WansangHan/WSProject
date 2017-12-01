@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
-
+#include "BattleCity.pb.h"
+#include "PacketManager.h"
 
 CPlayer::CPlayer()
 {

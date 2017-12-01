@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CurlManager.h"
+#include "LogManager.h"
 
 std::unique_ptr<CCurlManager> CCurlManager::m_inst;
 std::once_flag CCurlManager::m_once;

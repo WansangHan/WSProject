@@ -1,7 +1,6 @@
 #ifndef COMMONUISCENE_H
 #define COMMONUISCENE_H
 #include "UIScene.h"
-#include "UIManager.h"
 
 class CCommonUIScene : public CUIScene
 {

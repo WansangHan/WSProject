@@ -5,13 +5,7 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 #include <thread>
-#include "LogManager.h"
-#include "GameManager.h"
-#include "PacketManager.h"
-
-class CGameManager;
-class CPacketManager;
-enum SendPacketType;
+#include <mutex>
 
 class CNetworkManager
 {

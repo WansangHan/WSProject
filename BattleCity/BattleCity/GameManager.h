@@ -1,9 +1,5 @@
 #ifndef GAMEMANAGER_H
 #define GAMEMANAGER_H
-#pragma comment(lib, "libprotobuf")
-#include "LogManager.h"
-#include "NetworkManager.h"
-#include "PacketManager.h"
 #include "UIManager.h"
 #include "PlayManager.h"
 
@@ -14,10 +10,6 @@ enum GameState
 	LODDING,
 	PLAY,
 };
-
-class CNetworkManager;
-class CUIManager;
-class CPlayManager;
 
 class CGameManager
 {

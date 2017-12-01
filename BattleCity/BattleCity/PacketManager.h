@@ -1,16 +1,8 @@
 #ifndef PACKETMANAGER_H
 #define PACKETMANAGER_H
-#include <list>
-#include <thread>
-#include <mutex>
-#include <map>
-#include <vector>
-#include <functional>
-#include <Windows.h>
 #include <concurrent_queue.h>
-#include "LogManager.h"
+#include "NetworkManager.h"
 #include "GameManager.h"
-#include "BattleCity.pb.h"
 
 enum RecvPacketType
 {

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FileManager.h"
 #include <iostream>
+#include <memory>
 
 CFileManager::CFileManager()
 {

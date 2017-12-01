@@ -1,15 +1,8 @@
 #ifndef CURLMANAGER_H
 #define CURLMANAGER_H
-#pragma comment(lib, "json_vc71_libmtd")
 #include <json/json.h>
 #define CURL_STATICLIB
 #include <curl/curl.h>
-#pragma comment(lib, "wldap32.lib")
-#pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "libcurl.lib")
-#include "LogManager.h"
-#include <memory>
-#include <thread>
 #include <mutex>
 struct strres {
 	char *ptr;

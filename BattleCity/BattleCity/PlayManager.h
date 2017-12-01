@@ -1,11 +1,9 @@
 #ifndef PLAYMANAGER_H
 #define PLAYMANAGER_H
 #include <list>
-#include "PacketManager.h"
 #include "Player.h"
 #include "AIObject.h"
 
-class CGameManager;
 class CPlayer;
 class CAIObject;
 

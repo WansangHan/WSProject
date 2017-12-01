@@ -1,13 +1,7 @@
 #ifndef LOGMANAGER_H
 #define LOGMANAGER_H
-#include "FileManager.h"
-#include "CurlManager.h"
-#include <memory>
-#include <thread>
 #include <mutex>
-
-class CFileManager;
-class CCurlManager;
+#include "FileManager.h"
 
 class CLogManager
 {

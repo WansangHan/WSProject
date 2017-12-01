@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "NetworkManager.h"
+#include "BattleCity.pb.h"
+#include "GameManager.h"
+#include "PacketManager.h"
+#include "LogManager.h"
 
 std::unique_ptr<CNetworkManager> CNetworkManager::m_inst;
 std::once_flag CNetworkManager::m_once;
@@ -90,6 +94,8 @@ void CNetworkManager::NotifyUDPSocket()
 			if (this->GetisIOCPUDPSuccess() && this->GetisEPOLUDPSuccess())
 				return;
 			Sleep(1000);
+
+			CLogManager::getInstance().WriteLogMessage("INFO", true, "UDP Send Retry");
 		}
 	}));
 }

@@ -1,5 +1,10 @@
 #include "stdafx.h"
 #include "GameManager.h"
+#include "BattleCity.pb.h"
+#include "NetworkManager.h"
+#include "PacketManager.h"
+#include "CurlManager.h"
+#include "LogManager.h"
 
 std::unique_ptr<CGameManager> CGameManager::m_inst;
 std::once_flag CGameManager::m_once;

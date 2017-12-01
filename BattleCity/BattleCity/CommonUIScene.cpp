@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CommonUIScene.h"
+#include "UIManager.h"
 
 extern HINSTANCE hInst;
 

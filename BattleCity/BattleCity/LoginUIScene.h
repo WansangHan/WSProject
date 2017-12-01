@@ -1,7 +1,6 @@
 #ifndef LOGINUISCENE_H
 #define LOGINUISCENE_H
 #include "UIScene.h"
-#include "UIManager.h"
 // 회원가입 관련 TextBox 문자열 제한 길이
 #define MAX_NEWACCOUNT_ID_LENGTH 20
 #define MAX_NEWACCOUNT_PW_LENGTH 20

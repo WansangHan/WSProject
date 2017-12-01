@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "LoginUIScene.h"
+#include <json\json.h>
+#include <atlstr.h>
+#include "GameManager.h"
+#include "CurlManager.h"
 
 extern HINSTANCE hInst;
 

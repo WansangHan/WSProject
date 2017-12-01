@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "PacketManager.h"
+#include "GameManager.h"
+#include "LogManager.h"
 
 std::unique_ptr<CPacketManager> CPacketManager::m_inst;
 std::once_flag CPacketManager::m_once;

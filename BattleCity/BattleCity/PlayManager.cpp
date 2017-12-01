@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "PlayManager.h"
+#include "BattleCity.pb.h"
+#include "LogManager.h"
+#include "PacketManager.h"
 
 
 CPlayManager::CPlayManager()

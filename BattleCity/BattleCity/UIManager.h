@@ -1,14 +1,8 @@
 #pragma once
 #include <functional>
 #include <map>
-#include <atlstr.h>
 #include "CommonUIScene.h"
 #include "LoginUIScene.h"
-#include "GameManager.h"
-#include "LogManager.h"
-
-class CCommonUIScene;
-class CLoginUIScene;
 
 // Scene ป๓ลย enum
 enum SceneState
