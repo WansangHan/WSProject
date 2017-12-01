@@ -126,14 +126,14 @@ void CGameManager::SyncConnectSuccess(char * _data, int _size)
 	BattleCity::ObjectInformation SendData;
 	SendData.set__id(m_playManager->GetOwnPlayer()->GetID());
 	CPacketManager::getInstance().SendPacketToServer(SendPacketType::SD_ENTER_CALC_SERVER, SendData.SerializeAsString(), true, true);
-
-	CNetworkManager::getInstance().NotifyUDPSocket();
 }
 
 // EPOLL 서버에도 접속이 완료 되면, 플레이로 전환
 void CGameManager::CompleteConnect(char * _data, int _size)
 {
 	m_gameState = PLAY;
+
+	CNetworkManager::getInstance().NotifyUDPSocket();
 }
 
 // 플레이어가 들어왔을 때
