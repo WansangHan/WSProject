@@ -6,5 +6,5 @@ LINK_DIRECTORIES(/mnt/hgfs/WSProject/WSSockServer/protobuf-3.3.0/cmake/Build_Ret
 INCLUDE_DIRECTORIES(/usr/local/include/boost)
 LINK_DIRECTORIES(/usr/local/include/boost)
 project(WSSockServer)
-ADD_EXECUTABLE(WSSockServer LogManager.cpp FileManager.cpp SqlManager.cpp EPOLL.cpp stdafx.cpp WSSockServer.cpp PacketManager.cpp WSSockServer.pb.cc  Player.cpp AIObject.cpp InGame.cpp CalculateServer.cpp TCPSocket.cpp UDPSocket.cpp)
+ADD_EXECUTABLE(WSSockServer LogManager.cpp FileManager.cpp SqlManager.cpp EPOLL.cpp stdafx.cpp WSSockServer.cpp PacketManager.cpp WSSockServer.pb.cc  Player.cpp AIObject.cpp InGame.cpp CalculateServer.cpp TCPSocket.cpp UDPSocket.cpp BaseObject.cpp)
 TARGET_LINK_LIBRARIES(WSSockServer libgmock_main.a libprotobuf.a libprotobuf-lite.a libprotoc.a)

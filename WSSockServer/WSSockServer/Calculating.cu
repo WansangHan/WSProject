@@ -208,8 +208,8 @@ void CCalculating::EnterPlayer(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _
 	player->SetID(RecvData._id());
 
 	ObjectTransform playerTransform(vectorX, vectorY, scale, speed, ObjectDirection::IDLE);
-	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
-	player->SetCurTransform(&playerTransform, sizeof(ObjectTransform));
+	player->SetTransform(playerTransform);
+	player->SetCurTransform(playerTransform);
 	player->SetLastGetTickCount(GetTickCount());
 
 	m_players.insert(std::map<int, std::shared_ptr<CPlayer>>::value_type(player->GetID(), player));
@@ -268,8 +268,8 @@ void CCalculating::ApplyPlayerTrasform(std::shared_ptr<CBaseSocket> _sock, socka
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
 	player->SetLastGetTickCount(GetTickCount());
 	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
-	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
-	player->SetCurTransform(&playerTransform, sizeof(ObjectTransform));
+	player->SetTransform(playerTransform);
+	player->SetCurTransform(playerTransform);
 }
 
 // 증가한 플레이어의 크기 적용
@@ -282,5 +282,5 @@ void CCalculating::IncreaseScale(std::shared_ptr<CBaseSocket> _sock, sockaddr_in
 
 	std::shared_ptr<ObjectTransform> temp = player->GetTransform();
 	temp->m_scale = RecvData._increase();
-	player->SetTransform(temp.get(), sizeof(ObjectTransform));
+	player->SetTransform(*temp.get());
 }

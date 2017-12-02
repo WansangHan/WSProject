@@ -176,7 +176,7 @@ void CInGame::SuccessEnterCalc(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _
 	CPacketManager::getInstance().SendPacketToServer(player->GetSocket(), SendPacketType::SD_SUCCESS_CALC_CONNECT, "", nullptr, true);
 
 	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), ObjectDirection::IDLE);
-	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
+	player->SetTransform(playerTransform);
 
 	WSSockServer::ObjectPosition* pos = new WSSockServer::ObjectPosition;
 	pos->set__id(player->GetID());
@@ -232,7 +232,7 @@ void CInGame::ApplyPlayerPositionScale(std::shared_ptr<CBaseSocket> _sock, socka
 	
 	std::shared_ptr<CPlayer> player = FindPlayerToID(RecvData._position()._id());
 	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
-	player->SetTransform(&playerTransform, sizeof(ObjectTransform));
+	player->SetTransform(playerTransform);
 	SendToAllPlayer(SendPacketType::SD_PLAYER_POSITION_SCALE, RecvData.SerializeAsString(), nullptr, true);
 
 	CCalculateServer::getInstance().SendToCalculateServer(SendPacketType::SD_NOTIFY_PLAYER_TRANSFORM, RecvData.SerializeAsString(), true);
@@ -283,7 +283,7 @@ void CInGame::CollisionNotify(std::shared_ptr<CBaseSocket> _sock, sockaddr_in _a
 	{
 		std::shared_ptr<ObjectTransform> temp = bigerPlayer->GetTransform();
 		temp->m_scale += smallPlayer->GetTransform()->m_scale;
-		bigerPlayer->SetTransform(temp.get(), sizeof(ObjectTransform));
+		bigerPlayer->SetTransform(*temp.get());
 
 		WSSockServer::IncreaseScale SendData;
 		SendData.set__id(bigerPlayer->GetID());

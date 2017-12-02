@@ -1,11 +1,6 @@
 #ifndef AIOBJECT_H
 #define AIOBJECT_H
-#include <mutex>
-#ifdef IOCP_SERVER
-#include "Calculating.cuh"
-#else
-#include "InGame.h"
-#endif
+#include "BaseObject.h"
 
 struct ObjectTransform;
 
