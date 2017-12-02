@@ -4,42 +4,6 @@
 #include "Player.h"
 #include "AIObject.h"
 
-class CPlayer;
-class CAIObject;
-
-// 오브젝트 방향 상태값
-enum class ObjectDirection : int
-{
-	IDLE = 100,
-	UPUP,
-	LEFT,
-	RGHT,
-	DOWN,
-	UPLE,
-	UPRG,
-	DWLE,
-	DWRG,
-};
-
-// 오브젝트 Transform
-struct ObjectTransform
-{
-	float m_vectorX;
-	float m_vectorY;
-	float m_scale;
-	float m_speed;
-	ObjectDirection m_dir;
-	ObjectTransform() {}
-	ObjectTransform(float _vectorX, float _vectorY, float _scale, float _speed, ObjectDirection _dir)
-	{
-		m_vectorX = _vectorX;
-		m_vectorY = _vectorY;
-		m_scale = _scale;
-		m_speed = _speed;
-		m_dir = _dir;
-	}
-};
-
 class CPlayManager
 {
 	std::shared_ptr<CPlayer> m_ownPlayer;		// 클라이언트가 플레이하는 CPlayer 클래스 변수

@@ -32,14 +32,14 @@ void CPlayManager::InitPlayerManager()
 
 void CPlayManager::PaintPlay(HWND _hwnd, HDC _hdc)
 {
-	m_ownPlayer->PaintPlayer(_hwnd, _hdc);
+	m_ownPlayer->PaintObject(_hwnd, _hdc);
 	for (auto Pr : m_otherPlayer)
 	{
-		Pr->PaintPlayer(_hwnd, _hdc);
+		Pr->PaintObject(_hwnd, _hdc);
 	}
 	for (auto Ao : m_AIObjects)
 	{
-		Ao->PaintAIObject(_hwnd, _hdc);
+		Ao->PaintObject(_hwnd, _hdc);
 	}
 }
 
@@ -98,7 +98,7 @@ void CPlayManager::SetPlayerPositionScale(char * _data, int _size)
 	BattleCity::ObjectTransform RecvData;
 	RecvData.ParseFromArray(_data, _size);
 
-	std::shared_ptr<ObjectTransform> playerTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	ObjectTransform playerTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	// 자기 자신에 대한 위치 정보라면
 	if (m_ownPlayer->GetID() == RecvData._position()._id())
 	{
@@ -125,11 +125,12 @@ void CPlayManager::SetAIObjectPositionScale(char * _data, int _size)
 	BattleCity::ObjectTransform RecvData;
 
 	RecvData.ParseFromArray(_data, _size);
-	std::shared_ptr<ObjectTransform> aiObjectTransform = std::make_shared<ObjectTransform>(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
+	ObjectTransform aiObjectTransform(RecvData._position()._vectorx(), RecvData._position()._vectory(), RecvData._scale(), RecvData._speed(), (ObjectDirection)RecvData._dir());
 	
 	std::shared_ptr<CAIObject> aiObject = std::make_shared<CAIObject>();
 	aiObject->SetID(RecvData._position()._id());
 	aiObject->SetTransform(aiObjectTransform);
+	aiObject->SetCurTransform(aiObjectTransform);
 
 	m_AIObjects.push_back(aiObject);
 }
