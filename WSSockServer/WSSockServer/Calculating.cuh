@@ -1,24 +1,17 @@
 #ifndef CALCULATING_H
 #define CALCULATING_H
-#include <stdlib.h>
-#pragma comment(lib, "tbb")
-#pragma comment(lib, "tbbmalloc")
+#include <mutex>
 #include <tbb/concurrent_hash_map.h>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
-#include <cuda_runtime.h>
-#include "PacketManager.h"
+#include "BaseSocket.h"
 #include "Player.h"
-#include "AIObject.h"
 
 #ifdef __cplusplus 
 extern "C"
 {//<-- extern 시작
 #endif
-
-	enum class SendPacketType : int;
 	class CPlayer;
-	class CAIObject;
 
 	// 플레이어 방향 상태값
 	enum class ObjectDirection : int

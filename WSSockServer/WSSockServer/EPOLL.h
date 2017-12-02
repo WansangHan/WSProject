@@ -4,13 +4,10 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
-#include "LogManager.h"
-#include "BaseSocket.h"
+#include <mutex>
+#include <memory>
 #include "TCPSocket.h"
 #include "UDPSocket.h"
-#include "PacketManager.h"
-#include "InGame.h"
-#include "CalculateServer.h"
 
 class CEPOLL
 {

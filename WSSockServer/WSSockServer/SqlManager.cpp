@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "SqlManager.h"
+#include <mutex>
+#include "LogManager.h"
 
 
 CSqlManager::CSqlManager()

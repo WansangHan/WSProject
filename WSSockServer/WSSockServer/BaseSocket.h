@@ -8,7 +8,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #endif
-#include "LogManager.h"
 
 // TCP, UDP 소켓의 부모 클래스
 class CBaseSocket
@@ -31,7 +30,12 @@ public:
 
 	void CloseSocket()
 	{
+#ifdef IOCP_SERVER
 		closesocket(m_socket);
+#else
+		close(m_socket);
+#endif
+		
 	}
 
 #ifdef IOCP_SERVER

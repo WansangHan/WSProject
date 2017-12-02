@@ -11,6 +11,14 @@
 #ifdef IOCP_SERVER
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "mswsock.lib")
+#pragma comment(lib, "tbb")
+#pragma comment(lib, "tbbmalloc")
+#pragma comment(lib, "libprotobufd")
+#pragma comment(lib, "libmysql.lib")
+#pragma comment(lib, "cuda")
+#pragma comment(lib, "cudart")
+#pragma comment(lib, "cublas")
+#pragma comment(lib, "cufft")
 
 #include "targetver.h"
 

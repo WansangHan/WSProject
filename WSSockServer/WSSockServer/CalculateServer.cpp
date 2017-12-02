@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "CalculateServer.h"
+#include <sys/epoll.h>
+#include "TCPSocket.h"
+#include "UDPSocket.h"
+#include "LogManager.h"
 
 std::unique_ptr<CCalculateServer> CCalculateServer::m_inst;
 std::once_flag CCalculateServer::m_once;

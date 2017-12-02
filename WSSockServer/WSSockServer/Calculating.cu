@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "Calculating.cuh"
 #include <cuda.h>
-#include <iostream>
 #include <cufft.h>
 #include <cublas_v2.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cuda_runtime.h>
+#include "LogManager.h"
+#include "SyncServer.h"
+#include "PacketManager.h"
+#include "WSSockServer.pb.h"
 
 std::unique_ptr<CCalculating> CCalculating::m_inst;
 std::once_flag CCalculating::m_once;

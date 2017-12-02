@@ -1,8 +1,6 @@
 #ifndef CALCULATESERVER_H
 #define CALCULATESERVER_H
 #include "PacketManager.h"
-#include "TCPSocket.h"
-#include "UDPSocket.h"
 
 enum class SendPacketType : int;
 

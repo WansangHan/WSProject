@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SyncServer.h"
+#include "LogManager.h"
 
 std::unique_ptr<CSyncServer> CSyncServer::m_inst;
 std::once_flag CSyncServer::m_once;

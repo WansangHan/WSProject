@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "EPOLL.h"
+#include "LogManager.h"
+#include "PacketManager.h"
 
 std::unique_ptr<CEPOLL> CEPOLL::m_inst;
 std::once_flag CEPOLL::m_once;

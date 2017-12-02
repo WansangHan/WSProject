@@ -1,6 +1,11 @@
 #ifndef AIOBJECT_H
 #define AIOBJECT_H
-#include "PacketManager.h"
+#include <mutex>
+#ifdef IOCP_SERVER
+#include "Calculating.cuh"
+#else
+#include "InGame.h"
+#endif
 
 struct ObjectTransform;
 

@@ -1,13 +1,11 @@
 #ifndef LOGMANAGER_H
 #define LOGMANAGER_H
-#include "SqlManager.h"
-#include "FileManager.h"
-#include <memory>
-#include <thread>
 #include <mutex>
-
-class CSqlManager;
-class CFileManager;
+#ifndef IOCP_SERVER
+#include <memory>
+#endif
+#include "FileManager.h"
+#include "SqlManager.h"
 
 class CLogManager
 {

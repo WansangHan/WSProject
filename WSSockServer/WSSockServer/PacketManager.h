@@ -1,27 +1,21 @@
 #ifndef PACKETMANAGER_H
 #define PACKETMANAGER_H
-#include <list>
-#include <thread>
-#include <mutex>
-#include <map>
-#include <vector>
-#include <functional>
 #ifdef IOCP_SERVER
 #include <concurrent_queue.h>
 #else
 #include "SafeQueue.h"
 #endif
-#include "LogManager.h"
+#include <functional>
+#include <map>
+#include <thread>
+#include "BaseSocket.h"
 #ifdef IOCP_SERVER
-#include "IOCP.h"
-#include "SyncServer.h"
 #include "Calculating.cuh"
+#include "SyncServer.h"
 #else
-#include "EPOLL.h"
-#include "CalculateServer.h"
 #include "InGame.h"
+#include "CalculateServer.h"
 #endif
-#include "WSSockServer.pb.h"
 
 enum class SendPacketType : int
 {

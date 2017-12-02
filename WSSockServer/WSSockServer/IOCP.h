@@ -1,13 +1,9 @@
 #ifndef IOCP_H
 #define IOCP_H
-#pragma comment(lib, "libprotobufd")
-#include <WinSock2.h>
-#include <windows.h>
-#include <iostream>
+#include <mutex>
+#include <winsock2.h>
 #include <mswsock.h>
 #include "Overlapped.h"
-#include "LogManager.h"
-#include "PacketManager.h"
 #include "TCPSocket.h"
 #include "UDPSocket.h"
 

@@ -1,6 +1,9 @@
 #ifndef INGAME_H
 #define INGAME_H
+#include <mutex>
+#include <memory>
 #include "PacketManager.h"
+#include "BaseSocket.h"
 #include "Player.h"
 #include "AIObject.h"
 

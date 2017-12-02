@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "FileManager.h"
+#include <mutex>
 #include <iostream>
+#ifndef IOCP_SERVER
+#include <memory>
+#endif
 
 CFileManager::CFileManager()
 {

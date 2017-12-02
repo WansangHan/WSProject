@@ -1,5 +1,11 @@
 #include "stdafx.h"
 #include "PacketManager.h"
+#include "LogManager.h"
+#ifdef IOCP_SERVER
+#include "IOCP.h"
+#else
+#include "EPOLL.h"
+#endif
 
 std::unique_ptr<CPacketManager> CPacketManager::m_inst;
 std::once_flag CPacketManager::m_once;

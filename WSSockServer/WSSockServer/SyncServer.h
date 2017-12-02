@@ -1,8 +1,6 @@
 #ifndef SYNCSERVER_H
 #define SYNCSERVER_H
 #include "PacketManager.h"
-#include "TCPSocket.h"
-#include "UDPSocket.h"
 
 enum class SendPacketType : int;
 

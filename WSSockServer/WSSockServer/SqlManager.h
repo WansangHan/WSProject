@@ -1,14 +1,10 @@
 #ifndef SQLMANAGER_H
 #define SQLMANAGER_H
-#pragma comment(lib, "libmysql.lib")
 #include <my_global.h>
 #include <mysql.h>
 #undef min
 #undef max
 #undef test
-
-#include <iostream>
-#include "LogManager.h"
 
 class CSqlManager
 {

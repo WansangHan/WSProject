@@ -1,10 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
+#include <mutex>
+#include <string>
 #ifdef IOCP_SERVER
 #include "Calculating.cuh"
 #else
-#include <string>
-#include "BaseSocket.h"
 #include "InGame.h"
 #endif
 

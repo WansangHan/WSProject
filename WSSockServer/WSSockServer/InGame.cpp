@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "InGame.h"
+#include "LogManager.h"
+#include "WSSockServer.pb.h"
 
 std::unique_ptr<CInGame> CInGame::m_inst;
 std::once_flag CInGame::m_once;
